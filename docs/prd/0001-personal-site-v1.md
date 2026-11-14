@@ -78,7 +78,7 @@ Only the shared skills this repo uses are copied in (see `docs/context/skills-so
 ## Delivery
 Tickets (each refined before work starts):
 1. **Scaffold, CI, deploy:** Next.js static export, TypeScript, ESLint, Vitest, Playwright; CI on PRs; deploy to Pages on merge; issue and PR templates; a placeholder home page live.
-2. **Workflow wiring:** labels, project board, branch rules with the checks from ticket 1, Dependabot; commands recorded in AGENTS.md.
+2. **Workflow wiring:** labels, branch rules with the checks from ticket 1, Dependabot; commands recorded in AGENTS.md.
 3. **Design system:** pick a direction with the taste skill; tokens for type, colour, spacing; light and dark; font files and licences. Lives in its own folder, `design-language/` (the decisions and their reasons, plus the token source the site imports).
 4. **Layout shell:** header, navigation, footer, theme toggle, skip link, 404.
 5. **Blog engine:** post loader, front-matter validation, list with tags, post page, RSS, empty state; a test-only fixture post behind a build flag.

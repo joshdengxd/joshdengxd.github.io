@@ -21,7 +21,7 @@ Everything in this repo and on GitHub (code, docs, issues, PRs, commits, comment
 (read by create-ticket, refine-ticket, implement-and-verify-ticket, land-ticket)
 - Tracker: GitHub issues in joshdengxd/joshdengxd.github.io
 - Default branch: main; merge method: squash
-- States: labels `refined`, `in-progress`, `in-review` (Backlog = no state label; Done = closed by the user). Switch to a project board when one exists.
+- States: board "Personal site" (https://github.com/users/joshdengxd/projects/1), field Status: Backlog, Refined, In progress, In review, Done. New tickets are added to the board in Backlog. Done = the user closes the issue (the board's built-in workflow moves it). No state labels.
 - Labels: `ticket`, `prd-NNNN`
 - PRDs: `docs/prd/NNNN-name.md`; ticket drafts: `drafts/tickets/` (git-ignored)
 - Checks: not set yet (ticket 1 records them here)
