@@ -43,12 +43,14 @@ Node 26 (`.nvmrc`). Install: `npm ci`; once per machine for e2e: `npx playwright
 - Build: `npm run build` (static export to `out/`)
 - Dev: `npm run dev` (dev server, http://localhost:3000; routing and 404 differ from Pages)
 - Lint: `npm run lint`
+- Format: `npm run format` (Prettier writes code, config and CSS; `docs/context/code-style.md`)
+- Format check: `npm run format:check` (what CI runs, next to lint)
 - Type check: `npm run typecheck`
 - Unit: `npm test` (Vitest, `tests/unit/`)
 - e2e: `npm run e2e` (builds with the blog test fixture, `BLOG_FIXTURES=1`, through `scripts/run-e2e.mjs fixture`; serves `out/` on port 4173, runs Playwright Chromium, `tests/e2e/`; CI runs this only). It leaves a fixture build in `out/`: never deploy or upload it. `npm run e2e:default` does the same on the default build (no fixture, then `check:fixture`). Specs named `*.fixture.spec.ts` run only on the fixture build, `*.default.spec.ts` only on the default one, all others on both. `npm run e2e:webkit` (fixture build, `E2E_WEBKIT=1`) also runs `menu-sheet.spec.ts` in WebKit, the iPhone Safari engine; local and verification only, not in CI.
 - Fixture guard: `npm run check:fixture` (fails if the blog fixture's slug or title is anywhere in `out/`; run after the default `npm run build`)
 - Run: `npm run build && npm run serve` (serves `out/` on http://localhost:3000, as Pages does; this is what verifiers check)
-- CI: `.github/workflows/checks.yml`, one job `checks` on every PR: lint, type check, unit, default build + fixture guard, e2e on the fixture build, and e2e on the default build. `deploy.yml` runs the same guard after its build.
+- CI: `.github/workflows/checks.yml`, one job `checks` on every PR: lint, format check, type check, unit, default build + fixture guard, e2e on the fixture build, and e2e on the default build. `deploy.yml` runs the same guard after its build.
 
 ## Stack
 Check code against the current docs for these versions before writing or approving it (`current-docs` skill; docs source Context7, id after the colon). Upgrades are their own tickets.
@@ -56,6 +58,9 @@ Check code against the current docs for these versions before writing or approvi
 - React 19.3: reactjs/react.dev
 - TypeScript 5.9: microsoft/typescript
 - ESLint 9.39 + eslint-config-next 16.4.6: eslint/eslint
+- Prettier 3.10: prettier/prettier
+- typescript-eslint 8.72 (`strict` + `stylistic`, not type-checked): typescript-eslint/typescript-eslint
+- eslint-config-prettier 10.1 (`eslint-config-prettier/flat`): prettier/eslint-config-prettier
 - Vitest 5.1 (Vite 8): vitest-dev/vitest
 - Testing Library (react 16.3, dom 10.4, jest-dom 7.0): testing-library/react-testing-library
 - Playwright 1.65: microsoft/playwright

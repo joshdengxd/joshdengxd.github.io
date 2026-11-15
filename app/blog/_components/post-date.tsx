@@ -3,7 +3,9 @@
 import { useSyncExternalStore } from "react";
 import { formatLocalDate, formatUtcDate } from "@/lib/posts/dates";
 
-const subscribe = () => () => {};
+const subscribe = () => () => {
+  // nothing to unsubscribe from: the value never changes after hydration
+};
 
 /**
  * The HTML (and so a reader without JavaScript) has the UTC date. After hydration the text becomes the date in the
@@ -11,6 +13,10 @@ const subscribe = () => () => {};
  * so there is no mismatch and no state set in an effect.
  */
 export function PostDate({ iso }: { iso: string }) {
-  const inBrowser = useSyncExternalStore(subscribe, () => true, () => false);
+  const inBrowser = useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false,
+  );
   return <time dateTime={iso}>{inBrowser ? formatLocalDate(iso) : formatUtcDate(iso)}</time>;
 }

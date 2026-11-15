@@ -27,15 +27,21 @@ export function SiteShell({ children }: { children: ReactNode }) {
   // which changes no path. Back and forward (popstate), Escape and a click or tap outside close it here.
   useEffect(() => {
     const close = () => {
-      if (menu.current) menu.current.open = false;
+      if (menu.current) {
+        menu.current.open = false;
+      }
     };
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== "Escape" || !menu.current?.open) return;
+      if (e.key !== "Escape" || !menu.current?.open) {
+        return;
+      }
       close();
       button.current?.focus();
     };
     const onClick = (e: MouseEvent) => {
-      if (menu.current?.open && e.target instanceof Node && !menu.current.contains(e.target)) close();
+      if (menu.current?.open && e.target instanceof Node && !menu.current.contains(e.target)) {
+        close();
+      }
     };
     window.addEventListener("popstate", close);
     document.addEventListener("keydown", onKeyDown);
@@ -57,11 +63,15 @@ export function SiteShell({ children }: { children: ReactNode }) {
             </Link>
           )}
           <details ref={menu} className={styles.menu}>
-            <summary ref={button} className={styles.menuButton}>Menu</summary>
+            <summary ref={button} className={styles.menuButton}>
+              Menu
+            </summary>
             <div
               className={styles.sheet}
               onClick={(e) => {
-                if (e.target instanceof Element && e.target.closest("a") && menu.current) menu.current.open = false;
+                if (e.target instanceof Element && e.target.closest("a") && menu.current) {
+                  menu.current.open = false;
+                }
               }}
             >
               <NavLinks />

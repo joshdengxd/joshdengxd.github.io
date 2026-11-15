@@ -16,13 +16,17 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const project = findProject((await params).slug);
-  if (!project) return {};
+  if (!project) {
+    return {};
+  }
   return pageMetadata({ title: project.name, description: project.summary, path: projectPath(project.slug) });
 }
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const project = findProject((await params).slug);
-  if (!project) notFound();
+  if (!project) {
+    notFound();
+  }
   return (
     <PageLayout title={project.name} lead={project.summary} longTitle>
       <Section title="Repository">

@@ -13,7 +13,9 @@ describe("/design/ specimen", () => {
     const { container } = render(await DesignPage());
     const rows = container.querySelectorAll("tr[data-pair]");
     expect(rows).toHaveLength(20);
-    for (const row of rows) expect(row.textContent).toMatch(/\d+\.\d\d:1/);
+    for (const row of rows) {
+      expect(row.textContent).toMatch(/\d+\.\d\d:1/);
+    }
     expect(container.textContent).not.toMatch(/fails/);
   });
 

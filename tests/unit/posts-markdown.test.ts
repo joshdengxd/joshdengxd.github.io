@@ -14,7 +14,9 @@ describe("the Markdown pipeline", () => {
   });
 
   it("never outputs raw HTML from the source", async () => {
-    const html = await renderMarkdown('<script>alert(1)</script>\n\n<div onclick="x()">hi</div>\n\nText <img src=x onerror=alert(1)>');
+    const html = await renderMarkdown(
+      '<script>alert(1)</script>\n\n<div onclick="x()">hi</div>\n\nText <img src=x onerror=alert(1)>',
+    );
     expect(html).not.toMatch(/<script|<div|onclick|onerror|<img/);
   });
 
@@ -42,11 +44,17 @@ describe("the Markdown pipeline", () => {
     const ids = [...html.matchAll(/\sid="([^"]*)"/g)].map((m) => m[1]);
     // two references and two back-references, each with exactly one matching id (reference, entry, back-reference)
     expect(hrefs).toHaveLength(4);
-    for (const href of hrefs) expect(ids.filter((id) => id === href)).toHaveLength(1);
-    expect(hrefs).toEqual(expect.arrayContaining(["user-content-fn-1", "user-content-fnref-1", "user-content-fn-note"]));
+    for (const href of hrefs) {
+      expect(ids.filter((id) => id === href)).toHaveLength(1);
+    }
+    expect(hrefs).toEqual(
+      expect.arrayContaining(["user-content-fn-1", "user-content-fnref-1", "user-content-fn-note"]),
+    );
     // prefixed once, never twice; the only other id is the footnote heading that aria-describedby points at
     expect(hrefs.every((v) => /^user-content-(fn|fnref)-[\w-]+$/.test(v))).toBe(true);
-    expect(ids.filter((id) => id !== "footnote-label").every((v) => /^user-content-(fn|fnref)-[\w-]+$/.test(v))).toBe(true);
+    expect(ids.filter((id) => id !== "footnote-label").every((v) => /^user-content-(fn|fnref)-[\w-]+$/.test(v))).toBe(
+      true,
+    );
     expect(html).toContain('aria-describedby="footnote-label"');
     expect(ids).toContain("footnote-label");
     // nothing unsafe came with the footnotes
@@ -60,7 +68,7 @@ describe("the Markdown pipeline", () => {
 });
 
 describe("code highlighting", () => {
-  const block = (lang: string, code = "const a = 1; // note") => "```" + lang + "\n" + code + "\n```";
+  const block = (lang: string, code = "const a = 1; // note") => `\`\`\`${lang}\n${code}\n\`\`\``;
 
   it("highlights a block with a known language with --shiki-token-* variables and no colour value", async () => {
     const html = await renderMarkdown(block("ts"));
@@ -75,7 +83,8 @@ describe("code highlighting", () => {
   });
 
   it.each(HIGHLIGHT_LANGUAGES)("loads %s", async (lang) => {
-    const code = lang === "json" ? '{"a": [1, true, null]}' : lang === "diff" ? "- old\n+ new" : "const a = 1; // note";
+    const samples: Record<string, string> = { json: '{"a": [1, true, null]}', diff: "- old\n+ new" };
+    const code = samples[lang] ?? "const a = 1; // note";
     const html = await renderMarkdown(block(lang, code));
     expect(html).toContain('<pre class="shiki css-variables"');
     expect(html).toContain("var(--shiki-");
@@ -126,13 +135,21 @@ describe("code highlighting", () => {
     const blocks = [...html.matchAll(/<pre\b[\s\S]*?<\/pre>/g)].map((m) => m[0]);
     expect(blocks).toHaveLength(2);
     for (const b of blocks) {
-      const names = new Set([...b.matchAll(/<[a-z]+\s([^>]*)>/g)].flatMap((m) => [...m[1].matchAll(/([a-z-]+)="/g)].map((x) => x[1])));
-      for (const n of names) expect(["class", "style", "tabindex"]).toContain(n);
-      for (const [, v] of b.matchAll(/class="([^"]*)"/g)) expect(v).toMatch(/^(shiki css-variables|line)$/);
+      const names = new Set(
+        [...b.matchAll(/<[a-z]+\s([^>]*)>/g)].flatMap((m) => [...m[1].matchAll(/([a-z-]+)="/g)].map((x) => x[1])),
+      );
+      for (const n of names) {
+        expect(["class", "style", "tabindex"]).toContain(n);
+      }
+      for (const [, v] of b.matchAll(/class="([^"]*)"/g)) {
+        expect(v).toMatch(/^(shiki css-variables|line)$/);
+      }
     }
     // the footnote ids are still the only ids, prefixed once
     const ids = [...html.matchAll(/<[a-z][^>]*?\sid="([^"]*)"/g)].map((m) => m[1]);
-    expect(ids.filter((id) => id !== "footnote-label").every((v) => /^user-content-(fn|fnref)-[\w-]+$/.test(v))).toBe(true);
+    expect(ids.filter((id) => id !== "footnote-label").every((v) => /^user-content-(fn|fnref)-[\w-]+$/.test(v))).toBe(
+      true,
+    );
     expect(ids).toContain("user-content-fn-1");
   });
 
@@ -143,7 +160,7 @@ describe("code highlighting", () => {
   });
 
   it("keeps raw HTML and javascript: links out, with highlighting on", async () => {
-    const html = await renderMarkdown("<script>alert(1)</script>\n\n[x](javascript:alert(1))\n\n" + block("ts"));
+    const html = await renderMarkdown(`<script>alert(1)</script>\n\n[x](javascript:alert(1))\n\n${block("ts")}`);
     expect(html).not.toMatch(/<script|javascript:/i);
     expect(html).toContain("--shiki-token-keyword");
   });

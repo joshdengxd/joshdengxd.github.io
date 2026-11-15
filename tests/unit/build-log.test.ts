@@ -21,7 +21,9 @@ describe("lib/build-log", () => {
       "prod-release-gate",
       "log-analysis",
     ]);
-    for (const { why } of SKILLS_NOT_USED) expect(why.trim().length).toBeGreaterThan(20);
+    for (const { why } of SKILLS_NOT_USED) {
+      expect(why.trim().length).toBeGreaterThan(20);
+    }
   });
 
   it("describes the ticket cycle with the shared skills' names", () => {

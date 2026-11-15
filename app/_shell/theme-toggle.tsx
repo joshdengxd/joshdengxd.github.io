@@ -22,11 +22,15 @@ export function ThemeToggle() {
   // React may reset <html> attributes on a development remount; re-apply the stored choice before paint.
   useLayoutEffect(() => {
     try {
-      if (localStorage.getItem(THEME_KEY) === "light") document.documentElement.setAttribute("data-theme", "light");
+      if (localStorage.getItem(THEME_KEY) === "light") {
+        document.documentElement.setAttribute("data-theme", "light");
+      }
     } catch {}
   }, []);
 
-  if (theme === null) return null;
+  if (theme === null) {
+    return null;
+  }
 
   function toggle() {
     const next: Theme = current() === "light" ? "dark" : "light";

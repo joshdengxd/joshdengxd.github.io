@@ -15,7 +15,9 @@ export const archivo = localFont({
 
 // The code face, used only inside pre/code.
 export const codeFace = localFont({
-  src: [{ path: "../design-language/fonts/jetbrains-mono-latin-wght-normal.woff2", weight: "100 800", style: "normal" }],
+  src: [
+    { path: "../design-language/fonts/jetbrains-mono-latin-wght-normal.woff2", weight: "100 800", style: "normal" },
+  ],
   variable: "--font-code-face",
   display: "swap",
   preload: false,

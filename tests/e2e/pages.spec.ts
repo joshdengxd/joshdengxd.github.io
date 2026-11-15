@@ -35,7 +35,9 @@ test.describe("each page is reachable from the navigation", () => {
       await expect(page).toHaveTitle(`${heading} · Xindong Deng (Josh)`);
       await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
       expect((await page.goto(path))?.status()).toBe(200);
-      expect(await (await request.get("/sitemap.xml")).text()).toContain(`<loc>https://joshdengxd.github.io${path}</loc>`);
+      expect(await (await request.get("/sitemap.xml")).text()).toContain(
+        `<loc>https://joshdengxd.github.io${path}</loc>`,
+      );
       expect(problems).toEqual([]);
     });
   }
@@ -61,7 +63,10 @@ test.describe("projects", () => {
   });
 
   for (const [slug, repo] of Object.entries(REPOS)) {
-    test(`/projects/${slug}/ links its GitHub repo and is indexable with its own metadata`, async ({ page, request }) => {
+    test(`/projects/${slug}/ links its GitHub repo and is indexable with its own metadata`, async ({
+      page,
+      request,
+    }) => {
       const problems = watch(page);
       const res = await page.goto(`/projects/${slug}/`);
       expect(res?.status()).toBe(200);
@@ -82,7 +87,9 @@ test.describe("projects", () => {
 });
 
 test.describe("home", () => {
-  test("the D5 first screen, then Focus, Featured repos and Latest posts on the ground, then the footer line", async ({ page }) => {
+  test("the D5 first screen, then Focus, Featured repos and Latest posts on the ground, then the footer line", async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     const problems = watch(page);
     await page.goto("/");
@@ -94,7 +101,9 @@ test.describe("home", () => {
 
     await expect(page.getByRole("heading", { level: 2 })).toHaveText(["Focus", "Featured repos", "Latest posts"]);
     // The sections start below the first screen, and the footer line ends the page.
-    const focusTop = await page.getByRole("heading", { level: 2, name: "Focus" }).evaluate((el) => el.getBoundingClientRect().top + scrollY);
+    const focusTop = await page
+      .getByRole("heading", { level: 2, name: "Focus" })
+      .evaluate((el) => el.getBoundingClientRect().top + scrollY);
     expect(focusTop).toBeGreaterThanOrEqual(900);
     await expect(page.getByRole("contentinfo").getByRole("link", { name: "GitHub" })).toBeVisible();
     await expect(page.getByRole("contentinfo").getByRole("link", { name: "LinkedIn" })).toBeVisible();
@@ -102,11 +111,15 @@ test.describe("home", () => {
     // Featured repos: the same cards as the Projects index.
     const featured = page.getByRole("region", { name: "Featured repos" });
     await expect(featured.locator("article[data-project]")).toHaveCount(PROJECTS.length);
-    for (const p of PROJECTS) await expect(featured.getByRole("link", { name: p.name })).toHaveAttribute("href", `/projects/${p.slug}/`);
+    for (const p of PROJECTS) {
+      await expect(featured.getByRole("link", { name: p.name })).toHaveAttribute("href", `/projects/${p.slug}/`);
+    }
     expect(problems).toEqual([]);
   });
 
-  test("the home page has no horizontal overflow on a phone and the footer line follows the sections", async ({ page }) => {
+  test("the home page has no horizontal overflow on a phone and the footer line follows the sections", async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/");
     expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBe(0);
@@ -134,14 +147,23 @@ test.describe("placeholders", () => {
 });
 
 test.describe("how this site is built", () => {
-  test("links each part's issue, and its PR when known, for this repo only; names the five unused skills", async ({ page }) => {
+  test("links each part's issue, and its PR when known, for this repo only; names the five unused skills", async ({
+    page,
+  }) => {
     await page.goto("/how-this-site-is-built/");
     await expect(page.getByRole("heading", { level: 2 })).toHaveText(["Workflow", "Parts", "Skills not used here"]);
     await expect(page.getByRole("link", { name: "Issue #2" })).toHaveAttribute("href", `${REPO_URL}/issues/2`);
     await expect(page.getByRole("link", { name: "PR #11" })).toHaveAttribute("href", `${REPO_URL}/pull/11`);
     await expect(page.getByRole("link", { name: "Issue #7" })).toHaveAttribute("href", `${REPO_URL}/issues/7`);
     await expect(page.getByRole("link", { name: "PR #7", exact: true })).toHaveCount(0);
-    for (const skill of ["deploy-to-staging", "run-e2e-automation", "live-env-local-test", "prod-release-gate", "log-analysis"])
+    for (const skill of [
+      "deploy-to-staging",
+      "run-e2e-automation",
+      "live-env-local-test",
+      "prod-release-gate",
+      "log-analysis",
+    ]) {
       await expect(page.getByText(skill, { exact: true })).toBeVisible();
+    }
   });
 });

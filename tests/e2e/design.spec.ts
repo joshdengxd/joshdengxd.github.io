@@ -43,7 +43,9 @@ async function mismatches(page: Page, tokens: Record<string, string>) {
       viaLiteral.style.setProperty(prop, literal);
       const got = getComputedStyle(viaToken).getPropertyValue(prop);
       const want = getComputedStyle(viaLiteral).getPropertyValue(prop);
-      if (!want || got !== want) out.push(`${name}: ${prop} is "${got}", token file gives "${want}"`);
+      if (!want || got !== want) {
+        out.push(`${name}: ${prop} is "${got}", token file gives "${want}"`);
+      }
     }
     box.remove();
     return out;
@@ -94,7 +96,9 @@ test("computed styles on /design/ equal the token file, in both themes", async (
   expect(await mismatches(page, sharedTokens(css))).toEqual([]);
 
   for (const t of ["dark", "light"] as Theme[]) {
-    if ((await theme(page)) !== t) await page.getByRole("button", { name: "Light theme" }).click();
+    if ((await theme(page)) !== t) {
+      await page.getByRole("button", { name: "Light theme" }).click();
+    }
     expect(await theme(page)).toBe(t);
     expect(await mismatches(page, themeColours(css, t))).toEqual([]);
   }
@@ -119,8 +123,12 @@ test("fonts come from the site itself, and the condensed width is in the file", 
   }
   const fonts = requests.filter((r) => r.type === "font" || /\.(woff2?|ttf|otf)(\?|$)/.test(r.url));
   expect(fonts.length).toBeGreaterThan(0);
-  for (const f of fonts) expect(new URL(f.url).origin, f.url).toBe(origin);
-  for (const r of requests) expect(new URL(r.url).origin, r.url).toBe(origin);
+  for (const f of fonts) {
+    expect(new URL(f.url).origin, f.url).toBe(origin);
+  }
+  for (const r of requests) {
+    expect(new URL(r.url).origin, r.url).toBe(origin);
+  }
 
   const loaded = await page.evaluate(() =>
     [...document.fonts].filter((f) => f.status === "loaded").map((f) => ({ family: f.family, stretch: f.stretch })),
@@ -168,7 +176,9 @@ test("/design/ shows the highlighted code sample and a passing ratio for every c
 test("the code colours on /design/ equal the token file, in both themes", async ({ page }) => {
   await page.goto("/design/");
   for (const t of ["dark", "light"] as Theme[]) {
-    if ((await theme(page)) !== t) await page.getByRole("button", { name: "Light theme" }).click();
+    if ((await theme(page)) !== t) {
+      await page.getByRole("button", { name: "Light theme" }).click();
+    }
     expect(await theme(page)).toBe(t);
     const colours = codeColours(css, t);
     const seen = await page.locator("pre.shiki").evaluate((pre) => ({
@@ -179,7 +189,10 @@ test("the code colours on /design/ equal the token file, in both themes", async 
       const n = parseInt(h.slice(1), 16);
       return `rgb(${n >> 16}, ${(n >> 8) & 255}, ${n & 255})`;
     };
-    expect(seen).toEqual({ background: hex(colours["--shiki-background"]), foreground: hex(colours["--shiki-foreground"]) });
+    expect(seen).toEqual({
+      background: hex(colours["--shiki-background"]),
+      foreground: hex(colours["--shiki-foreground"]),
+    });
   }
 });
 
@@ -188,14 +201,18 @@ test.describe("reduced motion", () => {
 
   test("the name is not animated", async ({ page }) => {
     await page.goto("/");
-    const names = await page.locator(".reveal-line").evaluateAll((els) => els.map((e) => getComputedStyle(e).animationName));
+    const names = await page
+      .locator(".reveal-line")
+      .evaluateAll((els) => els.map((e) => getComputedStyle(e).animationName));
     expect(names).toEqual(["none", "none"]);
   });
 });
 
 test("the name rises from below on load", async ({ page }) => {
   await page.goto("/");
-  const names = await page.locator(".reveal-line").evaluateAll((els) => els.map((e) => getComputedStyle(e).animationName));
+  const names = await page
+    .locator(".reveal-line")
+    .evaluateAll((els) => els.map((e) => getComputedStyle(e).animationName));
   expect(names.every((n) => n !== "none")).toBe(true);
   await expect(page.getByRole("heading", { level: 1, name: "Xindong Deng (Josh), home" })).toBeVisible();
   await expect(page.locator("h1")).toHaveText(/Josh\s*Deng/);

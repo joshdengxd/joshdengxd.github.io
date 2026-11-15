@@ -37,7 +37,9 @@ export function declarationsFor(css: string, selector: string): Declarations {
   const blockRe = /([^{}]+)\{([^{}]*)\}/g;
   for (const [, selectors, body] of stripped.matchAll(blockRe)) {
     const list = selectors.split(",").map((s) => s.trim());
-    if (!list.includes(selector)) continue;
+    if (!list.includes(selector)) {
+      continue;
+    }
     for (const [, name, value] of body.matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)) {
       out[name] = value.trim();
     }
@@ -59,7 +61,9 @@ export function codeColours(css: string, theme: Theme): Declarations {
 /** Tokens that do not change with the theme (type, spacing, radius, motion). */
 export function sharedTokens(css: string): Declarations {
   const all = declarationsFor(css, ":root");
-  return Object.fromEntries(Object.entries(all).filter(([k]) => !k.startsWith("--color-") && !k.startsWith("--shiki-")));
+  return Object.fromEntries(
+    Object.entries(all).filter(([k]) => !k.startsWith("--color-") && !k.startsWith("--shiki-")),
+  );
 }
 
 function channel(v: number): number {
@@ -69,7 +73,9 @@ function channel(v: number): number {
 
 export function luminance(hex: string): number {
   const m = /^#([0-9a-f]{6})$/i.exec(hex.trim());
-  if (!m) throw new Error(`Not a #rrggbb colour: ${hex}`);
+  if (!m) {
+    throw new Error(`Not a #rrggbb colour: ${hex}`);
+  }
   const n = parseInt(m[1], 16);
   return 0.2126 * channel(n >> 16) + 0.7152 * channel((n >> 8) & 255) + 0.0722 * channel(n & 255);
 }
@@ -136,7 +142,15 @@ export function codeContrastPairs(css: string): CodePair[] {
     const c = codeColours(css, theme);
     for (const text of CODE_TEXT_ROLES) {
       const ratio = contrast(c[text], c[CODE_SURFACE_ROLE]);
-      pairs.push({ theme, text, textValue: c[text], surfaceValue: c[CODE_SURFACE_ROLE], ratio, required: AA_NORMAL, passes: ratio >= AA_NORMAL });
+      pairs.push({
+        theme,
+        text,
+        textValue: c[text],
+        surfaceValue: c[CODE_SURFACE_ROLE],
+        ratio,
+        required: AA_NORMAL,
+        passes: ratio >= AA_NORMAL,
+      });
     }
   }
   return pairs;

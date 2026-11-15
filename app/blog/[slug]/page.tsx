@@ -19,7 +19,9 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const post = (await getPosts()).find((p) => p.slug === slug);
-  if (!post) return hiddenMetadata;
+  if (!post) {
+    return hiddenMetadata;
+  }
   const meta = blogMetadata(post.title, post.summary, `/blog/${post.slug}/`);
   return { ...meta, openGraph: { ...meta.openGraph, type: "article", publishedTime: post.date } };
 }
@@ -27,7 +29,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const post = (await getPosts()).find((p) => p.slug === slug);
-  if (!post) notFound();
+  if (!post) {
+    notFound();
+  }
   return (
     <article className={styles.page}>
       <header className={styles.postHeader}>

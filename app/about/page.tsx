@@ -20,7 +20,9 @@ export default function Page() {
         <Placeholder>What I am learning about building software with coding agents comes here.</Placeholder>
       </Section>
       <Section title="How I work">
-        <Placeholder>How I plan, check and ship work, with a person on every irreversible step, comes here.</Placeholder>
+        <Placeholder>
+          How I plan, check and ship work, with a person on every irreversible step, comes here.
+        </Placeholder>
       </Section>
       <Section title="Links">
         <ul className={pageStyles.links}>

@@ -17,14 +17,18 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ tag: string }> }): Promise<Metadata> {
   const { tag } = await params;
   const group = groupByTag(await getPosts()).find((g) => g.tag === tag);
-  if (!group) return hiddenMetadata;
+  if (!group) {
+    return hiddenMetadata;
+  }
   return blogMetadata(`Posts tagged ${tag}`, `Blog posts tagged ${tag}, newest first.`, `/blog/tags/${tag}/`);
 }
 
 export default async function Page({ params }: { params: Promise<{ tag: string }> }) {
   const { tag } = await params;
   const group = groupByTag(await getPosts()).find((g) => g.tag === tag);
-  if (!group) notFound();
+  if (!group) {
+    notFound();
+  }
   return (
     <div className={styles.page}>
       <h1 className={styles.title}>Tagged {tag}</h1>

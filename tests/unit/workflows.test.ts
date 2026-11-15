@@ -18,7 +18,9 @@ const usesOf = (doc: Doc): string[] =>
 function expectPinned(text: string) {
   const lines = text.split(/\r?\n/).filter((l) => /^\s*(- )?uses:/.test(l));
   expect(lines.length).toBeGreaterThan(0);
-  for (const l of lines) expect(l).toMatch(/uses: [\w.-]+\/[\w./-]+@[0-9a-f]{40} # v\d+(\.\d+)*$/);
+  for (const l of lines) {
+    expect(l).toMatch(/uses: [\w.-]+\/[\w./-]+@[0-9a-f]{40} # v\d+(\.\d+)*$/);
+  }
 }
 
 describe("dependabot-auto-merge.yml", () => {

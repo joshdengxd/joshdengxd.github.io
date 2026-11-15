@@ -17,9 +17,7 @@ export default defineConfig({
   projects: [
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },
     // The phone Menu sheet behaves differently per engine (Safari on iPhones), so with the flag its spec also runs in WebKit.
-    ...(webkit
-      ? [{ name: "webkit", testMatch: "**/menu-sheet.spec.ts", use: { ...devices["Desktop Safari"] } }]
-      : []),
+    ...(webkit ? [{ name: "webkit", testMatch: "**/menu-sheet.spec.ts", use: { ...devices["Desktop Safari"] } }] : []),
   ],
   webServer: {
     command: `npx serve out --listen ${port} --no-port-switching`,

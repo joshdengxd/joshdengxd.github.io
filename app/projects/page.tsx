@@ -5,7 +5,8 @@ import { pageMetadata } from "@/lib/metadata";
 
 export const metadata = pageMetadata({
   title: "Projects",
-  description: "The public GitHub repos behind this site: shared agent skills, a job-search skill set, and the site itself.",
+  description:
+    "The public GitHub repos behind this site: shared agent skills, a job-search skill set, and the site itself.",
   path: "/projects/",
 });
 

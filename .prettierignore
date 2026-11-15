@@ -1,0 +1,11 @@
+# Only code, config and CSS are formatted.
+.claude/
+docs/
+*.md
+tests/fixtures/
+package-lock.json
+out/
+.next/
+drafts/
+design-language/decision/
+design-language/fonts/
