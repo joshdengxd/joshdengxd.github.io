@@ -2,6 +2,7 @@ name: checks
 
 on:
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -13,7 +14,7 @@ concurrency:
 jobs:
   checks:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -35,14 +36,18 @@ jobs:
         run: |
           npm run build
           npm run check:fixture
+      # e2e: manual run or Dependabot PR only; an ordinary PR is verified by the local e2e run (AGENTS.md, CI rules).
       - name: Install Playwright Chromium
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.user.login == 'dependabot[bot]'
         run: npx playwright install --with-deps chromium
       - name: Build and e2e (blog fixture build)
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.user.login == 'dependabot[bot]'
         run: npm run e2e
       - name: Build and e2e (default build)
+        if: github.event_name == 'workflow_dispatch' || github.event.pull_request.user.login == 'dependabot[bot]'
         run: npm run e2e:default
       - name: Upload e2e results on failure
-        if: failure()
+        if: failure() && (github.event_name == 'workflow_dispatch' || github.event.pull_request.user.login == 'dependabot[bot]')
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: playwright-results
