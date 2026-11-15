@@ -26,7 +26,6 @@
 
 .lead,
 .list,
-.prose,
 .postMeta {
   max-width: var(--measure);
 }
@@ -110,8 +109,12 @@
 .prose {
   display: grid;
   gap: var(--space-4);
-  max-width: var(--measure);
   min-width: 0;
+}
+
+/* Text keeps the reading measure; a code block may use the full width of the page column (long lines scroll inside it). */
+.prose > :not(pre) {
+  max-width: var(--measure);
 }
 
 .prose h2,
@@ -157,7 +160,8 @@
   max-width: 100%;
   overflow-x: auto;
   padding: var(--space-3) var(--space-4);
-  background: var(--color-panel);
+  background: var(--shiki-background);
+  color: var(--shiki-foreground);
   line-height: var(--leading-text);
 }
 

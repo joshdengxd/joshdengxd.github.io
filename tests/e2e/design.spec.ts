@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
-import { sharedTokens, themeColours, type Theme } from "../../lib/tokens";
+import { codeColours, sharedTokens, themeColours, type Theme } from "../../lib/tokens";
 
 const css = readFileSync(join(process.cwd(), "design-language", "tokens.css"), "utf8");
 const DARK_GROUND = "rgb(30, 44, 35)";
@@ -150,6 +150,36 @@ test("/design/ shows a passing contrast ratio for every pair", async ({ page }) 
   for (const text of await rows.allTextContents()) {
     expect(text).toMatch(/\d+\.\d\d:1/);
     expect(text).toContain("passes");
+  }
+});
+
+test("/design/ shows the highlighted code sample and a passing ratio for every code colour, in both themes", async ({
+  page,
+}) => {
+  await page.goto("/design/");
+  await expect(page.locator("pre.shiki")).toHaveCount(1);
+  const rows = page.locator("li[data-code-pair]");
+  await expect(rows).toHaveCount(10);
+  for (const text of await rows.allTextContents()) {
+    expect(text).toMatch(/dark \d+\.\d\d:1 passes, light \d+\.\d\d:1 passes/);
+  }
+});
+
+test("the code colours on /design/ equal the token file, in both themes", async ({ page }) => {
+  await page.goto("/design/");
+  for (const t of ["dark", "light"] as Theme[]) {
+    if ((await theme(page)) !== t) await page.getByRole("button", { name: "Light theme" }).click();
+    expect(await theme(page)).toBe(t);
+    const colours = codeColours(css, t);
+    const seen = await page.locator("pre.shiki").evaluate((pre) => ({
+      background: getComputedStyle(pre).backgroundColor,
+      foreground: getComputedStyle(pre).color,
+    }));
+    const hex = (h: string) => {
+      const n = parseInt(h.slice(1), 16);
+      return `rgb(${n >> 16}, ${(n >> 8) & 255}, ${n & 255})`;
+    };
+    expect(seen).toEqual({ background: hex(colours["--shiki-background"]), foreground: hex(colours["--shiki-foreground"]) });
   }
 });
 

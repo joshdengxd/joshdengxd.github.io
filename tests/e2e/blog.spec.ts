@@ -1,12 +1,22 @@
 // These run against the fixture build (npm run e2e builds with BLOG_FIXTURES=1): two test posts,
 // "blog-engine-fixture" (2026-11-15T23:30:00Z, tags engine-check + markdown, with a code block and a table) and
 // "blog-engine-fixture-early" (2026-11-16T00:30:00Z, tag engine-check).
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
+import { codeColours } from "../../lib/tokens";
 
 const LATE = "time[datetime='2026-11-15T23:30:00Z']"; // 23:30 UTC
 const EARLY = "time[datetime='2026-11-16T00:30:00Z']"; // 00:30 UTC the next day
 const POST = "/blog/blog-engine-fixture/";
 const TITLE = "Fixture post for the blog engine";
+const codeTokens = readFileSync(join(process.cwd(), "design-language", "tokens.css"), "utf8");
+
+/** "#rrggbb" as the browser reports a computed colour. */
+const rgb = (hex: string) => {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgb(${n >> 16}, ${(n >> 8) & 255}, ${n & 255})`;
+};
 
 /** Failed responses (404 and up), console errors and uncaught errors. */
 function watch(page: Page) {
@@ -60,7 +70,7 @@ test.describe("a post", () => {
     );
     await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
     await expect(page.getByRole("heading", { level: 2, name: "A code block" })).toBeVisible();
-    await expect(page.locator("pre code")).toContainText("export function add");
+    await expect(page.locator("pre code").first()).toContainText("export function add");
     await expect(page.getByRole("table")).toBeVisible();
     await expect(page.getByRole("columnheader", { name: "Part" })).toBeVisible();
     await expect(page.getByRole("link", { name: "link to the blog" })).toHaveAttribute("href", /^\/blog\/?$/);
@@ -75,7 +85,7 @@ test.describe("a post", () => {
     test(`a long code line scrolls inside its block, the page does not overflow (${name})`, async ({ page }) => {
       await page.setViewportSize(size);
       await page.goto(POST);
-      const pre = page.locator("pre");
+      const pre = page.locator("pre").first();
       await expect(pre).toBeVisible();
       const [scrolls, overflow] = await Promise.all([
         pre.evaluate((el) => el.scrollWidth > el.clientWidth && getComputedStyle(el).overflowX === "auto"),
@@ -83,9 +93,74 @@ test.describe("a post", () => {
       ]);
       expect(scrolls).toBe(true);
       expect(overflow).toBe(false);
-      await expect(page.locator("pre code")).toHaveCSS("font-family", /^codeFace,/) // the JetBrains Mono face from app/fonts.ts;
+      await expect(page.locator("pre code").first()).toHaveCSS("font-family", /^codeFace,/) // the JetBrains Mono face from app/fonts.ts;
     });
   }
+
+  test.describe("code highlighting", () => {
+    test("known languages are highlighted in the built HTML with --shiki-* variables and no colour value", async ({
+      request,
+    }) => {
+      const html = await (await request.get(POST)).text();
+      expect(html).toContain("--shiki-token-keyword");
+      expect(html).toContain("background-color:var(--shiki-background)");
+      for (const [, style] of html.matchAll(/style="([^"]*)"/g)) {
+        expect(style).not.toMatch(/#[0-9a-f]{3}|rgb\(|hsl\(/i);
+      }
+      expect(html).not.toMatch(/language-/);
+    });
+
+    test("no highlighting script or wasm is loaded in the browser", async ({ page }) => {
+      const urls: string[] = [];
+      page.on("request", (r) => urls.push(r.url()));
+      await page.goto(POST);
+      await page.waitForLoadState("networkidle");
+      expect(urls.filter((u) => /shiki|oniguruma|onig|\.wasm|textmate/i.test(u))).toEqual([]);
+      // the highlighting is already in the served markup
+      expect(await page.locator("pre.shiki span[style*='--shiki-token-']").count()).toBeGreaterThan(0);
+    });
+
+    test("an unknown language and no language render as plain code", async ({ page }) => {
+      await page.goto(POST);
+      const blocks = page.locator("pre.shiki");
+      await expect(blocks).toHaveCount(6); // ts, json, bash, csharp, brainfuck, none
+      const plain = await blocks.evaluateAll((els) => els.slice(4).map((e) => e.querySelectorAll("[style*='--shiki-token-']").length));
+      expect(plain).toEqual([0, 0]);
+      await expect(blocks.nth(4)).toContainText("++++++++[>++++[>++>+++<<-]<-]>>.");
+      await expect(blocks.nth(5)).toContainText("a block with no language");
+      const classes = await page.locator("pre code").evaluateAll((els) => els.map((e) => e.className));
+      expect(classes.every((c) => c === "")).toBe(true);
+    });
+
+    test("the code colours follow the theme and equal the token file, in both themes", async ({ page }) => {
+      await page.goto(POST);
+      for (const theme of ["dark", "light"] as const) {
+        if ((await page.evaluate(() => document.documentElement.getAttribute("data-theme"))) !== theme) {
+          await page.getByRole("button", { name: "Light theme" }).click();
+        }
+        await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+        const c = codeColours(codeTokens, theme);
+        const seen = await page.evaluate(() => {
+          const pre = document.querySelector("pre.shiki")!;
+          const color = (el: Element) => getComputedStyle(el).color;
+          const kw = [...pre.querySelectorAll("span[style]")].find((s) => s.textContent === "export")!;
+          const comment = [...pre.querySelectorAll("span[style]")].find((s) => s.textContent?.startsWith("// a long line"))!;
+          return {
+            background: getComputedStyle(pre).backgroundColor,
+            foreground: color(pre),
+            keyword: color(kw),
+            comment: color(comment),
+          };
+        });
+        expect(seen).toEqual({
+          background: rgb(c["--shiki-background"]),
+          foreground: rgb(c["--shiki-foreground"]),
+          keyword: rgb(c["--shiki-token-keyword"]),
+          comment: rgb(c["--shiki-token-comment"]),
+        });
+      }
+    });
+  });
 
   test("a slug that is not a post is the 404 page, and the hidden _none page does not exist in this build", async ({
     page,

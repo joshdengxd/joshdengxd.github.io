@@ -64,6 +64,8 @@ Check code against the current docs for these versions before writing or approvi
 - remark-rehype 11.1.2: remarkjs/remark-rehype
 - rehype-sanitize 6.0.0: rehypejs/rehype-sanitize
 - rehype-stringify 10.0.1: rehypejs/rehype
+- shiki 4.6.0 (build-time code highlighting, CSS-variables theme, JavaScript regex engine): shikijs/shiki
+- @shikijs/rehype 4.6.0 (the rehype plugin; import the default export from `@shikijs/rehype/core`): shikijs/shiki (its docs live in the same repo)
 - yaml 2.9.1 (post front matter): eemeli/yaml (use `--version v2.9.1`)
 - zod 4.6.7 (front matter schema): colinhacks/zod (use `--version v4.6.7`)
 - fast-xml-parser 5.12.0 (dev, feed test only): npm README

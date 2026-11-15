@@ -193,7 +193,7 @@ describe("loading from folders", () => {
     const posts = await loadPostsFrom(["tests/fixtures/posts"]);
     expect(posts.map((x) => x.slug)).toEqual(["blog-engine-fixture-early", "blog-engine-fixture"]);
     expect(posts[1].html).toContain("<table>");
-    expect(posts[1].html).toContain("<pre><code");
+    expect(posts[1].html).toContain('<pre class="shiki css-variables"');
   });
 });
 

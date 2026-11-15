@@ -17,6 +17,29 @@ export function add(a: number, b: number): number {
 }
 ```
 
+## More languages
+
+```json
+{ "name": "fixture", "tags": ["a", "b"], "count": 3, "ok": true }
+```
+
+```bash
+# list the files
+ls -la "$HOME" | grep --color=never ".md"
+```
+
+```csharp
+public class Greeter { public string Greet(string name) => $"Hello, {name}"; }
+```
+
+```brainfuck
+++++++++[>++++[>++>+++<<-]<-]>>. a plain line that is long enough to scroll inside its block as well ...........................................
+```
+
+```
+a block with no language, and a line that is long enough to scroll inside its block as well ...........................................
+```
+
 ## A table
 
 | Part | Job |

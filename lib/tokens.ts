@@ -10,6 +10,21 @@ export const TEXT_ROLES = ["--color-ink", "--color-muted", "--color-accent"] as 
 // Display roles are used only for the name (heavy, far above 24px): AA for large text, 3:1.
 export const DISPLAY_ROLES = ["--color-name-first", "--color-name-last"] as const;
 
+// Code colours: the variables Shiki's CSS-variables theme reads. Every text role is AA (4.5:1) on the code background.
+export const CODE_SURFACE_ROLE = "--shiki-background";
+export const CODE_TEXT_ROLES = [
+  "--shiki-foreground",
+  "--shiki-token-comment",
+  "--shiki-token-keyword",
+  "--shiki-token-string",
+  "--shiki-token-string-expression",
+  "--shiki-token-constant",
+  "--shiki-token-function",
+  "--shiki-token-parameter",
+  "--shiki-token-punctuation",
+  "--shiki-token-link",
+] as const;
+
 export const AA_NORMAL = 4.5;
 export const AA_LARGE = 3;
 
@@ -35,10 +50,16 @@ export function themeColours(css: string, theme: Theme): Declarations {
   return Object.fromEntries(Object.entries(all).filter(([k]) => k.startsWith("--color-")));
 }
 
+/** The code colours (--shiki-*) of a theme. */
+export function codeColours(css: string, theme: Theme): Declarations {
+  const all = declarationsFor(css, `[data-theme="${theme}"]`);
+  return Object.fromEntries(Object.entries(all).filter(([k]) => k.startsWith("--shiki-")));
+}
+
 /** Tokens that do not change with the theme (type, spacing, radius, motion). */
 export function sharedTokens(css: string): Declarations {
   const all = declarationsFor(css, ":root");
-  return Object.fromEntries(Object.entries(all).filter(([k]) => !k.startsWith("--color-")));
+  return Object.fromEntries(Object.entries(all).filter(([k]) => !k.startsWith("--color-") && !k.startsWith("--shiki-")));
 }
 
 function channel(v: number): number {
@@ -93,6 +114,29 @@ export function contrastPairs(css: string): Pair[] {
           });
         }
       }
+    }
+  }
+  return pairs;
+}
+
+export type CodePair = {
+  theme: Theme;
+  text: string;
+  textValue: string;
+  surfaceValue: string;
+  ratio: number;
+  required: number;
+  passes: boolean;
+};
+
+/** Every code text colour against the code background, for both themes. */
+export function codeContrastPairs(css: string): CodePair[] {
+  const pairs: CodePair[] = [];
+  for (const theme of THEMES) {
+    const c = codeColours(css, theme);
+    for (const text of CODE_TEXT_ROLES) {
+      const ratio = contrast(c[text], c[CODE_SURFACE_ROLE]);
+      pairs.push({ theme, text, textValue: c[text], surfaceValue: c[CODE_SURFACE_ROLE], ratio, required: AA_NORMAL, passes: ratio >= AA_NORMAL });
     }
   }
   return pairs;

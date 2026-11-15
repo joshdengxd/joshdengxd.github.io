@@ -222,8 +222,22 @@
   background: var(--color-name-last);
 }
 
-.code {
-  background: var(--color-panel);
+/* One line per code colour: the ratio text is set in the colour it measures, on the code background. */
+.codeRoles {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-1);
+}
+
+.codeRole {
+  padding: var(--space-2) var(--space-3);
+  overflow-wrap: anywhere;
+}
+
+/* The highlighted sample: Shiki's <pre> carries the code colours; this holds the block to its column. */
+.code pre {
   padding: var(--space-5);
   overflow-x: auto;
   line-height: var(--leading-text);

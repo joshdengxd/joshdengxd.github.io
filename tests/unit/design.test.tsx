@@ -9,16 +9,27 @@ describe("/design/ specimen", () => {
     expect(metadata.robots).toMatchObject({ index: false });
   });
 
-  it("shows a contrast ratio for every pair of both themes", () => {
-    const { container } = render(<DesignPage />);
+  it("shows a contrast ratio for every pair of both themes", async () => {
+    const { container } = render(await DesignPage());
     const rows = container.querySelectorAll("tr[data-pair]");
     expect(rows).toHaveLength(20);
     for (const row of rows) expect(row.textContent).toMatch(/\d+\.\d\d:1/);
     expect(container.textContent).not.toMatch(/fails/);
   });
 
-  it("has no toggle of its own (the toggle is in the shell)", () => {
-    render(<DesignPage />);
+  it("shows a highlighted code sample and the ratio of every code colour, in both themes", async () => {
+    const { container } = render(await DesignPage());
+    expect(container.querySelectorAll("pre.shiki")).toHaveLength(1);
+    expect(container.querySelectorAll('pre.shiki span[style*="--shiki-token-"]').length).toBeGreaterThan(0);
+    const rows = container.querySelectorAll("li[data-code-pair]");
+    expect(rows).toHaveLength(10);
+    for (const row of rows) {
+      expect(row.textContent).toMatch(/dark \d+\.\d\d:1 passes, light \d+\.\d\d:1 passes/);
+    }
+  });
+
+  it("has no toggle of its own (the toggle is in the shell)", async () => {
+    render(await DesignPage());
     expect(screen.queryByRole("button", { name: "Light theme" })).toBeNull();
   });
 });
