@@ -232,6 +232,34 @@ test.describe("phone", () => {
   }
 });
 
+// The condensed Archivo file is what makes the name fit a phone. Until it arrives (or if it never does) the
+// fallback face must fit too: no page may overflow while the font is missing.
+test.describe("phone, web font not loaded", () => {
+  for (const js of [true, false]) {
+    for (const width of [320, 390]) {
+      test(`nothing overflows at ${width}px with the font file blocked (JavaScript ${js ? "on" : "off"})`, async ({ browser }) => {
+        const context = await browser.newContext({ javaScriptEnabled: js, viewport: { width, height: 800 } });
+        const page = await context.newPage();
+        let blocked = 0;
+        await page.route("**/*.woff2", (route) => {
+          blocked += 1;
+          return route.abort();
+        });
+        for (const path of PAGES) {
+          await page.goto(path);
+          await page.waitForLoadState("load");
+          const loaded = await page.evaluate(() => document.fonts.check('800 20px archivo'));
+          expect(loaded, `${path}: the web font must be missing for this test to mean anything`).toBe(false);
+          const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+          expect(overflow, path).toBeLessThanOrEqual(0);
+        }
+        expect(blocked).toBeGreaterThan(0);
+        await context.close();
+      });
+    }
+  }
+});
+
 test.describe("without JavaScript, on a phone", () => {
   test.use({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
 

@@ -7,6 +7,8 @@ export const archivo = localFont({
   src: [{ path: "../design-language/fonts/archivo-latin-wdth-normal.woff2", weight: "100 900", style: "normal" }],
   variable: "--font-archivo-face",
   display: "swap",
+  // The fallbacks are declared by hand in globals.css (a text one and a condensed one for the name).
+  adjustFontFallback: false,
   // Keep the width axis usable: without this the face is declared at 100% only.
   declarations: [{ prop: "font-stretch", value: "62% 125%" }],
 });

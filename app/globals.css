@@ -5,6 +5,28 @@
   box-sizing: border-box;
 }
 
+/* Fallbacks while the Archivo file loads (or if it never does). Text: Arial scaled to Archivo's metrics.
+   Name: the web face is condensed to 62%, Arial cannot condense, so it is scaled down to about the same
+   width; otherwise the name would overflow a phone until the font arrives. */
+@font-face {
+  font-family: "Archivo text fallback";
+  src: local("Arial"), local("Helvetica"), local("Liberation Sans");
+  ascent-override: 85.41%;
+  descent-override: 20.43%;
+  line-gap-override: 0%;
+  size-adjust: 102.8%;
+}
+
+@font-face {
+  font-family: "Archivo name fallback";
+  src: local("Arial Bold"), local("Arial-BoldMT"), local("Helvetica Bold"), local("Liberation Sans Bold"), local("Arial");
+  font-weight: 800;
+  ascent-override: 85.41%;
+  descent-override: 20.43%;
+  line-gap-override: 0%;
+  size-adjust: 62%;
+}
+
 body {
   margin: 0;
   background: var(--color-ground);
@@ -46,6 +68,7 @@ code {
   font-size: var(--step-name);
   font-weight: var(--weight-name);
   font-stretch: var(--stretch-name);
+  font-family: var(--font-archivo-face), "Archivo name fallback", Arial, sans-serif;
   line-height: var(--leading-name);
   letter-spacing: var(--tracking-name);
   text-transform: uppercase;
