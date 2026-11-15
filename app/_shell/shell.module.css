@@ -1,0 +1,227 @@
+/* The shared D5 shell. Phones first (one top row and a Menu sheet); from 64rem the panel on the right. */
+.shell {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel {
+  position: relative;
+  background: var(--color-panel);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-2) var(--margin-page);
+}
+
+/* Touch targets: every link and control in the shell is at least 44px tall. */
+.wordmark,
+.menuButton,
+.nav a,
+.toggle,
+.profiles a {
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+}
+
+.wordmark {
+  font-size: var(--step-lead);
+  font-weight: var(--weight-name);
+  font-stretch: var(--stretch-name);
+  line-height: var(--leading-title);
+  letter-spacing: var(--tracking-title);
+  text-transform: uppercase;
+  text-decoration: none;
+  gap: 0.25em;
+}
+
+.menu {
+  margin-inline-start: auto;
+}
+
+.menuButton {
+  list-style: none;
+  cursor: pointer;
+  font-weight: var(--weight-strong);
+  color: var(--color-ink);
+  padding-inline: var(--space-3);
+  margin-inline-end: calc(-1 * var(--space-3));
+}
+
+.menuButton::-webkit-details-marker {
+  display: none;
+}
+
+.menu[open] .menuButton {
+  color: var(--color-accent);
+}
+
+/* The sheet floats over the page under the top row, the one place a menu may sit on content. */
+.sheet {
+  position: absolute;
+  inset-inline: 0;
+  top: 100%;
+  z-index: 2;
+  background: var(--color-panel);
+  padding: var(--space-2) var(--margin-page) var(--space-6);
+  display: grid;
+  justify-items: start;
+  gap: var(--space-5);
+}
+
+/* Closed, the sheet is not laid out at all (some engines still measure the contents of a closed <details>). */
+.menu:not([open]) .sheet,
+.wide {
+  display: none;
+}
+
+.nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+}
+
+.nav a {
+  font-size: var(--step-lead);
+  font-weight: var(--weight-strong);
+  line-height: var(--leading-title);
+  color: var(--color-ink);
+  text-decoration: none;
+}
+
+.nav a:hover {
+  text-decoration: underline;
+}
+
+.nav a[aria-current="page"] {
+  color: var(--color-accent);
+}
+
+.toggle {
+  font: inherit;
+  font-weight: var(--weight-strong);
+  color: var(--color-ink);
+  background: var(--color-ground);
+  border: 0;
+  border-radius: var(--radius-none);
+  padding: var(--space-2) var(--space-5);
+  cursor: pointer;
+}
+
+.toggle[aria-pressed="true"] {
+  color: var(--color-accent);
+}
+
+/* On phones only home fills the screen (the name at the foot); other pages run on into the footer line. */
+.main {
+  display: flex;
+  flex-direction: column;
+}
+
+.shell[data-home] .main {
+  flex: 1;
+}
+
+/* Focus lands here from the skip link; the page itself needs no ring. */
+.main:focus {
+  outline: none;
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: var(--space-5);
+  padding: var(--space-7) var(--margin-page) var(--space-4);
+  color: var(--color-muted);
+}
+
+.profiles {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: var(--space-5);
+}
+
+@media (min-width: 64rem) {
+  .shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--width-panel);
+    grid-template-rows: 1fr auto;
+  }
+
+  /* The panel stays at the right while the page scrolls, in its own column, so it never covers content. */
+  .panel {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    position: sticky;
+    top: 0;
+    align-self: start;
+    height: 100svh;
+    padding: var(--margin-page);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-7);
+  }
+
+  /* Wordmark, navigation and toggle run to the outer margin, so the page keeps one pair of margins. */
+  .bar {
+    padding: 0;
+    justify-content: flex-end;
+  }
+
+  .menu {
+    display: none;
+  }
+
+  .wide {
+    display: grid;
+    justify-items: end;
+    text-align: right;
+    gap: var(--space-6);
+  }
+
+  .main {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .footer {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  /* Home keeps the D5 composition: navigation at the top of the panel, the page fills the rest
+     (the name on the left, the intro at the foot of the panel column). */
+  .shell[data-home] {
+    grid-template-rows: auto 1fr;
+  }
+
+  .shell[data-home] .panel {
+    grid-row: 1;
+    position: relative;
+    z-index: 1;
+    height: auto;
+    padding-bottom: 0;
+  }
+
+  .shell[data-home] .bar {
+    display: none;
+  }
+
+  .shell[data-home] .main {
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-template-rows: subgrid;
+  }
+}

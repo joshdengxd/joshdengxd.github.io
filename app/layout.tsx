@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "../design-language/tokens.css";
 import "./globals.css";
+import { SiteShell } from "./_shell/site-shell";
 import { archivo, codeFace } from "./fonts";
 import { themeScript } from "./theme";
 
@@ -24,7 +25,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body>{children}</body>
+      <body>
+        <a href="#main" className="skip-link">
+          Skip to content
+        </a>
+        <SiteShell>{children}</SiteShell>
+      </body>
     </html>
   );
 }

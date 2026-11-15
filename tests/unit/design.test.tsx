@@ -1,16 +1,10 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import DesignPage, { metadata } from "@/app/design/page";
 import sitemap from "@/app/sitemap";
-import { THEME_KEY } from "@/app/theme";
 
 describe("/design/ specimen", () => {
-  afterEach(() => {
-    localStorage.clear();
-    document.documentElement.setAttribute("data-theme", "dark");
-  });
-
   it("is noindex", () => {
     expect(metadata.robots).toMatchObject({ index: false });
   });
@@ -23,18 +17,9 @@ describe("/design/ specimen", () => {
     expect(container.textContent).not.toMatch(/fails/);
   });
 
-  it("the toggle switches to light and remembers it, and back", async () => {
+  it("has no toggle of its own (the toggle is in the shell)", () => {
     render(<DesignPage />);
-    const toggle = screen.getByRole("button", { name: "Light theme" });
-    expect(toggle).toHaveAttribute("aria-pressed", "false");
-    fireEvent.click(toggle);
-    expect(document.documentElement.getAttribute("data-theme")).toBe("light");
-    expect(localStorage.getItem(THEME_KEY)).toBe("light");
-    await waitFor(() => expect(toggle).toHaveAttribute("aria-pressed", "true"));
-    fireEvent.click(toggle);
-    expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
-    expect(localStorage.getItem(THEME_KEY)).toBe("dark");
-    await waitFor(() => expect(toggle).toHaveAttribute("aria-pressed", "false"));
+    expect(screen.queryByRole("button", { name: "Light theme" })).toBeNull();
   });
 });
 

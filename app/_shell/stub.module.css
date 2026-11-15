@@ -1,0 +1,45 @@
+/* A placeholder page and the 404 page: the title set like the name, low on the ground, as on the home page. */
+.stub {
+  flex: 1;
+  display: grid;
+  align-content: end;
+  gap: var(--space-5);
+  padding: var(--margin-page);
+  padding-top: var(--space-9);
+}
+
+/* Display size between the title step and the name step, so one thing leads the first screen. */
+.title {
+  font-size: min(30svh, 11vw);
+  font-weight: var(--weight-name);
+  font-stretch: var(--stretch-name);
+  line-height: var(--leading-name);
+  letter-spacing: var(--tracking-name);
+  text-transform: uppercase;
+  color: var(--color-name-last);
+  /* room for the cap tops at this tight leading */
+  padding-top: 0.06em;
+}
+
+.line,
+.placeholder {
+  max-width: var(--measure);
+  font-size: var(--step-lead);
+}
+
+.placeholder {
+  justify-self: start;
+  background: var(--color-panel);
+  padding: var(--space-3) var(--space-4);
+}
+
+.placeholder strong {
+  color: var(--color-accent);
+  font-weight: var(--weight-strong);
+}
+
+.back {
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+}

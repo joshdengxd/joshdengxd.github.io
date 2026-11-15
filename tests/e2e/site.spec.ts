@@ -22,7 +22,7 @@ test("unknown URL shows the site's own 404 page", async ({ page }) => {
   const res = await page.goto("/no-such-page/");
   expect(res?.status()).toBe(404);
   await expect(page.getByText("This page does not exist.")).toBeVisible();
-  await page.getByRole("link", { name: "Home" }).click();
+  await page.getByRole("link", { name: "Back to the home page" }).click();
   await expect(page).toHaveURL("/");
   await expect(page.getByText(/under construction/i)).toBeVisible();
 });

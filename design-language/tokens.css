@@ -36,7 +36,7 @@
 
 :root {
   /* Families. The face variables are set on <html> by next/font/local (app/fonts.ts). */
-  --font-text: var(--font-archivo-face), system-ui, sans-serif;
+  --font-text: var(--font-archivo-face), "Archivo text fallback", system-ui, sans-serif;
   --font-code: var(--font-code-face), monospace;
 
   /* Type steps: five sizes do the work. */

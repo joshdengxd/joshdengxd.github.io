@@ -1,6 +1,7 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
+import { GITHUB_URL, HOME_LABEL, LINKEDIN_URL } from "@/app/_shell/links";
+import NotFound, { metadata as notFoundMetadata } from "@/app/not-found";
 import Home from "@/app/page";
-import NotFound from "@/app/not-found";
 
 describe("placeholder pages", () => {
   it("home shows the placeholder sentence", () => {
@@ -8,9 +9,12 @@ describe("placeholder pages", () => {
     expect(screen.getByText(/under construction/i)).toBeInTheDocument();
   });
 
-  it("home shows the name as its heading, revealed line by line", () => {
+  it("home shows the name as its heading, revealed line by line, as the current home mark", () => {
     render(<Home />);
-    const h1 = screen.getByRole("heading", { level: 1, name: "Josh Deng" });
+    const h1 = screen.getByRole("heading", { level: 1, name: HOME_LABEL });
+    const mark = within(h1).getByRole("link", { name: HOME_LABEL });
+    expect(mark).toHaveAttribute("href", "/");
+    expect(mark).toHaveAttribute("aria-current", "page");
     expect(h1.querySelectorAll(".reveal-mask > .reveal-line")).toHaveLength(2);
     expect(h1.querySelector(".name-first")).toHaveTextContent("Josh");
     expect(h1.querySelector(".name-last")).toHaveTextContent("Deng");
@@ -21,8 +25,17 @@ describe("placeholder pages", () => {
     expect(container.querySelector('a[href^="/design"]')).toBeNull();
   });
 
-  it("404 links back home", () => {
+  it("home has the GitHub and LinkedIn links", () => {
+    render(<Home />);
+    expect(screen.getByRole("link", { name: "GitHub" })).toHaveAttribute("href", GITHUB_URL);
+    expect(screen.getByRole("link", { name: "LinkedIn" })).toHaveAttribute("href", LINKEDIN_URL);
+  });
+
+  it("404 has a title and links back home", () => {
     render(<NotFound />);
-    expect(screen.getByRole("link", { name: "Home" })).toHaveAttribute("href", "/");
+    expect(screen.getByRole("heading", { level: 1, name: "Page not found" })).toBeInTheDocument();
+    expect(screen.getByText("This page does not exist.")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Back to the home page" })).toHaveAttribute("href", "/");
+    expect(notFoundMetadata.title).toBe("Page not found · Xindong Deng (Josh)");
   });
 });
