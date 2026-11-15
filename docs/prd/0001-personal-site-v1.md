@@ -15,7 +15,7 @@ Software developer by background (since 2018), now training myself to be an **AI
 Tone: show the work and the thinking.
 
 ## Goals
-1. **Workflow in the repo.** Every change goes create ticket -> refine ticket -> implement and verify ticket -> code review -> land ticket, using the skills in `.claude/skills/`. Templates and CI make the steps visible.
+1. **Workflow in the repo.** Every change goes create ticket -> refine ticket -> implement and verify ticket -> code review -> land ticket, using the skills in `.claude/skills/`. The skills define the ticket and PR formats; CI makes the checks visible.
 2. **Stack and architecture chosen and documented**, with the reasons.
 3. **Design system** chosen deliberately (not a default template): type, colour, spacing, light and dark.
 4. **Page skeletons** ready for content: Home, About, Projects, Blog, How this site is built, 404.
@@ -77,7 +77,7 @@ Only the shared skills this repo uses are copied in (see `docs/context/skills-so
 
 ## Delivery
 Tickets (each refined before work starts):
-1. **Scaffold, CI, deploy:** Next.js static export, TypeScript, ESLint, Vitest, Playwright; CI on PRs; deploy to Pages on merge; issue and PR templates; a placeholder home page live.
+1. **Scaffold, CI, deploy:** Next.js static export, TypeScript, ESLint, Vitest, Playwright; CI on PRs; deploy to Pages on merge; a placeholder home page live.
 2. **Workflow wiring:** labels, branch rules with the checks from ticket 1, Dependabot; commands recorded in AGENTS.md.
 3. **Design system:** pick a direction with the taste skill; tokens for type, colour, spacing; light and dark; font files and licences. Lives in its own folder, `design-language/` (the decisions and their reasons, plus the token source the site imports).
 4. **Layout shell:** header, navigation, footer, theme toggle, skip link, 404.
