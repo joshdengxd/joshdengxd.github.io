@@ -22,7 +22,8 @@ One paragraph: what it is, who uses it.
 Search code, docs and the ticket first. Ask the user only when they cannot answer it.
 
 ## Commands
-build / test / lint / run (exact commands)
+build / type check / lint / unit / e2e / run (exact commands; the ticket skills read them from here;
+"run" starts the app the way it is deployed, which is what verifiers check)
 
 ## Architecture constraints
 - Layers and allowed dependencies (a small table)
@@ -35,15 +36,25 @@ Naming, error handling, testing. Current framework versions and the syntax to us
 Never touch: generated files, migrations without review, production configs.
 
 ## Ticket workflow settings
-(read by create-ticket, refine-ticket, implement-and-verify-ticket, land-ticket)
+(read by create-ticket, refine-ticket, implement-and-verify-ticket, verify-against-criteria, land-ticket, drain-refined)
 - Tracker: GitHub issues in <owner/repo> (or Jira project <KEY>)
+- Identity: the account every tracker call, push and merge uses, and how
+  (e.g. gh with GH_TOKEN=$(gh auth token --user <account>) on each call; never switch the active account)
 - Default branch: main; merge method: squash
+- Changes without a ticket (skill syncs, docs, PRD edits): <path, e.g. a PR titled "chore: ..." the owner merges>
+- Max wait: 30 min for PR checks and for a deploy
 - States: board <name/number> columns Backlog, Refined, In progress, In review, Done
   (no board: labels refined, in-progress, in-review; Backlog = no label)
+  Board ids for scripted moves: project <id>, Status field <id>, options <name=id, ...>
+- Done: the person moves the ticket (or closes the issue). Reopened or sent back:
+  In progress for a small fix, Refined if the plan changes, always with a comment.
 - Labels: ticket, prd-NNNN
-- PRDs: docs/prd/NNNN-name.md; ticket drafts: drafts/tickets/ (git-ignored)
-- Checks: <type check>, <lint>, <unit>, <e2e>; run app: <command>
-- Deploy: <workflow> on merge to main -> <deployed URL>
+- PRDs: docs/prd/NNNN-name.md
+- Ticket drafts: drafts/tickets/; scratch and run reports: drafts/ (both git-ignored)
+- Checks: the Commands section above
+- Browser checks: local app via the run command (Chrome DevTools MCP); deployed: <URL>
+- Deploy: <workflow> on merge to main -> <deployed URL>; deployed commit shown at <where>
+- Max fix rounds: 3
 
 ## Context index
 See docs/context/INDEX.md
