@@ -33,11 +33,19 @@ Batch mode: `drain-refined` runs steps 3-4 unattended for every Refined ticket (
 - Ticket drafts: `drafts/tickets/`; scratch and run reports: `drafts/` (both git-ignored)
 - Checks: the Commands section below
 - Browser checks: local app via the run command (Chrome DevTools MCP); deployed: https://joshdengxd.github.io
-- Deploy: GitHub Actions on merge to main -> https://joshdengxd.github.io; deployed commit: not set yet (#2 records it)
+- Deploy: `.github/workflows/deploy.yml` on push to main (or run it by hand) -> https://joshdengxd.github.io; deployed commit: `<meta name="commit">` on every page holds the full SHA of the build
 - Max fix rounds: 3
 
 ## Commands
-Not set yet. #2 defines build / type check / lint / unit / e2e / run and records them here; "run" serves the static build `out/`, which is what Pages serves and what verifiers check.
+Node 26 (`.nvmrc`). Install: `npm ci`; once per machine for e2e: `npx playwright install chromium`.
+- Build: `npm run build` (static export to `out/`)
+- Dev: `npm run dev` (dev server, http://localhost:3000; routing and 404 differ from Pages)
+- Lint: `npm run lint`
+- Type check: `npm run typecheck`
+- Unit: `npm test` (Vitest, `tests/unit/`)
+- e2e: `npm run e2e` (builds, serves `out/` on port 4173, runs Playwright Chromium, `tests/e2e/`)
+- Run: `npm run build && npm run serve` (serves `out/` on http://localhost:3000, as Pages does; this is what verifiers check)
+- CI: `.github/workflows/checks.yml`, one job `checks` on every PR: lint, type check, unit, build and e2e.
 
 ## Boundaries
 - Never merge, publish or post on GitHub without the user's approval (a `drain-refined` run the user started approves its own merges and landing comments). Any automated merge outside that (for example Dependabot) needs this line changed first.
