@@ -18,12 +18,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     // Dark in the HTML for everyone; the head script may switch to a stored "light" before paint.
-    <html
-      lang="en"
-      data-theme="dark"
-      className={`${archivo.variable} ${codeFace.variable}`}
-      suppressHydrationWarning
-    >
+    <html lang="en" data-theme="dark" className={`${archivo.variable} ${codeFace.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>

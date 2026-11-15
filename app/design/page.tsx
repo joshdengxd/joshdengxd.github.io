@@ -26,7 +26,10 @@ const THEME_NAME: Record<Theme, string> = { dark: "Dark theme, the default", lig
 const TYPE_SAMPLES: { token: string; sample: string }[] = [
   { token: "--step-title", sample: "A title on two lines at most" },
   { token: "--step-lead", sample: "Navigation and short lead lines" },
-  { token: "--step-body", sample: "Running text, at a measure of about sixty-five characters, in the full ink colour." },
+  {
+    token: "--step-body",
+    sample: "Running text, at a measure of about sixty-five characters, in the full ink colour.",
+  },
   { token: "--step-small", sample: "Small print: captions, table notes and code." },
 ];
 
@@ -78,6 +81,13 @@ export default async function DesignPage() {
   const pick = (prefixes: string[]) => shared.filter(([k]) => prefixes.some((p) => k.startsWith(p)));
   const pairs = contrastPairs(css);
   const codePairs = codeContrastPairs(css);
+  const codePair = (theme: (typeof THEMES)[number], role: string) => {
+    const pair = codePairs.find((c) => c.theme === theme && c.text === role);
+    if (!pair) {
+      throw new Error(`No code contrast pair for ${theme} ${role}`);
+    }
+    return pair;
+  };
   const codeHtml = await renderMarkdown(CODE_SAMPLE);
 
   return (
@@ -86,8 +96,8 @@ export default async function DesignPage() {
         <div className={styles.introText}>
           <h1 className={styles.title}>Design language</h1>
           <p className={styles.introLead}>
-            Every token of direction D5, read from the token file the site imports. This page is a specimen for
-            checking the tokens; it is not linked from the site.
+            Every token of direction D5, read from the token file the site imports. This page is a specimen for checking
+            the tokens; it is not linked from the site.
           </p>
         </div>
         <p className={`name ${styles.nameSample}`} aria-label="Josh Deng, set in the name step">
@@ -148,7 +158,9 @@ export default async function DesignPage() {
                             {role(p.text)} on {role(p.surface)}
                           </td>
                           <td
-                            className={p.required === AA_LARGE ? `${styles.sample} ${styles.displaySample}` : styles.sample}
+                            className={
+                              p.required === AA_LARGE ? `${styles.sample} ${styles.displaySample}` : styles.sample
+                            }
                             style={{ background: `var(${p.surface})`, color: `var(${p.text})` } as CSSProperties}
                           >
                             {p.required === AA_LARGE ? "Name" : "Sample text"}
@@ -173,8 +185,8 @@ export default async function DesignPage() {
             Type
           </h2>
           <p>
-            One family, Archivo, variable in weight and width: condensed and heavy for the name (the name step is
-            the name at the top of this page), normal width for text.{" "}
+            One family, Archivo, variable in weight and width: condensed and heavy for the name (the name step is the
+            name at the top of this page), normal width for text.{" "}
             {/* taste-skill-ignore: the next line names the code face in prose; it does not set text in it */}
             JetBrains Mono only for code. {/* taste-skill-ignore */}
             Both are served from this site.
@@ -184,7 +196,10 @@ export default async function DesignPage() {
           <ul className={styles.steps}>
             {TYPE_SAMPLES.map(({ token, sample }) => (
               <li key={token} className={styles.step}>
-                <span style={{ fontSize: `var(${token})` }} className={token === "--step-title" ? styles.titleSample : undefined}>
+                <span
+                  style={{ fontSize: `var(${token})` }}
+                  className={token === "--step-title" ? styles.titleSample : undefined}
+                >
                   {sample}
                 </span>
                 <code>{token}</code>
@@ -249,10 +264,7 @@ export default async function DesignPage() {
           </p>
         </div>
         <div className={styles.body}>
-          <TokenTable
-            caption="Motion tokens"
-            tokens={pick(["--duration-", "--delay-", "--ease-", "--distance-"])}
-          />
+          <TokenTable caption="Motion tokens" tokens={pick(["--duration-", "--delay-", "--ease-", "--distance-"])} />
         </div>
       </section>
 
@@ -261,13 +273,18 @@ export default async function DesignPage() {
           <h2 id="code" className={styles.heading}>
             Code
           </h2>
-          <p>Code blocks use the code face at the small step, highlighted at build time with colours from the tokens.</p>
+          <p>
+            Code blocks use the code face at the small step, highlighted at build time with colours from the tokens.
+          </p>
         </div>
         <div className={styles.body}>
           <div className={styles.code} dangerouslySetInnerHTML={{ __html: codeHtml }} />
-          <ul className={styles.codeRoles} aria-label="Code colours and their contrast on the code background, 4.5:1 needed">
+          <ul
+            className={styles.codeRoles}
+            aria-label="Code colours and their contrast on the code background, 4.5:1 needed"
+          >
             {CODE_TEXT_ROLES.map((role) => {
-              const [dark, light] = THEMES.map((theme) => codePairs.find((c) => c.theme === theme && c.text === role)!);
+              const [dark, light] = THEMES.map((theme) => codePair(theme, role));
               return (
                 <li
                   key={role}

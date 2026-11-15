@@ -2,7 +2,9 @@ import { execSync } from "node:child_process";
 import type { NextConfig } from "next";
 
 function commitSha(): string {
-  if (process.env.GITHUB_SHA) return process.env.GITHUB_SHA;
+  if (process.env.GITHUB_SHA) {
+    return process.env.GITHUB_SHA;
+  }
   try {
     return execSync("git rev-parse HEAD", { encoding: "utf8" }).trim();
   } catch {

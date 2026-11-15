@@ -19,7 +19,8 @@
 
 @font-face {
   font-family: "Archivo name fallback";
-  src: local("Arial Bold"), local("Arial-BoldMT"), local("Helvetica Bold"), local("Liberation Sans Bold"), local("Arial");
+  src:
+    local("Arial Bold"), local("Arial-BoldMT"), local("Helvetica Bold"), local("Liberation Sans Bold"), local("Arial");
   font-weight: 800;
   ascent-override: 85.41%;
   descent-override: 20.43%;

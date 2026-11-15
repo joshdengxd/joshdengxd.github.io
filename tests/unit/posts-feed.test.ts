@@ -33,7 +33,10 @@ describe("the feed", () => {
   });
 
   it("has one item per post, in the order given, with link, guid, date and tags", () => {
-    const xml = buildFeed([post(), post({ slug: "second", title: "Second", date: "2026-11-01T08:05:09Z", tags: ["a", "b"] })]);
+    const xml = buildFeed([
+      post(),
+      post({ slug: "second", title: "Second", date: "2026-11-01T08:05:09Z", tags: ["a", "b"] }),
+    ]);
     expect(XMLValidator.validate(xml)).toBe(true);
     const items = parse(xml).channel.item;
     expect(items.map((i: { title: string }) => i.title)).toEqual(["First post", "Second"]);

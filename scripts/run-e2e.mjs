@@ -17,7 +17,9 @@ if (build !== "fixture" && build !== "default") {
 
 function run(command, env = {}) {
   const result = spawnSync(command, { stdio: "inherit", shell: true, env: { ...process.env, ...env } });
-  if (result.status !== 0) process.exit(result.status ?? 1);
+  if (result.status !== 0) {
+    process.exit(result.status ?? 1);
+  }
 }
 
 if (build === "fixture") {

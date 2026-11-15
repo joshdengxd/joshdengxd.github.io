@@ -26,7 +26,11 @@ export function findLeaks(outDir, terms) {
   const leaks = [];
   for (const file of filesUnder(outDir)) {
     const text = readFileSync(file, "utf8");
-    for (const term of terms) if (file.includes(term) || text.includes(term)) leaks.push([file, term]);
+    for (const term of terms) {
+      if (file.includes(term) || text.includes(term)) {
+        leaks.push([file, term]);
+      }
+    }
   }
   return leaks;
 }
@@ -45,7 +49,9 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   }
   const leaks = findLeaks(out, terms);
   if (leaks.length > 0) {
-    for (const [file, term] of leaks) console.error(`check-no-fixture: "${term}" found in ${file}`);
+    for (const [file, term] of leaks) {
+      console.error(`check-no-fixture: "${term}" found in ${file}`);
+    }
     process.exit(1);
   }
   console.log(`check-no-fixture: ${terms.length} fixture terms, none in ${out}/`);

@@ -15,8 +15,7 @@ const LIGHT_GROUND = "rgb(243, 240, 230)";
 
 const theme = (page: Page) => page.evaluate(() => document.documentElement.getAttribute("data-theme"));
 const bodyBackground = (page: Page) => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-const currentLinks = (page: Page) =>
-  page.locator('a[aria-current="page"]').filter({ visible: true });
+const currentLinks = (page: Page) => page.locator('a[aria-current="page"]').filter({ visible: true });
 
 // The first animation frame comes before the first paint: the theme then is the theme the visitor first sees.
 type Recorded = { firstFrameTheme?: string | null };
@@ -80,7 +79,9 @@ test.describe("theme", () => {
     }
   });
 
-  test("the toggle in the shell switches to light; it survives a reload and carries to other pages", async ({ page }) => {
+  test("the toggle in the shell switches to light; it survives a reload and carries to other pages", async ({
+    page,
+  }) => {
     await page.goto("/about/");
     const toggle = page.getByRole("button", { name: "Light theme" });
     await expect(toggle).toHaveAttribute("aria-pressed", "false");
@@ -162,14 +163,18 @@ test.describe("keyboard", () => {
       await page.keyboard.press("Tab");
       const info = await page.evaluate(() => {
         const el = document.activeElement as HTMLElement | null;
-        if (!el || el === document.body) return { name: "", ring: false };
+        if (!el || el === document.body) {
+          return { name: "", ring: false };
+        }
         const cs = getComputedStyle(el);
         return {
           name: el.getAttribute("aria-label") ?? el.textContent?.trim() ?? "",
           ring: cs.outlineStyle !== "none" && parseFloat(cs.outlineWidth) >= 2,
         };
       });
-      if (info.name === "") break;
+      if (info.name === "") {
+        break;
+      }
       order.push(info.name);
       expect(info.ring, `focus ring on ${info.name}`).toBe(true);
     }
@@ -241,7 +246,9 @@ test.describe("phone", () => {
 test.describe("phone, web font not loaded", () => {
   for (const js of [true, false]) {
     for (const width of [320, 390]) {
-      test(`nothing overflows at ${width}px with the font file blocked (JavaScript ${js ? "on" : "off"})`, async ({ browser }) => {
+      test(`nothing overflows at ${width}px with the font file blocked (JavaScript ${js ? "on" : "off"})`, async ({
+        browser,
+      }) => {
         const context = await browser.newContext({ javaScriptEnabled: js, viewport: { width, height: 800 } });
         const page = await context.newPage();
         let blocked = 0;
@@ -252,7 +259,7 @@ test.describe("phone, web font not loaded", () => {
         for (const path of PAGES) {
           await page.goto(path);
           await page.waitForLoadState("load");
-          const loaded = await page.evaluate(() => document.fonts.check('800 20px archivo'));
+          const loaded = await page.evaluate(() => document.fonts.check("800 20px archivo"));
           expect(loaded, `${path}: the web font must be missing for this test to mean anything`).toBe(false);
           const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
           expect(overflow, path).toBeLessThanOrEqual(0);
@@ -275,7 +282,9 @@ test.describe("without JavaScript, on a phone", () => {
       await page.locator("summary", { hasText: "Menu" }).click();
       const sheet = page.getByRole("navigation", { name: "Main" }).filter({ visible: true });
       await expect(sheet, path).toBeVisible();
-      for (const { label } of NAV) await expect(sheet.getByRole("link", { name: label })).toBeVisible();
+      for (const { label } of NAV) {
+        await expect(sheet.getByRole("link", { name: label })).toBeVisible();
+      }
       // No toggle without JavaScript: it could not work.
       await expect(page.getByRole("button", { name: "Light theme" })).toHaveCount(0);
     }
@@ -283,12 +292,17 @@ test.describe("without JavaScript, on a phone", () => {
 });
 
 test.describe("personal details", () => {
-  test("the shell shows no contact detail, and outside links go only to GitHub, LinkedIn, the public repos and this repo's issues and PRs", async ({ page }) => {
+  test("the shell shows no contact detail, and outside links go only to GitHub, LinkedIn, the public repos and this repo's issues and PRs", async ({
+    page,
+  }) => {
     const outside = new Set<string>();
     for (const path of [...PAGES, ...PROJECTS.map((p) => `/projects/${p.slug}/`)]) {
       await page.goto(path);
-      for (const href of await page.locator("a[href]").evaluateAll((as) => as.map((a) => a.getAttribute("href")!)))
-        if (!href.startsWith("/") && !href.startsWith("#")) outside.add(href);
+      for (const href of await page.locator("a[href]").evaluateAll((as) => as.map((a) => a.getAttribute("href")!))) {
+        if (!href.startsWith("/") && !href.startsWith("#")) {
+          outside.add(href);
+        }
+      }
       const shell = await page.locator("header, footer").allInnerTexts();
       expect(shell.join(" "), path).not.toMatch(/@|\+?\d[\d\s().-]{6,}\d/);
     }
@@ -299,11 +313,15 @@ test.describe("personal details", () => {
       "https://github.com/joshdengxd/job-search-skills",
       "https://github.com/joshdengxd/joshdengxd.github.io",
     ];
-    for (const href of outside)
+    for (const href of outside) {
       expect(
-        allowed.includes(href) || /^https:\/\/github\.com\/joshdengxd\/joshdengxd\.github\.io\/(issues|pull)\/\d+$/.test(href),
+        allowed.includes(href) ||
+          /^https:\/\/github\.com\/joshdengxd\/joshdengxd\.github\.io\/(issues|pull)\/\d+$/.test(href),
         href,
       ).toBe(true);
-    for (const href of allowed) expect([...outside], href).toContain(href);
+    }
+    for (const href of allowed) {
+      expect([...outside], href).toContain(href);
+    }
   });
 });

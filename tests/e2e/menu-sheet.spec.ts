@@ -12,7 +12,9 @@ const sheetLink = (page: Page, name: string) => page.locator("details nav a", { 
 const slowNavigation = (page: Page) =>
   page.route(/\.txt(\?.*)?$/, async (route) => {
     await new Promise((resolve) => setTimeout(resolve, DELAY));
-    await route.continue().catch(() => {});
+    await route.continue().catch(() => {
+      // the page may already be gone when the delayed request resumes
+    });
   });
 const expectOpen = (page: Page, open: boolean) => expect(sheet(page)).toHaveJSProperty("open", open);
 /** The state right now, without waiting: used right after a tap, while the slow navigation is still on its way. */
@@ -53,7 +55,9 @@ test.describe("Menu sheet with a slow navigation", () => {
     await expectOpen(page, false);
   });
 
-  test("Menu, About, Menu, Projects ends on /projects/ with the sheet closed; each tap toggled it once", async ({ page }) => {
+  test("Menu, About, Menu, Projects ends on /projects/ with the sheet closed; each tap toggled it once", async ({
+    page,
+  }) => {
     await start(page, "/");
     await recordToggles(page);
     await menuButton(page).tap();

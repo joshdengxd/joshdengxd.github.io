@@ -93,7 +93,7 @@ test.describe("a post", () => {
       ]);
       expect(scrolls).toBe(true);
       expect(overflow).toBe(false);
-      await expect(page.locator("pre code").first()).toHaveCSS("font-family", /^codeFace,/) // the JetBrains Mono face from app/fonts.ts;
+      await expect(page.locator("pre code").first()).toHaveCSS("font-family", /^codeFace,/); // the JetBrains Mono face from app/fonts.ts;
     });
   }
 
@@ -124,7 +124,9 @@ test.describe("a post", () => {
       await page.goto(POST);
       const blocks = page.locator("pre.shiki");
       await expect(blocks).toHaveCount(6); // ts, json, bash, csharp, brainfuck, none
-      const plain = await blocks.evaluateAll((els) => els.slice(4).map((e) => e.querySelectorAll("[style*='--shiki-token-']").length));
+      const plain = await blocks.evaluateAll((els) =>
+        els.slice(4).map((e) => e.querySelectorAll("[style*='--shiki-token-']").length),
+      );
       expect(plain).toEqual([0, 0]);
       await expect(blocks.nth(4)).toContainText("++++++++[>++++[>++>+++<<-]<-]>>.");
       await expect(blocks.nth(5)).toContainText("a block with no language");
@@ -144,7 +146,9 @@ test.describe("a post", () => {
           const pre = document.querySelector("pre.shiki")!;
           const color = (el: Element) => getComputedStyle(el).color;
           const kw = [...pre.querySelectorAll("span[style]")].find((s) => s.textContent === "export")!;
-          const comment = [...pre.querySelectorAll("span[style]")].find((s) => s.textContent?.startsWith("// a long line"))!;
+          const comment = [...pre.querySelectorAll("span[style]")].find((s) =>
+            s.textContent?.startsWith("// a long line"),
+          )!;
           return {
             background: getComputedStyle(pre).backgroundColor,
             foreground: color(pre),
@@ -218,8 +222,9 @@ test.describe("feed and sitemap", () => {
       "/blog/blog-engine-fixture-early/",
       "/blog/tags/engine-check/",
       "/blog/tags/markdown/",
-    ])
+    ]) {
       expect(xml, path).toContain(`<loc>https://joshdengxd.github.io${path}</loc>`);
+    }
     expect(xml).toContain("<lastmod>2026-11-15T23:30:00Z</lastmod>");
     expect(xml).not.toContain("_none");
   });

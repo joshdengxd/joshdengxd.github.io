@@ -19,9 +19,13 @@ export const isHome = (pathname: string | null) => pathname !== null && trimSlas
 
 /** True when `pathname` is the page `href` or one of its sub-pages (`/blog/a-post/` marks Blog). */
 export function isCurrent(pathname: string | null, href: string): boolean {
-  if (pathname === null) return false;
+  if (pathname === null) {
+    return false;
+  }
   const path = trimSlash(pathname);
   const target = trimSlash(href);
-  if (target === "/") return path === "/";
+  if (target === "/") {
+    return path === "/";
+  }
   return path === target || path.startsWith(`${target}/`);
 }

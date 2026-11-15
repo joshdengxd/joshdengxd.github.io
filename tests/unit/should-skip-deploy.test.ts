@@ -3,7 +3,8 @@ import { decide, extractCommit, shouldSkip } from "@/scripts/should-skip-deploy.
 
 const A = "a".repeat(40);
 const B = "b".repeat(40);
-const page = (commit: string) => `<html><head><meta charset="utf-8"/><meta name="commit" content="${commit}"/></head></html>`;
+const page = (commit: string) =>
+  `<html><head><meta charset="utf-8"/><meta name="commit" content="${commit}"/></head></html>`;
 const ok = (body: string) => async () => ({ ok: true, status: 200, text: async () => body });
 
 describe("extractCommit", () => {
@@ -53,6 +54,8 @@ describe("decide", () => {
     expect(fetchImpl).not.toHaveBeenCalled();
   });
   it("force=true redeploys even when the live commit equals the run's commit", async () => {
-    expect((await decide({ eventName: "workflow_dispatch", force: true, sha: A, fetchImpl: ok(page(A)) })).skip).toBe(false);
+    expect((await decide({ eventName: "workflow_dispatch", force: true, sha: A, fetchImpl: ok(page(A)) })).skip).toBe(
+      false,
+    );
   });
 });

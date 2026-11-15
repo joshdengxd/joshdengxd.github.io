@@ -25,20 +25,25 @@ const FIXTURE_DIR = "tests/fixtures/posts";
 /** Splits the `---` block from the body. `bodyLine` is the 1-based line of the file where the body starts. */
 export function splitFrontMatter(file: string, raw: string): { yaml: string; body: string; bodyLine: number } {
   const lines = raw.replace(/^\uFEFF/, "").split(/\r?\n/);
-  if (lines[0]?.trimEnd() !== "---") throw new PostError(file, "front matter", "the file must start with a --- block");
+  if (lines[0]?.trimEnd() !== "---") {
+    throw new PostError(file, "front matter", "the file must start with a --- block");
+  }
   const end = lines.findIndex((line, i) => i > 0 && line.trimEnd() === "---");
-  if (end === -1) throw new PostError(file, "front matter", "the --- block is never closed");
+  if (end === -1) {
+    throw new PostError(file, "front matter", "the --- block is never closed");
+  }
   return { yaml: lines.slice(1, end).join("\n"), body: lines.slice(end + 1).join("\n"), bodyLine: end + 2 };
 }
 
 /** Parses and validates one post file; `file` is only used in messages. Throws with the file and the field named. */
 export async function parsePost(file: string, slug: string, raw: string): Promise<Post> {
-  if (!SLUG_PATTERN.test(slug) || RESERVED_SLUGS.includes(slug))
+  if (!SLUG_PATTERN.test(slug) || RESERVED_SLUGS.includes(slug)) {
     throw new PostError(
       file,
       "file name",
       `the slug "${slug}" must be lower-case words joined by hyphens (a-z, 0-9, -), and "${RESERVED_SLUGS.join('" or "')}" is reserved for a route`,
     );
+  }
 
   const { yaml, body, bodyLine } = splitFrontMatter(file, raw);
 
@@ -49,8 +54,9 @@ export async function parsePost(file: string, slug: string, raw: string): Promis
   } catch (error) {
     throw new PostError(file, "front matter", (error as Error).message.split("\n")[0]);
   }
-  if (data === null || typeof data !== "object" || Array.isArray(data))
+  if (data === null || typeof data !== "object" || Array.isArray(data)) {
     throw new PostError(file, "front matter", "must list title, date, tags and summary");
+  }
 
   const parsed = frontMatterSchema.safeParse(data);
   if (!parsed.success) {
@@ -63,8 +69,9 @@ export async function parsePost(file: string, slug: string, raw: string): Promis
   }
 
   const rawHtml = findRawHtml(body);
-  if (rawHtml.length > 0)
+  if (rawHtml.length > 0) {
     throw new PostError(file, "body", `line ${bodyLine + rawHtml[0] - 1}: raw HTML is not allowed, use Markdown`);
+  }
 
   return { ...parsed.data, slug, html: await renderMarkdown(body) };
 }
@@ -79,12 +86,18 @@ export async function loadPostsFrom(dirs: string[], root = process.cwd()): Promi
   const posts = new Map<string, { post: Post; file: string }>();
   for (const dir of dirs) {
     const abs = resolve(root, dir);
-    if (!statSync(abs, { throwIfNoEntry: false })?.isDirectory()) continue;
-    for (const name of readdirSync(abs).filter((n) => n.endsWith(".md")).sort()) {
+    if (!statSync(abs, { throwIfNoEntry: false })?.isDirectory()) {
+      continue;
+    }
+    for (const name of readdirSync(abs)
+      .filter((n) => n.endsWith(".md"))
+      .sort()) {
       const file = relative(root, join(abs, name)).split("\\").join("/");
       const post = await parsePost(file, name.slice(0, -3), readFileSync(join(abs, name), "utf8"));
       const earlier = posts.get(post.slug);
-      if (earlier) throw new PostError(file, "file name", `the slug "${post.slug}" is already used by ${earlier.file}`);
+      if (earlier) {
+        throw new PostError(file, "file name", `the slug "${post.slug}" is already used by ${earlier.file}`);
+      }
       posts.set(post.slug, { post, file });
     }
   }
@@ -100,7 +113,9 @@ let cached: Promise<Post[]> | undefined;
 
 /** All posts, newest first. Cached during a build; read fresh in the dev server so edits show up. */
 export function getPosts(): Promise<Post[]> {
-  if (process.env.NODE_ENV !== "production") return loadPostsFrom(contentDirs());
+  if (process.env.NODE_ENV !== "production") {
+    return loadPostsFrom(contentDirs());
+  }
   return (cached ??= loadPostsFrom(contentDirs()));
 }
 
@@ -109,6 +124,10 @@ export type TagGroup = { tag: string; posts: Post[] };
 /** Every tag with its posts (newest first), tags in alphabetical order. */
 export function groupByTag(posts: Post[]): TagGroup[] {
   const groups = new Map<string, Post[]>();
-  for (const post of sortPosts(posts)) for (const tag of post.tags) groups.set(tag, [...(groups.get(tag) ?? []), post]);
+  for (const post of sortPosts(posts)) {
+    for (const tag of post.tags) {
+      groups.set(tag, [...(groups.get(tag) ?? []), post]);
+    }
+  }
   return [...groups.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([tag, list]) => ({ tag, posts: list }));
 }

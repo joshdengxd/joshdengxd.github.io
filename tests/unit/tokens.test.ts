@@ -40,8 +40,20 @@ describe("design tokens", () => {
 
   it("covers type, spacing, radius and motion", () => {
     const names = Object.keys(sharedTokens(css));
-    for (const prefix of ["--font-", "--step-", "--weight-", "--leading-", "--space-", "--radius-", "--duration-", "--ease-"]) {
-      expect(names.some((n) => n.startsWith(prefix)), prefix).toBe(true);
+    for (const prefix of [
+      "--font-",
+      "--step-",
+      "--weight-",
+      "--leading-",
+      "--space-",
+      "--radius-",
+      "--duration-",
+      "--ease-",
+    ]) {
+      expect(
+        names.some((n) => n.startsWith(prefix)),
+        prefix,
+      ).toBe(true);
     }
     expect(names.filter((n) => n.startsWith("--step-")).length).toBeGreaterThanOrEqual(5);
   });
@@ -53,10 +65,15 @@ describe("design tokens", () => {
 });
 
 describe("code colours (--shiki-*)", () => {
-  it.each(["dark", "light"] as const)("the %s theme defines the code background and every code text role as #rrggbb", (theme) => {
-    const c = codeColours(css, theme);
-    for (const role of [CODE_SURFACE_ROLE, ...CODE_TEXT_ROLES]) expect(c[role], role).toMatch(/^#[0-9a-f]{6}$/i);
-  });
+  it.each(["dark", "light"] as const)(
+    "the %s theme defines the code background and every code text role as #rrggbb",
+    (theme) => {
+      const c = codeColours(css, theme);
+      for (const role of [CODE_SURFACE_ROLE, ...CODE_TEXT_ROLES]) {
+        expect(c[role], role).toMatch(/^#[0-9a-f]{6}$/i);
+      }
+    },
+  );
 
   it("both themes define the same code roles, and they are exactly what Shiki's CSS-variables theme reads", () => {
     const expected = [CODE_SURFACE_ROLE, ...CODE_TEXT_ROLES].sort();
@@ -90,12 +107,9 @@ describe("WCAG 2.2 AA contrast, every text and surface pair of both themes", () 
     expect(pairs).toHaveLength(2 * SURFACE_ROLES.length * (TEXT_ROLES.length + DISPLAY_ROLES.length));
   });
 
-  it.each(pairs.map((p) => [p.theme, p.text, p.surface, p] as const))(
-    "%s: %s on %s",
-    (_theme, text, _surface, p) => {
-      const required = (TEXT_ROLES as readonly string[]).includes(text) ? AA_NORMAL : AA_LARGE;
-      expect(p.required).toBe(required);
-      expect(p.ratio).toBeGreaterThanOrEqual(required);
-    },
-  );
+  it.each(pairs.map((p) => [p.theme, p.text, p.surface, p] as const))("%s: %s on %s", (_theme, text, _surface, p) => {
+    const required = (TEXT_ROLES as readonly string[]).includes(text) ? AA_NORMAL : AA_LARGE;
+    expect(p.required).toBe(required);
+    expect(p.ratio).toBeGreaterThanOrEqual(required);
+  });
 });

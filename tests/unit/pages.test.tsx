@@ -52,7 +52,9 @@ describe("home", () => {
   it("Featured repos has the same cards as Projects, each linking to its page", () => {
     render(<HomeView posts={[]} />);
     const featured = screen.getByRole("region", { name: "Featured repos" });
-    const links = within(featured).getAllByRole("link").map((l) => slashed(l.getAttribute("href")));
+    const links = within(featured)
+      .getAllByRole("link")
+      .map((l) => slashed(l.getAttribute("href")));
     expect(links.filter((h) => h?.startsWith("/projects/") && h !== "/projects/")).toEqual(
       PROJECTS.map((p) => `/projects/${p.slug}/`),
     );
@@ -69,11 +71,11 @@ describe("home", () => {
     render(<HomeView posts={[1, 2, 3, 4].map(post)} />);
     const latest = screen.getByRole("region", { name: "Latest posts" });
     expect(latest).not.toHaveTextContent("No posts yet");
-    expect(within(latest).getAllByRole("heading", { level: 3 }).map((h) => h.textContent)).toEqual([
-      "Post 1",
-      "Post 2",
-      "Post 3",
-    ]);
+    expect(
+      within(latest)
+        .getAllByRole("heading", { level: 3 })
+        .map((h) => h.textContent),
+    ).toEqual(["Post 1", "Post 2", "Post 3"]);
     expect(slashed(within(latest).getByRole("link", { name: "Post 1" }).getAttribute("href"))).toBe("/blog/post-1/");
   });
 });
@@ -140,8 +142,9 @@ describe("How this site is built", () => {
       "live-env-local-test",
       "prod-release-gate",
       "log-analysis",
-    ])
+    ]) {
       expect(screen.getByText(skill)).toBeInTheDocument();
+    }
     expect(howMeta.robots).toBeUndefined();
   });
 });
@@ -156,8 +159,9 @@ describe("sitemap and robots", () => {
       "/how-this-site-is-built/",
       "/blog/",
       ...PROJECTS.map((p) => `/projects/${p.slug}/`),
-    ])
+    ]) {
       expect(urls).toContain(`https://joshdengxd.github.io${path}`);
+    }
     expect(urls.join("\n")).not.toMatch(/design|_none/);
     expect(new Set(urls).size).toBe(urls.length);
   });

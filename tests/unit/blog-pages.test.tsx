@@ -56,8 +56,14 @@ describe("the post list", () => {
     render(<PostList posts={posts} empty="none" />);
     const titles = screen.getAllByRole("heading", { level: 2 }).map((h) => h.textContent);
     expect(titles).toEqual(["First post", "Older post"]);
-    expect(screen.getByRole("link", { name: "First post" })).toHaveAttribute("href", expect.stringMatching(/^\/blog\/first-post\/?$/));
-    expect(screen.getByRole("link", { name: "agents" })).toHaveAttribute("href", expect.stringMatching(/^\/blog\/tags\/agents\/?$/));
+    expect(screen.getByRole("link", { name: "First post" })).toHaveAttribute(
+      "href",
+      expect.stringMatching(/^\/blog\/first-post\/?$/),
+    );
+    expect(screen.getByRole("link", { name: "agents" })).toHaveAttribute(
+      "href",
+      expect.stringMatching(/^\/blog\/tags\/agents\/?$/),
+    );
     expect(screen.getAllByText("A summary.")).toHaveLength(2);
   });
 

@@ -6,7 +6,9 @@ import { TagLinks } from "./tag-links";
 
 /** Posts as given (the caller sorts, newest first), or the empty state when there are none. */
 export function PostList({ posts, empty }: { posts: Post[]; empty: string }) {
-  if (posts.length === 0) return <p className={styles.empty}>{empty}</p>;
+  if (posts.length === 0) {
+    return <p className={styles.empty}>{empty}</p>;
+  }
   return (
     <ol className={styles.list}>
       {posts.map((post) => (

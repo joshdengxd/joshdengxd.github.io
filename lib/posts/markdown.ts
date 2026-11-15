@@ -18,7 +18,9 @@ const parser = unified().use(remarkParse).use(remarkGfm);
 export function findRawHtml(markdown: string): number[] {
   const lines: number[] = [];
   const walk = (node: MdNode) => {
-    if (node.type === "html" && node.position) lines.push(node.position.start.line);
+    if (node.type === "html" && node.position) {
+      lines.push(node.position.start.line);
+    }
     node.children?.forEach(walk);
   };
   walk(parser.parse(markdown) as MdNode);
@@ -38,7 +40,21 @@ const schema = { ...defaultSchema, clobber: [] };
 // <pre> with its own element tree, built from the code text only: the only attributes it writes are `class`, `style`
 // (var(--shiki-*) references, never a colour value) and `tabindex`, so nothing an author writes (language, meta string,
 // code text) can become an id, an event handler or a class. Nothing runs in the browser.
-export const HIGHLIGHT_LANGUAGES = ["ts", "tsx", "js", "jsx", "json", "bash", "shell", "yaml", "md", "css", "html", "diff", "csharp"];
+export const HIGHLIGHT_LANGUAGES = [
+  "ts",
+  "tsx",
+  "js",
+  "jsx",
+  "json",
+  "bash",
+  "shell",
+  "yaml",
+  "md",
+  "css",
+  "html",
+  "diff",
+  "csharp",
+];
 
 // Every colour comes from the variables in design-language/tokens.css, so the theme switch needs nothing extra.
 const CODE_THEME = createCssVariablesTheme({ name: "css-variables", variablePrefix: "--shiki-", fontStyle: true });
@@ -63,7 +79,9 @@ async function buildProcessor(): Promise<Processor> {
       const classes = node.properties?.className;
       if (node.tagName === "code" && Array.isArray(classes)) {
         const lang = classes.find((c) => typeof c === "string" && c.startsWith("language-"));
-        if (typeof lang === "string" && !loaded.has(lang.slice("language-".length))) delete node.properties!.className;
+        if (typeof lang === "string" && !loaded.has(lang.slice("language-".length))) {
+          delete node.properties?.className;
+        }
       }
       node.children?.forEach(walk);
     };

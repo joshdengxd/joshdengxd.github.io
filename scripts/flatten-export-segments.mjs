@@ -15,14 +15,22 @@ function filesUnder(dir) {
 }
 
 function removeEmptyDirs(dir) {
-  for (const e of readdirSync(dir, { withFileTypes: true })) if (e.isDirectory()) removeEmptyDirs(join(dir, e.name));
-  if (readdirSync(dir).length === 0) rmdirSync(dir);
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    if (e.isDirectory()) {
+      removeEmptyDirs(join(dir, e.name));
+    }
+  }
+  if (readdirSync(dir).length === 0) {
+    rmdirSync(dir);
+  }
 }
 
 let moved = 0;
 function walk(dir) {
   for (const e of readdirSync(dir, { withFileTypes: true })) {
-    if (!e.isDirectory()) continue;
+    if (!e.isDirectory()) {
+      continue;
+    }
     const path = join(dir, e.name);
     if (e.name.startsWith("__next.")) {
       for (const file of filesUnder(path)) {
@@ -37,5 +45,9 @@ function walk(dir) {
   }
 }
 
-if (statSync(out, { throwIfNoEntry: false })?.isDirectory()) walk(out);
-if (moved) console.log(`flatten-export-segments: moved ${moved} segment file(s) to the names the client requests`);
+if (statSync(out, { throwIfNoEntry: false })?.isDirectory()) {
+  walk(out);
+}
+if (moved) {
+  console.log(`flatten-export-segments: moved ${moved} segment file(s) to the names the client requests`);
+}

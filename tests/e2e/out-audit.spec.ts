@@ -13,9 +13,12 @@ const ORIGIN = "https://joshdengxd.github.io";
 type Page = { file: string; path: string; html: string; noindex: boolean; text: string };
 
 function htmlFiles(dir: string): string[] {
-  return readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
-    e.isDirectory() ? (e.name === "_next" ? [] : htmlFiles(join(dir, e.name))) : e.name.endsWith(".html") ? [join(dir, e.name)] : [],
-  );
+  return readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
+    if (e.isDirectory()) {
+      return e.name === "_next" ? [] : htmlFiles(join(dir, e.name));
+    }
+    return e.name.endsWith(".html") ? [join(dir, e.name)] : [];
+  });
 }
 
 const decode = (s: string) =>
@@ -43,7 +46,13 @@ function loadPages(): Page[] {
     const html = readFileSync(file, "utf8");
     const rel = relative(OUT, file).split(sep).join("/");
     const path = rel === "404.html" ? "/404.html" : `/${rel.replace(/index\.html$/, "")}`;
-    return { file: rel, path, html, noindex: /<meta name="robots" content="[^"]*noindex/.test(html), text: textOf(html) };
+    return {
+      file: rel,
+      path,
+      html,
+      noindex: /<meta name="robots" content="[^"]*noindex/.test(html),
+      text: textOf(html),
+    };
   });
 }
 
@@ -67,23 +76,38 @@ test.describe("pages and the sitemap", () => {
     const urls = new Set(sitemapUrls());
     expect(pages.length).toBeGreaterThan(8);
     for (const p of pages) {
-      if (p.noindex) expect(urls.has(`${ORIGIN}${p.path}`), `${p.file} is noindex but in the sitemap`).toBe(false);
-      else expect(urls.has(`${ORIGIN}${p.path}`), `${p.file} is indexable but not in the sitemap`).toBe(true);
+      if (p.noindex) {
+        expect(urls.has(`${ORIGIN}${p.path}`), `${p.file} is noindex but in the sitemap`).toBe(false);
+      } else {
+        expect(urls.has(`${ORIGIN}${p.path}`), `${p.file} is indexable but not in the sitemap`).toBe(true);
+      }
     }
     const indexablePaths = new Set(indexable.map((p) => `${ORIGIN}${p.path}`));
-    for (const url of urls) expect(indexablePaths.has(url), `${url} is in the sitemap but has no indexable page`).toBe(true);
+    for (const url of urls) {
+      expect(indexablePaths.has(url), `${url} is in the sitemap but has no indexable page`).toBe(true);
+    }
   });
 
   test("the sitemap has every v1 route, and never /design/ or a _none page", () => {
     const urls = sitemapUrls();
-    for (const path of ["/", "/about/", "/projects/", "/how-this-site-is-built/", "/blog/", ...PROJECTS.map((p) => `/projects/${p.slug}/`)])
+    for (const path of [
+      "/",
+      "/about/",
+      "/projects/",
+      "/how-this-site-is-built/",
+      "/blog/",
+      ...PROJECTS.map((p) => `/projects/${p.slug}/`),
+    ]) {
       expect(urls, path).toContain(`${ORIGIN}${path}`);
+    }
     expect(urls.join("\n")).not.toMatch(/design|_none/);
     expect(new Set(urls).size).toBe(urls.length);
   });
 
   test("the hidden pages (/design/, _none, 404) are noindex", () => {
-    for (const p of pages.filter((q) => /design|_none|404|_not-found/.test(q.file))) expect(p.noindex, p.file).toBe(true);
+    for (const p of pages.filter((q) => /design|_none|404|_not-found/.test(q.file))) {
+      expect(p.noindex, p.file).toBe(true);
+    }
   });
 });
 
@@ -102,8 +126,11 @@ test.describe("metadata of every indexable page", () => {
   test("titles are the page title plus the site name (the home page: the name alone)", () => {
     for (const p of indexable) {
       const t = title(p.html);
-      if (p.path === "/") expect(t).toBe("Xindong Deng (Josh)");
-      else expect(t, p.file).toMatch(/^.+ · Xindong Deng \(Josh\)$/);
+      if (p.path === "/") {
+        expect(t).toBe("Xindong Deng (Josh)");
+      } else {
+        expect(t, p.file).toMatch(/^.+ · Xindong Deng \(Josh\)$/);
+      }
       expect(t.match(/Xindong Deng \(Josh\)/g), p.file).toHaveLength(1);
     }
   });
@@ -165,7 +192,9 @@ test.describe("placeholders", () => {
     for (const p of pages) {
       const body = p.html.replace(/<script[\s\S]*?<\/script>/g, "");
       const marked = (body.match(/ data-placeholder(?:="[^"]*")?[ >]/g) ?? []).length;
-      const labelled = (body.match(/<p [^>]*data-placeholder(?:="[^"]*")?[^>]*><span [^>]*>Placeholder:<\/span>/g) ?? []).length;
+      const labelled = (
+        body.match(/<p [^>]*data-placeholder(?:="[^"]*")?[^>]*><span [^>]*>Placeholder:<\/span>/g) ?? []
+      ).length;
       const labels = (p.text.match(/Placeholder:/g) ?? []).length;
       expect(labelled, `${p.file}: placeholders without the label`).toBe(marked);
       expect(labels, `${p.file}: a Placeholder: label that is not on a placeholder`).toBe(marked);
@@ -175,8 +204,9 @@ test.describe("placeholders", () => {
   });
 
   test("the v1 pages each have at least one placeholder", () => {
-    for (const path of ["/", "/about/", ...PROJECTS.map((p) => `/projects/${p.slug}/`)])
+    for (const path of ["/", "/about/", ...PROJECTS.map((p) => `/projects/${p.slug}/`)]) {
       expect(pages.find((p) => p.path === path)?.html, path).toContain("data-placeholder");
+    }
   });
 });
 
@@ -185,22 +215,28 @@ test.describe("personal details", () => {
     ["a place of residence", /based in|located in|living in|lives in|home town|hometown/i],
     ["an email address", /[\w.+-]+@[\w-]+\.[a-z]{2,}/i],
     ["a phone number", /(?:\+?\d[\s().-]?){10,}/],
-    ["job-search status", /open to work|looking for (?:a |new |my next )?(?:job|role|work|opportunit)|job[- ]hunt|seeking|laid off|layoff|unemployed|available for hire/i],
+    [
+      "job-search status",
+      /open to work|looking for (?:a |new |my next )?(?:job|role|work|opportunit)|job[- ]hunt|seeking|laid off|layoff|unemployed|available for hire/i,
+    ],
     ["a photo", /<img[\s>]/i],
   ];
 
   test("no page shows a city, email, phone number, job-search status or photo", () => {
-    for (const p of pages)
+    for (const p of pages) {
       for (const [what, pattern] of FORBIDDEN) {
         const where = what === "a photo" ? p.html : p.text;
         expect(pattern.test(where), `${p.file} shows ${what}`).toBe(false);
       }
+    }
   });
 
   test("the only location named is 'Alberta, Canada'", () => {
     const home = pages.find((p) => p.path === "/")!;
     expect(home.text).toContain("Alberta, Canada");
-    for (const p of pages) expect(p.text.replace(/Alberta, Canada/g, ""), p.file).not.toMatch(/Alberta|Canada/);
+    for (const p of pages) {
+      expect(p.text.replace(/Alberta, Canada/g, ""), p.file).not.toMatch(/Alberta|Canada/);
+    }
   });
 
   test("outside links go only to the GitHub and LinkedIn profiles, the three public repos and this repo's issues and PRs", () => {
@@ -210,10 +246,15 @@ test.describe("personal details", () => {
       ...PROJECTS.map((p) => p.repoUrl),
     ];
     const issueOrPull = new RegExp(`^${REPO_URL.replace(/[.]/g, "\\.")}/(?:issues|pull)/\\d+$`);
-    for (const p of pages)
-      for (const href of [...p.html.replace(/<script[\s\S]*?<\/script>/g, "").matchAll(/<a [^>]*href="([^"]+)"/g)].map((m) => decode(m[1]))) {
-        if (href.startsWith("/") || href.startsWith("#")) continue;
+    for (const p of pages) {
+      for (const href of [...p.html.replace(/<script[\s\S]*?<\/script>/g, "").matchAll(/<a [^>]*href="([^"]+)"/g)].map(
+        (m) => decode(m[1]),
+      )) {
+        if (href.startsWith("/") || href.startsWith("#")) {
+          continue;
+        }
         expect(allowed.includes(href) || issueOrPull.test(href), `${p.file} links ${href}`).toBe(true);
       }
+    }
   });
 });

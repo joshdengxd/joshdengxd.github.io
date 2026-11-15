@@ -14,17 +14,23 @@ const good = (over: Record<string, string> = {}) => {
     .map(([k, v]) => `${k}: ${v}`);
   return `---\n${lines.join("\n")}\n---\n\nBody text.\n`;
 };
-const fails = (raw: string, slug = "my-post") => parsePost(FILE, slug, raw).then(
-  () => {
-    throw new Error("expected the post to fail");
-  },
-  (e: Error) => e.message,
-);
+const fails = (raw: string, slug = "my-post") =>
+  parsePost(FILE, slug, raw).then(
+    () => {
+      throw new Error("expected the post to fail");
+    },
+    (e: Error) => e.message,
+  );
 
 describe("front matter validation", () => {
   it("accepts a valid post", async () => {
     const post = await parsePost(FILE, "my-post", good());
-    expect(post).toMatchObject({ slug: "my-post", title: "A post", date: "2026-11-15T18:00:00Z", tags: ["learning", "agents"] });
+    expect(post).toMatchObject({
+      slug: "my-post",
+      title: "A post",
+      date: "2026-11-15T18:00:00Z",
+      tags: ["learning", "agents"],
+    });
     expect(post.html).toBe("<p>Body text.</p>");
   });
 
@@ -116,7 +122,7 @@ describe("splitFrontMatter", () => {
 
 describe("BOM and Windows line endings", () => {
   it("parses a whole post with a BOM and CRLF line endings", async () => {
-    const post = await parsePost(FILE, "my-post", "\uFEFF" + good().replace(/\n/g, "\r\n"));
+    const post = await parsePost(FILE, "my-post", `\uFEFF${good().replace(/\n/g, "\r\n")}`);
     expect(post).toMatchObject({ title: "A post", tags: ["learning", "agents"] });
     expect(post.html).toBe("<p>Body text.</p>");
   });
@@ -147,7 +153,10 @@ describe("raw HTML", () => {
   });
 
   it("does not mistake code or autolinks for HTML", async () => {
-    const raw = good().replace("Body text.", "Use `<div>` here.\n\n```html\n<div>x</div>\n```\n\n<https://example.com>");
+    const raw = good().replace(
+      "Body text.",
+      "Use `<div>` here.\n\n```html\n<div>x</div>\n```\n\n<https://example.com>",
+    );
     const post = await parsePost(FILE, "my-post", raw);
     expect(post.html).toContain("&#x3C;div>");
   });
@@ -181,7 +190,7 @@ describe("sorting and tags", () => {
 describe("loading from folders", () => {
   it("fails a duplicate slug, naming both files", async () => {
     await expect(loadPostsFrom(["tests/fixtures/dup-a", "tests/fixtures/dup-b"])).rejects.toThrow(
-      "tests/fixtures/dup-b/same-slug.md: file name: the slug \"same-slug\" is already used by tests/fixtures/dup-a/same-slug.md",
+      'tests/fixtures/dup-b/same-slug.md: file name: the slug "same-slug" is already used by tests/fixtures/dup-a/same-slug.md',
     );
   });
 

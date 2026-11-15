@@ -47,7 +47,9 @@ describe("shell", () => {
       // next/link applies the trailingSlash setting only in the build; the built HTML is checked in e2e.
       const shown = links.map((l) => [l.textContent, trimSlash(l.getAttribute("href")!)]);
       expect(shown).toEqual(NAV.map((i) => [i.label, trimSlash(i.href)]));
-      expect(links.filter((l) => l.getAttribute("aria-current") === "page").map((l) => l.textContent)).toEqual(["Blog"]);
+      expect(links.filter((l) => l.getAttribute("aria-current") === "page").map((l) => l.textContent)).toEqual([
+        "Blog",
+      ]);
     }
 
     const footer = screen.getByRole("contentinfo");
