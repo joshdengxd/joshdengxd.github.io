@@ -1,5 +1,5 @@
 // Fails (exit 1) if the blog test fixture leaked into a build: the slug or the title of any post in
-// tests/fixtures/posts/ appearing anywhere in out/ (HTML, feed, sitemap, Next.js data files).
+// tests/fixtures/posts/ appearing anywhere in out/ (HTML, sitemap, Next.js data files).
 // Run after `npm run build` in CI and in the deploy workflow. Usage: node scripts/check-no-fixture.mjs [out] [fixtures]
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";

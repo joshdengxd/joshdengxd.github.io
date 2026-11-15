@@ -7,7 +7,6 @@ import BlogPage, { metadata as blogMeta } from "@/app/blog/page";
 import { generateStaticParams as slugParams } from "@/app/blog/[slug]/page";
 import { generateStaticParams as tagParams } from "@/app/blog/tags/[tag]/page";
 import sitemap from "@/app/sitemap";
-import { GET as rss } from "@/app/rss.xml/route";
 import { formatUtcDate } from "@/lib/posts/dates";
 import type { Post } from "@/lib/posts/loader";
 
@@ -22,14 +21,17 @@ const post = (over: Partial<Post> = {}): Post => ({
 });
 
 describe("/blog/ with no posts (the deployed state)", () => {
-  it("says there are no posts yet, links the feed, and is indexable", async () => {
+  it("says there are no posts yet, opens with the weekly line, and is indexable", async () => {
     render(await BlogPage());
     expect(screen.getByRole("heading", { level: 1, name: "Blog" })).toBeInTheDocument();
     expect(screen.getByText("No posts yet.")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "RSS feed" })).toHaveAttribute("href", "/rss.xml");
+    expect(
+      screen.getByText("My learning notes on building software with agents, posted weekly. Newest first."),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /rss|feed/i })).toBeNull();
     expect(blogMeta.robots).toBeUndefined();
-    expect(blogMeta.alternates?.types).toEqual({ "application/rss+xml": "/rss.xml" });
-    expect(blogMeta.description).toBeTruthy();
+    expect(blogMeta.alternates?.types).toBeUndefined();
+    expect(blogMeta.description).toBe("My weekly learning notes on building software with agents.");
   });
 
   it("generates one hidden _none page per dynamic route, so the static export has something to build", async () => {
@@ -37,16 +39,9 @@ describe("/blog/ with no posts (the deployed state)", () => {
     expect(await tagParams()).toEqual([{ tag: "_none" }]);
   });
 
-  it("keeps the hidden _none pages out of the sitemap and the feed", async () => {
+  it("keeps the hidden _none pages out of the sitemap", async () => {
     const urls = (await sitemap()).map((e) => e.url).join("\n");
     expect(urls).not.toContain("_none");
-    expect(await (await rss()).text()).not.toContain("_none");
-  });
-
-  it("serves an empty feed", async () => {
-    const res = await rss();
-    expect(res.headers.get("content-type")).toContain("application/rss+xml");
-    expect(await res.text()).not.toContain("<item>");
   });
 });
 

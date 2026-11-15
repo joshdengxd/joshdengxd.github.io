@@ -4,6 +4,7 @@
 - Created: 2026-11-14
 - Tickets: GitHub issues labelled `prd-0001`
 - Amendment 2026-11-15: the workflow runs in two modes, unattended (`drain-refined`: only machine gates decide, the owner starts the run and samples the results) and step by step (the owner reviews and approves by hand). Wherever this PRD says the owner reviews or merges, read it as the step-by-step mode; irreversible actions outside the repository stay with the owner in both. Approved text otherwise unchanged. Tracked in issue #28.
+- Amended 2026-11-15: no RSS feed (Pages table, requirement 9 and ticket 5 no longer include it).
 
 ## Summary
 A personal website that introduces me, shares how I think about agent-assisted software delivery, explains what my public repos do, and hosts a blog. The site is built with my own shared skills, so its issues and PRs are a public record of that workflow.
