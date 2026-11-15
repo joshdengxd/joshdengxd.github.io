@@ -58,6 +58,7 @@ Check code against the current docs for these versions before writing or approvi
 - Testing Library (react 16.3, dom 10.4, jest-dom 7.0): testing-library/react-testing-library
 - Playwright 1.65: microsoft/playwright
 - GitHub Actions (checkout v7, setup-node v7, configure-pages v6, upload-pages-artifact v5, deploy-pages v5, upload-artifact v7): each action's README at its pinned tag
+- npm override in `package.json`: `@typescript-eslint/typescript-estree` gets `minimatch ^11.0.1`, because its own `^10.2.2` range is in a Dependabot advisory (`>= 7.0.0, < 11.0.1`); scoped to that one package, since the other users need minimatch 3.x. Remove it when `@typescript-eslint/typescript-estree` requires minimatch >= 11.0.1.
 
 ## Boundaries
 - Never merge, publish or post on GitHub without the user's approval (a `drain-refined` run the user started approves its own merges and landing comments). Any automated merge outside that (for example Dependabot) needs this line changed first.
