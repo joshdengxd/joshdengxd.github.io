@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import rehypeShikiFromHighlighter from "@shikijs/rehype/core";
 import { imageSize } from "image-size";
@@ -124,13 +124,16 @@ function figureFor(img: HastNode, ctx: ImageContext): HastNode {
   if (!src.includes(".") || !(IMAGE_FORMATS as readonly string[]).includes(extension)) {
     throw new ImageError(line, `the picture "${src}" must be ${IMAGE_FORMATS.join(", ")}`);
   }
+  // An exact name match, so a name that works on Windows (case-insensitive) cannot 404 on the host (case-sensitive).
   const path = join(ctx.dir, src);
-  if (!existsSync(path) || !statSync(path).isFile()) {
+  if (!existsSync(ctx.dir) || !readdirSync(ctx.dir).includes(src)) {
     throw new ImageError(line, `the picture "${src}" is not in ${ctx.label}`);
   }
   let size: { width: number; height: number };
   try {
-    const { width, height } = imageSize(readFileSync(path));
+    const { width: w, height: h, orientation } = imageSize(readFileSync(path));
+    // A JPEG whose EXIF orientation is 5-8 is shown turned a quarter: the box is the other way round.
+    const [width, height] = orientation !== undefined && orientation >= 5 ? [h, w] : [w, h];
     if (!Number.isFinite(width) || !Number.isFinite(height) || width < 1 || height < 1) {
       throw new Error("no size");
     }
@@ -167,7 +170,7 @@ function figureFor(img: HastNode, ctx: ImageContext): HastNode {
 
 const rehypePictures = () => (tree: object, file: { data: object }) => {
   const ctx = (file.data as { images?: ImageContext }).images;
-  const walk = (node: HastNode) => {
+  const walk = (node: HastNode, top: boolean) => {
     const children = node.children;
     if (!children) {
       return;
@@ -177,6 +180,12 @@ const rehypePictures = () => (tree: object, file: { data: object }) => {
       const content = isElement(child, "p") ? child.children?.filter((c) => c.type !== "text" || c.value?.trim()) : [];
       const alone = content?.length === 1 && isElement(content[0], "img") ? content[0] : undefined;
       if (alone) {
+        if (ctx && !top) {
+          throw new ImageError(
+            alone.position?.start.line ?? 1,
+            "a picture must stand at the top level, not in a list or a quote",
+          );
+        }
         if (ctx) {
           children[i] = figureFor(alone, ctx);
         } else {
@@ -189,11 +198,11 @@ const rehypePictures = () => (tree: object, file: { data: object }) => {
         }
         throw new ImageError(child.position?.start.line ?? 1, "a picture must stand alone in its own paragraph");
       } else {
-        walk(child);
+        walk(child, false);
       }
     }
   };
-  walk(tree as HastNode);
+  walk(tree as HastNode, true);
 };
 
 type Processor = {

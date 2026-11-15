@@ -95,6 +95,17 @@ describe("pictures in posts", () => {
     expect((await failure(markdown)).message).toContain("alone in its own paragraph");
   });
 
+  it.each([
+    ["in a loose list item", "- item\n\n  ![x](diagram.svg)"],
+    ["in a quote", "> ![x](diagram.svg)"],
+  ])("fails for a picture %s", async (_name, markdown) => {
+    expect((await failure(markdown)).message).toContain("top level");
+  });
+
+  it("needs the exact file name, case included", async () => {
+    expect((await failure("![x](DIAGRAM.svg)")).message).toContain("is not in");
+  });
+
   it("drops pictures when there is no image folder (the /design/ sample)", async () => {
     const html = await renderMarkdown("Text.\n\n![x](https://example.com/a.png)\n\n![y](diagram.svg)\n\nEnd.");
     expect(html).not.toContain("<img");
