@@ -1,0 +1,226 @@
+.page {
+  padding: var(--margin-page);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-10);
+}
+
+.intro,
+.section {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6);
+  /* room above each heading's glyphs, so the heading sits inside its section */
+  padding-top: var(--space-2);
+}
+
+.intro {
+  min-height: calc(100svh - 2 * var(--margin-page));
+  align-items: end;
+}
+
+@media (min-width: 64rem) {
+  .intro,
+  .section {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    column-gap: var(--space-8);
+  }
+}
+
+.title {
+  font-size: var(--step-title);
+  font-weight: var(--weight-title);
+  line-height: var(--leading-title);
+  letter-spacing: var(--tracking-title);
+}
+
+.introText,
+.lead {
+  display: grid;
+  gap: var(--space-4);
+  align-content: start;
+  max-width: var(--measure);
+}
+
+.heading {
+  font-size: var(--step-title);
+  font-weight: var(--weight-title);
+  line-height: var(--leading-title);
+  letter-spacing: var(--tracking-title);
+}
+
+.subheading {
+  font-size: var(--step-lead);
+  font-weight: var(--weight-strong);
+}
+
+.body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-7);
+  min-width: 0;
+}
+
+.theme {
+  background: var(--color-ground);
+  color: var(--color-ink);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-5);
+  padding: var(--space-4);
+}
+
+@media (min-width: 48rem) {
+  .theme {
+    padding: var(--space-5);
+  }
+}
+
+.swatches,
+.steps,
+.bars,
+.shapes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.swatch {
+  display: grid;
+  grid-template-columns: var(--space-7) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.swatchText {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  column-gap: var(--space-4);
+}
+
+.chip {
+  display: block;
+  width: var(--space-7);
+  height: var(--space-7);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.table th,
+.table td {
+  padding: var(--space-2) var(--space-3);
+  vertical-align: baseline;
+}
+
+/* long token names may break; numbers and samples stay whole */
+.table td:first-child {
+  overflow-wrap: anywhere;
+}
+
+.table thead th {
+  font-weight: var(--weight-strong);
+  background: var(--color-panel);
+}
+
+.table tbody tr:nth-child(even) td {
+  background: var(--color-panel);
+}
+
+.table tbody tr:nth-child(even) td.sample,
+.table td.sample {
+  font-weight: var(--weight-strong);
+}
+
+.caption {
+  text-align: left;
+  padding-bottom: var(--space-2);
+  color: var(--color-muted);
+}
+
+.number {
+  font-variant-numeric: tabular-nums;
+}
+
+.nameSample {
+  justify-self: start;
+}
+
+/* The name colours are only ever large: sample them at the large-text size (24px, WCAG "large"). */
+.displaySample {
+  font-size: var(--step-lead);
+  font-weight: var(--weight-name);
+  font-stretch: var(--stretch-name);
+  line-height: var(--leading-title);
+  text-transform: uppercase;
+}
+
+.introLead {
+  font-size: var(--step-lead);
+}
+
+.step {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.titleSample {
+  font-weight: var(--weight-title);
+  line-height: var(--leading-title);
+  letter-spacing: var(--tracking-title);
+}
+
+.barRow,
+.shapeItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.bar {
+  display: block;
+  height: var(--space-4);
+  background: var(--color-accent);
+}
+
+.shapes {
+  grid-auto-flow: column;
+  justify-content: start;
+  gap: var(--space-6);
+}
+
+.shape {
+  display: block;
+  width: var(--space-8);
+  height: var(--space-8);
+  background: var(--color-name-last);
+}
+
+.code {
+  background: var(--color-panel);
+  padding: var(--space-5);
+  overflow-x: auto;
+  line-height: var(--leading-text);
+}
+
+.toggle {
+  justify-self: start;
+  font: inherit;
+  font-weight: var(--weight-strong);
+  color: var(--color-ink);
+  background: var(--color-panel);
+  border: 0;
+  border-radius: var(--radius-none);
+  padding: var(--space-3) var(--space-5);
+  cursor: pointer;
+}
+
+.toggle[aria-pressed="true"] {
+  color: var(--color-accent);
+}

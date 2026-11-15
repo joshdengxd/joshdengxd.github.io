@@ -1,0 +1,66 @@
+/* Base styles built on design-language/tokens.css. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-ground);
+  color: var(--color-ink);
+  font-family: var(--font-text);
+  font-size: var(--step-body);
+  font-weight: var(--weight-text);
+  font-stretch: var(--stretch-text);
+  line-height: var(--leading-text);
+}
+
+h1,
+h2,
+h3,
+p,
+figure,
+pre {
+  margin: 0;
+}
+
+a {
+  color: var(--color-accent);
+  text-underline-offset: 0.2em;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+pre,
+code {
+  font-family: var(--font-code);
+  font-size: var(--step-small);
+}
+
+/* The name: condensed, heavy, uppercase, two lines. */
+.name {
+  font-size: var(--step-name);
+  font-weight: var(--weight-name);
+  font-stretch: var(--stretch-name);
+  line-height: var(--leading-name);
+  letter-spacing: var(--tracking-name);
+  text-transform: uppercase;
+}
+
+@media (max-width: 47.99rem) {
+  .name {
+    font-size: var(--step-name-narrow);
+  }
+}
+
+.name-first {
+  color: var(--color-name-first);
+}
+
+.name-last {
+  color: var(--color-name-last);
+}
