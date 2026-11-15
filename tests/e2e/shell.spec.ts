@@ -255,8 +255,8 @@ test.describe("phone", () => {
           [...document.querySelectorAll<HTMLElement>("header a, header button, header summary, footer a, main a")]
             .filter((el) => el.offsetParent !== null || getComputedStyle(el).position === "fixed")
             // WCAG 2.2 target size, inline exception: a link is exempt only when it is displayed inline and sits in a
-            // sentence, i.e. its paragraph still has text once the text of ALL links in it is removed. Every other
-            // link (blocks, inline-blocks, flex, a paragraph of only links) must be 44px.
+            // sentence, i.e. its paragraph still has a letter or digit once the text of ALL links in it is removed.
+            // Every other link (blocks, inline-blocks, flex, a paragraph of only links) must be 44px.
             .filter((el) => {
               const block = el.closest("p");
               if (!el.matches("main a") || !block || getComputedStyle(el).display !== "inline") {
@@ -264,7 +264,7 @@ test.describe("phone", () => {
               }
               const copy = block.cloneNode(true) as HTMLElement;
               copy.querySelectorAll("a").forEach((a) => a.remove());
-              return (copy.textContent ?? "").trim() === "";
+              return !/[\p{L}\p{N}]/u.test(copy.textContent ?? "");
             })
             .map((el) => ({ name: el.textContent?.trim(), r: el.getBoundingClientRect() }))
             .filter(({ r }) => r.width > 0 && (r.width < 44 || r.height < 44))
