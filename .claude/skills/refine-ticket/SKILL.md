@@ -18,7 +18,7 @@ Read the project's `AGENTS.md` (section "Ticket workflow settings"): tracker and
 Open the ticket, its comments, linked items, its PRD if any, and the tickets it depends on. If the ticket already carries a refinement summary, start from it. If it is closed or Done, ask before doing anything. If a dependency is not landed yet, say so.
 
 ## Stage 2: Research
-For a non-trivial ticket, start a research subagent to look through the code and docs. It reports back: where the change would land, patterns the codebase already uses for similar work, and risks. It makes no edits. Skip it when the repo is tiny or the ticket touches only a few known files; say so.
+For a non-trivial ticket, start a research subagent to look through the code and docs. It reports back: where the change would land, patterns the codebase already uses for similar work, what the current docs for the installed versions recommend for this kind of change (`current-docs`), and risks. It makes no edits. Skip it when the repo is tiny or the ticket touches only a few known files; say so.
 
 ## Stage 3: Decide together
 Take the open points one at a time: scope, approach, affected files, edge cases, acceptance criteria, what is explicitly out of scope, and how each criterion will be verified. For each point, suggest an answer with a reason and let the user accept or change it. Settle small points quickly; spend the time on the ones that could send the work in different directions.

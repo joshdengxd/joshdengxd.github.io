@@ -31,6 +31,7 @@ build / type check / lint / unit / e2e / run (exact commands; the ticket skills 
 
 ## Conventions
 Naming, error handling, testing. Current framework versions and the syntax to use (and deprecated patterns to avoid).
+Stack (docs source: Context7, via `current-docs`): one line per library: name, installed version, Context7 id.
 
 ## Boundaries
 Never touch: generated files, migrations without review, production configs.

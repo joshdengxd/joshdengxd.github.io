@@ -1,6 +1,6 @@
 # Skills source
 
-`.claude/skills/` holds the skills this repo uses, copied from `skills/` in [joshdengxd/josh-shared-skills](https://github.com/joshdengxd/josh-shared-skills) at commit `43b9588`.
+`.claude/skills/` holds the skills this repo uses, copied from `skills/` in [joshdengxd/josh-shared-skills](https://github.com/joshdengxd/josh-shared-skills) at commit `74fed07`.
 
 Not copied yet (no staging environment, e2e suite or logs to use them with): `deploy-to-staging`, `run-e2e-automation`, `prod-release-gate`, `live-env-local-test`, `log-analysis`. Copy them in when a ticket needs them.
 

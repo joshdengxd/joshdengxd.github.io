@@ -20,6 +20,8 @@ For every acceptance criterion, record:
 - which test exercises it (or "none"). Only behaviour needs a test; a criterion about a file, config or doc is covered by the check its "Verified by" names (inspection counts),
 - status: **met**, **partly met**, **not met**, or **n/a** when the diff cannot implement it (a repository setting, a landing step, a CI result, the live site); give the reason. n/a criteria are left to the behaviour and deployed checks and do not count toward the verdict.
 
+Then check the diff against the current docs for the installed versions (`current-docs`): anything deprecated, removed or broken in that version is a DEFECT; working code that is not the documented way is a remark. Cite the doc source for each.
+
 Then scan the diff for loose ends the criteria did not mention: renamed things still referenced under the old name, left-over debug code, new TODOs.
 
 ## Verdict

@@ -26,7 +26,7 @@ If the ticket is not refined, say so and suggest `refine-ticket` first; continue
    - **Resume or new**: look for an open PR whose only `Refs` line is this ticket. If there is one, continue on its branch: read the PR's review comments and the ticket comments since the last push, and fix what they name. Otherwise (no PR, a closed PR, or a PR shared with other tickets) create a new branch and worktree from the latest default branch; read the ticket comments for why earlier attempts failed. Never work on the default branch.
    - **Coming back from In review** (the person found a problem): comment on open tickets that depend on this one that it is being reworked.
    - Move the ticket to **In progress**.
-2. **Implement** what the refinement summary says. Add or update tests, including an end-to-end test for the new behaviour when the project has a suite. Do not run landing steps or change anything outside the repo (settings, labels, rulesets, hosting); those belong to `land-ticket`.
+2. **Implement** what the refinement summary says, following the current docs for the installed versions of every library and tool the change touches (`current-docs`); list the docs consulted for the PR. Add or update tests, including an end-to-end test for the new behaviour when the project has a suite. Do not run landing steps or change anything outside the repo (settings, labels, rulesets, hosting); those belong to `land-ticket`.
 3. **Checks.** Run type check, lint, unit tests and the end-to-end tests that cover the change. All must pass before step 4.
 4. **Behaviour check.** Spawn a NEW subagent with fresh context. Give it only: the acceptance criteria, how to start the app, and the step 3 output. It must not edit files; it may run the app, the existing tests, and any probe a criterion names (in a temporary clone, removed afterwards). It starts the app with the run command on a free port, confirms it is serving this commit, and stops it before returning. For each `local` criterion it records:
    - how it checked: in a browser with Chrome DevTools MCP when the behaviour is visible there, otherwise by running a test or command;
@@ -39,7 +39,7 @@ If the ticket is not refined, say so and suggest `refine-ticket` first; continue
    - Otherwise: fix, rerun all of step 3, and run steps 4 and 5 again with NEW subagents. At the max fix rounds, stop and hand the open items to the user; the ticket stays In progress until they decide.
 7. **PR.** Open a PR to the default branch (or update the existing one):
    - title: the ticket title followed by the ticket reference in parentheses: `(#N)` for GitHub, `(KEY-123)` for Jira;
-   - body: `Refs #N` or `Refs KEY-123` (never `Closes`/`Fixes`/`Resolves`, so merging does not close the ticket and skip In review); `Verified at <commit sha>`; the criteria table (criterion, phase, how checked, status, evidence); the code-review verdict; the check results; the landing steps copied from the refinement summary.
+   - body: `Refs #N` or `Refs KEY-123` (never `Closes`/`Fixes`/`Resolves`, so merging does not close the ticket and skip In review); `Verified at <commit sha>`; the criteria table (criterion, phase, how checked, status, evidence); the code-review verdict; the docs consulted (library, version, topic, source); the check results; the landing steps copied from the refinement summary.
    Every push after verification means verifying again and rewriting the body, `Verified at` included. Leave it for a person to review; landing is `land-ticket`.
 
 ## When a ticket goes back
