@@ -14,7 +14,7 @@ Read when you add or edit a page, change metadata, the sitemap or robots, the so
 
 ## Metadata
 - Root layout: `title: { default, template: "%s · Xindong Deng (Josh)" }`, `metadataBase`. A page passes the bare title.
-- `pageMetadata({ title, description, path })` (`lib/metadata.ts`) is used by every page, the blog pages included (`blogMetadata` adds the feed link): description, canonical (absolute through `metadataBase`, with the trailing slash, equal to the sitemap URL), Open Graph and Twitter card (`summary_large_image`), and the social image in both.
+- `pageMetadata({ title, description, path })` (`lib/metadata.ts`) is used by every page, the blog pages included: description, canonical (absolute through `metadataBase`, with the trailing slash, equal to the sitemap URL), Open Graph and Twitter card (`summary_large_image`), and the social image in both.
 - Why the image is set by the helper and not left to the file convention: `openGraph` merges shallowly, and the `app/opengraph-image.png` file only reaches the pages of its own segment, so a page with its own `openGraph` lost the image. The helper sets `images` itself (url `/opengraph-image.png`, 1200x630, alt text read from `app/opengraph-image.alt.txt`). The home page's title is the bare site name (`title.absolute`).
 - Social image: `app/opengraph-image.png`, the D5 name in the dark theme, made by screenshotting a small page built from `design-language/tokens.css` and the Archivo file at 1200x630. Replace the PNG (and the alt text) to change it; keep it under 200 KB.
 - `app/robots.ts` (force-static): allow all, absolute sitemap URL, `/design/` not disallowed (a crawler has to see its noindex). `app/sitemap.ts`: every public route, never `/design/` or a `_none` page.

@@ -28,7 +28,9 @@ function watch(page: Page) {
 }
 
 test.describe("the list", () => {
-  test("shows the posts newest first, each with date, summary and tag links, and links the feed", async ({ page }) => {
+  test("shows the posts newest first, each with date, summary and tag links, and has no feed link", async ({
+    page,
+  }) => {
     const problems = watch(page);
     await page.goto("/blog/");
     await expect(page.getByRole("heading", { level: 1, name: "Blog" })).toBeVisible();
@@ -38,11 +40,8 @@ test.describe("the list", () => {
     await expect(page.getByText("A test post 30 minutes after midnight UTC")).toBeVisible();
     await expect(page.locator(LATE)).toBeVisible();
     await expect(page.getByRole("link", { name: "markdown" })).toHaveAttribute("href", "/blog/tags/markdown/");
-    await expect(page.getByRole("link", { name: "RSS feed" })).toHaveAttribute("href", "/rss.xml");
-    await expect(page.locator('link[rel="alternate"][type="application/rss+xml"]')).toHaveAttribute(
-      "href",
-      "https://joshdengxd.github.io/rss.xml",
-    );
+    await expect(page.getByRole("link", { name: /rss|feed/i })).toHaveCount(0);
+    await expect(page.locator('link[rel="alternate"][type="application/rss+xml"]')).toHaveCount(0);
     await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
     expect(problems).toEqual([]);
   });
@@ -222,20 +221,7 @@ test.describe("tag pages", () => {
   });
 });
 
-test.describe("feed and sitemap", () => {
-  test("rss.xml is RSS 2.0 with the fixture posts, newest first", async ({ request }) => {
-    const res = await request.get("/rss.xml");
-    expect(res.status()).toBe(200);
-    expect(res.headers()["content-type"]).toContain("xml");
-    const xml = await res.text();
-    expect(xml).toContain('<rss version="2.0"');
-    expect(xml).toContain('rel="self"');
-    expect(xml).toContain("<link>https://joshdengxd.github.io/blog/blog-engine-fixture/</link>");
-    expect(xml).toContain("<pubDate>Sun, 15 Nov 2026 23:30:00 GMT</pubDate>");
-    expect(xml.indexOf("blog-engine-fixture-early")).toBeLessThan(xml.indexOf("blog-engine-fixture/"));
-    expect(xml).not.toContain("_none");
-  });
-
+test.describe("sitemap", () => {
   test("the sitemap has /blog/, the posts and the tag pages, and no _none page", async ({ request }) => {
     const xml = await (await request.get("/sitemap.xml")).text();
     for (const path of [
@@ -249,6 +235,7 @@ test.describe("feed and sitemap", () => {
     }
     expect(xml).toContain("<lastmod>2026-11-15T23:30:00Z</lastmod>");
     expect(xml).not.toContain("_none");
+    expect(xml).not.toContain("rss.xml");
   });
 });
 
