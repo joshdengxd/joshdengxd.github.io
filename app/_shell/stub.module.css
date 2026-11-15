@@ -1,4 +1,4 @@
-/* A placeholder page and the 404 page: the title set like the name, low on the ground, as on the home page. */
+/* The 404 page: the title set like the name, low on the ground, as on the home page. */
 .stub {
   flex: 1;
   display: grid;
@@ -21,21 +21,9 @@
   padding-top: 0.06em;
 }
 
-.line,
-.placeholder {
+.line {
   max-width: var(--measure);
   font-size: var(--step-lead);
-}
-
-.placeholder {
-  justify-self: start;
-  background: var(--color-panel);
-  padding: var(--space-3) var(--space-4);
-}
-
-.placeholder strong {
-  color: var(--color-accent);
-  font-weight: var(--weight-strong);
 }
 
 .back {

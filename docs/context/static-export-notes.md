@@ -4,7 +4,7 @@ Read when working on build, routing, metadata, content or CI. Verify against cur
 
 ## Next.js export
 - `output: 'export'`, `trailingSlash: true`, `images.unoptimized: true`. No `basePath`: this is a user site at the domain root.
-- Set `metadataBase` to `https://joshdengxd.github.io` so social preview URLs are absolute. Use one URL form (trailing slash) in canonical tags, sitemap and RSS.
+- Set `metadataBase` to `https://joshdengxd.github.io` so social preview URLs are absolute. Use one URL form (trailing slash) in canonical tags, sitemap and RSS. A page's own `openGraph` or `twitter` replaces the parent's whole (shallow merge): use `pageMetadata` (`lib/metadata.ts`), see `pages.md`.
 - RSS: route handler with `export const dynamic = 'force-static'`. Add `sitemap.ts` and `robots.ts`.
 - Dynamic pages (posts, projects): `generateStaticParams` with `dynamicParams = false`.
 - Next 16 removed `next lint`: run ESLint directly with a flat config.

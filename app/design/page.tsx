@@ -16,7 +16,7 @@ import {
 import styles from "./design.module.css";
 
 export const metadata: Metadata = {
-  title: "Design language · Xindong Deng (Josh)",
+  title: "Design language",
   description: "Specimen of the site's design tokens.",
   robots: { index: false, follow: false },
 };

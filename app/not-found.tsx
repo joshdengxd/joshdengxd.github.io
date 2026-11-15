@@ -3,7 +3,7 @@ import Link from "next/link";
 import styles from "./_shell/stub.module.css";
 
 // Exported as 404.html, which GitHub Pages serves for unknown URLs; it renders inside the shell of the root layout.
-export const metadata: Metadata = { title: "Page not found · Xindong Deng (Josh)" };
+export const metadata: Metadata = { title: "Page not found" };
 
 export default function NotFound() {
   return (

@@ -2,9 +2,6 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import { GITHUB_URL, HOME_LABEL, isCurrent, LINKEDIN_URL, NAV, trimSlash } from "@/app/_shell/links";
 import { SiteShell } from "@/app/_shell/site-shell";
 import { ThemeToggle } from "@/app/_shell/theme-toggle";
-import AboutPage, { metadata as aboutMetadata } from "@/app/about/page";
-import HowPage, { metadata as howMetadata } from "@/app/how-this-site-is-built/page";
-import ProjectsPage, { metadata as projectsMetadata } from "@/app/projects/page";
 import { THEME_KEY } from "@/app/theme";
 
 const nav = vi.hoisted(() => ({ pathname: "/" as string | null }));
@@ -59,11 +56,13 @@ describe("shell", () => {
     expect(screen.getByRole("main")).toHaveAttribute("id", "main");
   });
 
-  it("on home: no small wordmark, no footer line, no section marked", () => {
+  it("on home: no small wordmark, no section marked, and the same footer line as the other pages", () => {
     nav.pathname = "/";
     render(<SiteShell>page</SiteShell>);
     expect(screen.queryByRole("link", { name: HOME_LABEL })).toBeNull();
-    expect(screen.queryByRole("contentinfo")).toBeNull();
+    const footer = screen.getByRole("contentinfo");
+    expect(within(footer).getByRole("link", { name: "GitHub" })).toHaveAttribute("href", GITHUB_URL);
+    expect(within(footer).getByRole("link", { name: "LinkedIn" })).toHaveAttribute("href", LINKEDIN_URL);
     expect(document.querySelectorAll('[aria-current="page"]')).toHaveLength(0);
   });
 
@@ -87,19 +86,5 @@ describe("shell", () => {
     expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
     expect(localStorage.getItem(THEME_KEY)).toBe("dark");
     await waitFor(() => expect(toggle).toHaveAttribute("aria-pressed", "false"));
-  });
-});
-
-describe("placeholder pages", () => {
-  it.each([
-    ["About", AboutPage, aboutMetadata],
-    ["Projects", ProjectsPage, projectsMetadata],
-    ["How this site is built", HowPage, howMetadata],
-  ])("%s has its title, a marked placeholder line and noindex", (title, Page, metadata) => {
-    render(<Page />);
-    expect(screen.getByRole("heading", { level: 1, name: title })).toBeInTheDocument();
-    expect(screen.getByText("Placeholder.")).toBeInTheDocument();
-    expect(metadata.title).toBe(`${title} · Xindong Deng (Josh)`);
-    expect(metadata.robots).toMatchObject({ index: false });
   });
 });

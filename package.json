@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
-    "e2e": "node scripts/build-fixture.mjs && playwright test",
+    "e2e": "node scripts/run-e2e.mjs fixture",
+    "e2e:default": "node scripts/run-e2e.mjs default",
     "check:fixture": "node scripts/check-no-fixture.mjs"
   },
   "dependencies": {

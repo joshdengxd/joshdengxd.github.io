@@ -1,0 +1,61 @@
+/* Direction D5 on the home page: the first screen has the name on the left and the panel column (one step lighter)
+   on the right, carrying the navigation at the top (from the shell) and the intro with the profile links at the
+   foot. Below it, Focus, Featured repos and Latest posts sit on the ground. */
+.name {
+  /* the first screen is one viewport high: the name fills it from the foot */
+  min-height: 55svh;
+  flex: 1 0 auto;
+  display: flex;
+  align-items: flex-end;
+  padding: var(--margin-page);
+}
+
+.nameLink {
+  display: block;
+  text-decoration: none;
+}
+
+.panel {
+  background: var(--color-panel);
+  padding: var(--margin-page);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--space-4);
+}
+
+.intro {
+  font-size: var(--step-lead);
+}
+
+.ground {
+  display: grid;
+  gap: var(--space-9);
+  padding: var(--space-9) var(--margin-page) var(--space-6);
+  min-width: 0;
+}
+
+.postTitle {
+  font-size: var(--step-lead);
+  font-weight: var(--weight-title);
+  line-height: var(--leading-title);
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 64rem) {
+  .name {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    min-height: 100svh;
+  }
+
+  .panel {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .ground {
+    grid-column: 1 / -1;
+    grid-row: 3;
+  }
+}

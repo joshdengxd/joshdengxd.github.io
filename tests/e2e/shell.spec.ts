@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { PROJECTS } from "../../lib/projects";
 
 const HOME_LABEL = "Xindong Deng (Josh), home";
 const NAV = [
@@ -7,8 +8,7 @@ const NAV = [
   { href: "/blog/", label: "Blog" },
   { href: "/how-this-site-is-built/", label: "How this site is built" },
 ];
-const STUBS = NAV.filter((n) => n.href !== "/blog/");
-const PAGES = ["/", ...NAV.map((n) => n.href), "/design/", "/no-such-page/"];
+const PAGES = ["/", ...NAV.map((n) => n.href), "/projects/this-site/", "/design/", "/no-such-page/"];
 const ACCENT_DARK = "rgb(196, 154, 90)";
 const DARK_GROUND = "rgb(30, 44, 35)";
 const LIGHT_GROUND = "rgb(243, 240, 230)";
@@ -52,7 +52,8 @@ for (const js of [true, false]) {
         expect(await bodyBackground(page), path).toBe(DARK_GROUND);
 
         const current = currentLinks(page);
-        const section = NAV.find((n) => n.href === path);
+        // A project page marks Projects, as a sub-page of it.
+        const section = NAV.find((n) => path === n.href || path.startsWith(n.href));
         if (path === "/") {
           await expect(current).toHaveCount(1);
           await expect(current).toHaveAccessibleName(HOME_LABEL);
@@ -134,7 +135,7 @@ test.describe("navigation", () => {
     await expect(page.getByRole("contentinfo")).toBeVisible();
     await page.getByRole("link", { name: "Back to the home page" }).click();
     await expect(page).toHaveURL("/");
-    await expect(page.getByText(/under construction/i)).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Josh\s*Deng/);
   });
 });
 
@@ -172,11 +173,14 @@ test.describe("keyboard", () => {
       order.push(info.name);
       expect(info.ring, `focus ring on ${info.name}`).toBe(true);
     }
+    // The About page's own Links section comes before the footer line.
     expect(order).toEqual([
       "Skip to content",
       HOME_LABEL,
       ...NAV.map((n) => n.label),
       "Light theme",
+      "GitHub",
+      "LinkedIn",
       "GitHub",
       "LinkedIn",
     ]);
@@ -278,27 +282,28 @@ test.describe("without JavaScript, on a phone", () => {
   });
 });
 
-test.describe("placeholder pages and personal details", () => {
-  test("stub pages are noindex, visibly marked and not in the sitemap", async ({ page, request }) => {
-    for (const { href, label } of STUBS) {
-      await page.goto(href);
-      await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
-      await expect(page.getByRole("heading", { level: 1, name: label })).toBeVisible();
-      await expect(page.getByText("Placeholder.", { exact: true })).toBeVisible();
-    }
-    const xml = await (await request.get("/sitemap.xml")).text();
-    for (const { href } of STUBS) expect(xml).not.toContain(href);
-  });
-
-  test("the only outside links are GitHub and LinkedIn, and there is no other contact detail", async ({ page }) => {
+test.describe("personal details", () => {
+  test("the shell shows no contact detail, and outside links go only to GitHub, LinkedIn, the public repos and this repo's issues and PRs", async ({ page }) => {
     const outside = new Set<string>();
-    for (const path of PAGES) {
+    for (const path of [...PAGES, ...PROJECTS.map((p) => `/projects/${p.slug}/`)]) {
       await page.goto(path);
       for (const href of await page.locator("a[href]").evaluateAll((as) => as.map((a) => a.getAttribute("href")!)))
         if (!href.startsWith("/") && !href.startsWith("#")) outside.add(href);
       const shell = await page.locator("header, footer").allInnerTexts();
       expect(shell.join(" "), path).not.toMatch(/@|\+?\d[\d\s().-]{6,}\d/);
     }
-    expect([...outside].sort()).toEqual(["https://github.com/joshdengxd", "https://www.linkedin.com/in/josh-deng-edm"]);
+    const allowed = [
+      "https://github.com/joshdengxd",
+      "https://www.linkedin.com/in/josh-deng-edm",
+      "https://github.com/joshdengxd/josh-shared-skills",
+      "https://github.com/joshdengxd/job-search-skills",
+      "https://github.com/joshdengxd/joshdengxd.github.io",
+    ];
+    for (const href of outside)
+      expect(
+        allowed.includes(href) || /^https:\/\/github\.com\/joshdengxd\/joshdengxd\.github\.io\/(issues|pull)\/\d+$/.test(href),
+        href,
+      ).toBe(true);
+    for (const href of allowed) expect([...outside], href).toContain(href);
   });
 });

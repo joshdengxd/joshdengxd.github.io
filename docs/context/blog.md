@@ -19,7 +19,7 @@ summary: One or two sentences (1-300 characters).
 
 ## Pipeline and pages
 - `lib/posts/`: `loader.ts` (split `---`, `yaml`, `zod` strict schema in `schema.ts`, duplicate slugs, sorting, tags), `markdown.ts` (unified: remark-parse, remark-gfm, remark-rehype, rehype-sanitize, Shiki, rehype-stringify; build time only), `feed.ts` (RSS 2.0 by hand), `dates.ts`.
-- `/blog/`, `/blog/<slug>/`, `/blog/tags/<tag>/`, `/rss.xml`, `/sitemap.xml` (home, `/blog/`, posts, tag pages).
+- `/blog/`, `/blog/<slug>/`, `/blog/tags/<tag>/`, `/rss.xml`, `/sitemap.xml` (every public route, see `pages.md`; the blog part is `/blog/`, posts, tag pages). Blog page metadata comes from `pageMetadata` through `blogMetadata`. Home shows the three newest posts (Latest posts) or "No posts yet".
 - Static export refuses a dynamic route with no pages, so with no posts or tags each dynamic route generates one hidden page, `_none`: the 404 content with `noindex`, never linked, never in the sitemap or feed.
 - Dates: HTML has `<time datetime=UTC>` with the UTC date; a client component swaps it for the reader's locale and zone after hydration.
 
@@ -33,5 +33,5 @@ summary: One or two sentences (1-300 characters).
 
 ## Test fixture
 - `tests/fixtures/posts/` holds two test posts (one with code blocks in several languages, one with an unknown and one with no language, and a GFM table; the second sits 30 minutes after midnight UTC for the time-zone tests). They load only when `BLOG_FIXTURES=1`.
-- `npm run e2e` builds with the flag through `scripts/build-fixture.mjs` (Windows-safe). The default build never reads them.
+- `npm run e2e` builds with the flag through `scripts/run-e2e.mjs fixture` (which calls `scripts/build-fixture.mjs`, Windows-safe). The default build never reads them; `npm run e2e:default` tests that build (home shows "No posts yet").
 - `npm run check:fixture` fails when a fixture slug or title is anywhere in `out/`; CI runs it after the default build and `deploy.yml` runs it before upload.
