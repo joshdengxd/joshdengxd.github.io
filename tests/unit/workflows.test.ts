@@ -147,3 +147,52 @@ describe("checks.yml", () => {
     expect(await browsersOf(true)).toContain("webkit");
   });
 });
+
+describe("all workflows: light CI that cannot hang", () => {
+  const files = ["checks.yml", "deploy.yml", "dependabot-auto-merge.yml"];
+  const MAX_TIMEOUT: Record<string, number> = { checks: 8, plan: 2, build: 5, deploy: 6, "dependabot-auto-merge": 3 };
+  const COND = "github.event_name == 'workflow_dispatch' || github.event.pull_request.user.login == 'dependabot[bot]'";
+
+  it("every job has timeout-minutes, no larger than its limit", () => {
+    for (const f of files) {
+      for (const [name, job] of Object.entries<Y>(load(`workflows/${f}`).doc.jobs)) {
+        expect(MAX_TIMEOUT[name], `${f}: no limit known for job ${name}`).toBeDefined();
+        expect(typeof job["timeout-minutes"], `${f}: ${name} has no timeout-minutes`).toBe("number");
+        expect(job["timeout-minutes"], `${f}: ${name} timeout too large`).toBeLessThanOrEqual(MAX_TIMEOUT[name]);
+      }
+    }
+  });
+
+  it("no workflow filters pull_request by paths or paths-ignore (a skipped required check blocks the PR)", () => {
+    for (const f of files) {
+      const { doc } = load(`workflows/${f}`);
+      const pr = typeof doc.on === "object" ? doc.on.pull_request : undefined;
+      expect(pr?.paths, `${f}: paths`).toBeUndefined();
+      expect(pr?.["paths-ignore"], `${f}: paths-ignore`).toBeUndefined();
+    }
+  });
+
+  it("checks.yml: PR and manual triggers, e2e only for manual or Dependabot, job still named checks", () => {
+    const { doc } = load("workflows/checks.yml");
+    expect(Object.keys(doc.on).sort()).toEqual(["pull_request", "workflow_dispatch"]);
+    expect(Object.keys(doc.jobs)).toEqual(["checks"]);
+    expect(doc.jobs.checks.name).toBeUndefined();
+    const steps = stepsOf(doc.jobs.checks);
+    const heavy = steps.filter(
+      (s) => /playwright|npm run e2e/.test(s.run ?? "") || /upload-artifact/.test(s.uses ?? ""),
+    );
+    expect(heavy).toHaveLength(4);
+    for (const s of heavy) {
+      expect(String(s.if).replace(/\s+/g, " ")).toContain(COND);
+    }
+    const light = steps.filter((s) => !heavy.includes(s));
+    for (const s of light) {
+      expect(s.if).toBeUndefined();
+    }
+    const runs = light.map((s) => String(s.run));
+    for (const r of ["npm ci", "npm run lint", "npm run format:check", "npm run typecheck", "npm test"]) {
+      expect(runs).toContain(r);
+    }
+    expect(runs.some((r) => /npm run build\s+npm run check:fixture/.test(r))).toBe(true);
+  });
+});

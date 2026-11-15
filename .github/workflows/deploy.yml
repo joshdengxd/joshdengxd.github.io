@@ -24,7 +24,7 @@ jobs:
   # Scheduled and manual runs skip build + deploy when the live site already serves this commit (green, not failed).
   plan:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 2
     permissions:
       contents: read
     outputs:
@@ -44,7 +44,7 @@ jobs:
     needs: plan
     if: needs.plan.outputs.skip != 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 5
     permissions:
       contents: read
       pages: read
@@ -71,7 +71,7 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 6
     permissions:
       pages: write
       id-token: write
