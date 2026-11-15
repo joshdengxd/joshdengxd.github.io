@@ -27,6 +27,7 @@ Take the open points one at a time: scope, approach, affected files, edge cases,
 Draft the summary: what and why, decisions taken, where to change, acceptance criteria with how each is verified, out of scope, remaining risks. Check that:
 - each acceptance criterion is something a reviewer can actually check, and comes from a decision in stage 3;
 - no question is left open;
+- every document or ticket it mentions (PRD, design notes, other tickets) is a link the reader can click;
 - the summary describes the final agreed plan only: no version labels, no history of earlier options.
 
 ## Stage 5: Publish

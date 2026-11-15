@@ -30,7 +30,7 @@ Read the project's `AGENTS.md` (section "Ticket workflow settings"): tracker and
    depends_on: [<draft numbers>]
    issue:            # filled in after creation
    ---
-   ## Context      (PRD and section it comes from; what exists today)
+   ## Context      (link to the PRD and section it comes from; what exists today)
    ## Goal         (one sentence: the outcome)
    ## Scope
    ## Out of scope
@@ -48,5 +48,6 @@ Read the project's `AGENTS.md` (section "Ticket workflow settings"): tracker and
 ## Rules
 - Never create anything in the tracker before the user approves the drafts.
 - Re-running is safe: a draft with `issue:` set, or a tracker ticket with the same title (and the same PRD label, when there is one), is skipped.
+- Every reference a reader needs is a link they can click: the PRD as a link to its file in the repo (or its page in the wiki), other tickets as ticket references. A bare name like "PRD-0001" is not enough.
 - Implementation detail belongs in the refinement, not here; a ticket says what must be true, not how.
 - Write tickets in the project's tracker language.
