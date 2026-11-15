@@ -24,6 +24,7 @@ Batch mode: `drain-refined` runs steps 3-4 unattended for every Refined ticket (
 - Identity: joshdengxd. Run gh with `GH_TOKEN=$(gh auth token --user joshdengxd)` on each call and push with that token as an HTTP auth header; never switch the active gh account.
 - Default branch: main; merge method: squash
 - Changes without a ticket (skill syncs, docs, PRD edits): a PR titled `chore: ...`, `checks` green, the user merges it.
+- Auto-merge: Dependabot PRs whose update type is patch or minor (grouped PRs count as their highest type, security updates included) merge themselves once `checks` is green (`.github/workflows/dependabot-auto-merge.yml`, needs the repo setting "Allow auto-merge"); majors and everything else wait for the user. A merge made with the workflow token starts no push run, so the daily `deploy.yml` schedule deploys it within a day.
 - Max wait: 30 min for PR checks and for a deploy
 - States: board "Personal site" (https://github.com/users/joshdengxd/projects/1), field Status: Backlog, Refined, In progress, In review, Done. New tickets are added to the board in Backlog. No state labels.
   Board ids: project `PVT_kwHOFRG3Ts4Brp0g`, Status field `PVTSSF_lAHOFRG3Ts4Brp0gzhp7iN8`, options Backlog `38d84374`, Refined `4468383d`, In progress `caa18168`, In review `5c7bb449`, Done `19ddfbc8`.
@@ -34,7 +35,7 @@ Batch mode: `drain-refined` runs steps 3-4 unattended for every Refined ticket (
 - Ticket drafts: `drafts/tickets/`; scratch and run reports: `drafts/` (both git-ignored)
 - Checks: the Commands section below
 - Browser checks (Chrome DevTools MCP): before merge, locally against `out/` served by the run command; after merge, against the live site https://joshdengxd.github.io
-- Deploy: `.github/workflows/deploy.yml` on push to main (or run it by hand) -> https://joshdengxd.github.io; deployed commit: `<meta name="commit">` on every page holds the full SHA of the build
+- Deploy: `.github/workflows/deploy.yml` on push to main, daily (skips build and deploy when the live commit already equals main's head), or by hand (the `force` input redeploys regardless) -> https://joshdengxd.github.io; deployed commit: `<meta name="commit">` on every page holds the full SHA of the build
 - Max fix rounds: 3
 
 ## Commands
@@ -69,11 +70,11 @@ Check code against the current docs for these versions before writing or approvi
 - yaml 2.9.1 (post front matter): eemeli/yaml (use `--version v2.9.1`)
 - zod 4.6.7 (front matter schema): colinhacks/zod (use `--version v4.6.7`)
 - fast-xml-parser 5.12.0 (dev, feed test only): npm README
-- GitHub Actions (checkout v7, setup-node v7, configure-pages v6, upload-pages-artifact v5, deploy-pages v5, upload-artifact v7): each action's README at its pinned tag
+- GitHub Actions (checkout v7, setup-node v7, configure-pages v6, upload-pages-artifact v5, deploy-pages v5, upload-artifact v7, dependabot/fetch-metadata v3.1.0): each action's README at its pinned tag
 - npm override in `package.json`: `@typescript-eslint/typescript-estree` gets `minimatch ^11.0.1`, because its own `^10.2.2` range is in a Dependabot advisory (`>= 7.0.0, < 11.0.1`); scoped to that one package, since the other users need minimatch 3.x. Remove it when `@typescript-eslint/typescript-estree` requires minimatch >= 11.0.1.
 
 ## Boundaries
-- Never merge, publish or post on GitHub without the user's approval (a `drain-refined` run the user started approves its own merges and landing comments). Any automated merge outside that (for example Dependabot) needs this line changed first.
+- Never merge, publish or post on GitHub without the user's approval (a `drain-refined` run the user started approves its own merges and landing comments). One automated merge is allowed: Dependabot patch and minor PRs, merged by `.github/workflows/dependabot-auto-merge.yml` through GitHub auto-merge once `checks` is green. Majors, failed checks and every other PR still need the user. Any other automated merge needs this line changed first.
 - No personal data beyond what the user approved for the site. No former-employer internals (names of internal systems, URLs, code, tickets). No local file paths.
 - Skills in `.claude/skills/` are copied from josh-shared-skills; change them there, not here.
 
