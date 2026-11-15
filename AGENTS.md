@@ -39,13 +39,13 @@ Batch mode: `drain-refined` runs steps 3-4 unattended for every Refined ticket (
 - Max fix rounds: 3
 
 ## Commands
-Node 26 (`.nvmrc`). Install: `npm ci`; once per machine for e2e: `npx playwright install chromium`.
+Node 26 (`.nvmrc`). Install: `npm ci`; once per machine for e2e: `npx playwright install chromium`; optional, for `npm run e2e:webkit` (local and verification only, not CI, to keep CI cost low): `npx playwright install webkit`.
 - Build: `npm run build` (static export to `out/`)
 - Dev: `npm run dev` (dev server, http://localhost:3000; routing and 404 differ from Pages)
 - Lint: `npm run lint`
 - Type check: `npm run typecheck`
 - Unit: `npm test` (Vitest, `tests/unit/`)
-- e2e: `npm run e2e` (builds with the blog test fixture, `BLOG_FIXTURES=1`, through `scripts/run-e2e.mjs fixture`; serves `out/` on port 4173, runs Playwright Chromium, `tests/e2e/`). It leaves a fixture build in `out/`: never deploy or upload it. `npm run e2e:default` does the same on the default build (no fixture, then `check:fixture`). Specs named `*.fixture.spec.ts` run only on the fixture build, `*.default.spec.ts` only on the default one, all others on both.
+- e2e: `npm run e2e` (builds with the blog test fixture, `BLOG_FIXTURES=1`, through `scripts/run-e2e.mjs fixture`; serves `out/` on port 4173, runs Playwright Chromium, `tests/e2e/`; CI runs this only). It leaves a fixture build in `out/`: never deploy or upload it. `npm run e2e:default` does the same on the default build (no fixture, then `check:fixture`). Specs named `*.fixture.spec.ts` run only on the fixture build, `*.default.spec.ts` only on the default one, all others on both. `npm run e2e:webkit` (fixture build, `E2E_WEBKIT=1`) also runs `menu-sheet.spec.ts` in WebKit, the iPhone Safari engine; local and verification only, not in CI.
 - Fixture guard: `npm run check:fixture` (fails if the blog fixture's slug or title is anywhere in `out/`; run after the default `npm run build`)
 - Run: `npm run build && npm run serve` (serves `out/` on http://localhost:3000, as Pages does; this is what verifiers check)
 - CI: `.github/workflows/checks.yml`, one job `checks` on every PR: lint, type check, unit, default build + fixture guard, e2e on the fixture build, and e2e on the default build. `deploy.yml` runs the same guard after its build.

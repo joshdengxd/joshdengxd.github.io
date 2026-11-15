@@ -119,3 +119,29 @@ describe("dependabot.yml", () => {
     expect(groups[0]["update-types"]).toEqual(["minor", "patch"]);
   });
 });
+
+describe("checks.yml", () => {
+  const { doc } = load("workflows/checks.yml");
+
+  /** The projects of playwright.config.ts with E2E_WEBKIT set or not (CI never sets it). */
+  const projectsOf = async (webkit: boolean) => {
+    vi.resetModules();
+    vi.stubEnv("E2E_WEBKIT", webkit ? "1" : "");
+    const config = (await import("../../playwright.config")).default;
+    vi.unstubAllEnvs();
+    return config.projects ?? [];
+  };
+  const browsersOf = async (webkit: boolean): Promise<string[]> =>
+    [...new Set((await projectsOf(webkit)).map((p) => (p.use?.defaultBrowserType as string) ?? "chromium"))].sort();
+
+  it("installs exactly the browsers the Playwright config runs in CI; WebKit is flag-only", async () => {
+    const install = stepsOf(doc.jobs.checks).filter((s) => /playwright install/.test(s.run ?? ""));
+    expect(install).toHaveLength(1);
+    const words = String(install[0].run).split(/\s+/);
+    expect(words).toContain("--with-deps");
+    const installed = words.filter((w) => ["chromium", "firefox", "webkit"].includes(w)).sort();
+    expect(await browsersOf(false)).toEqual(installed);
+    expect(await browsersOf(false)).not.toContain("webkit");
+    expect(await browsersOf(true)).toContain("webkit");
+  });
+});

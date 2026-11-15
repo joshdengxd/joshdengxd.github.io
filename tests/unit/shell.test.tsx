@@ -74,6 +74,58 @@ describe("shell", () => {
     expect(within(details).getByRole("navigation", { name: "Main" })).toBeInTheDocument();
   });
 
+  describe("the Menu sheet closes by what the visitor does, not by the path", () => {
+    const openSheet = () => {
+      nav.pathname = "/about/";
+      const view = render(<SiteShell>page</SiteShell>);
+      const details = view.container.querySelector("details")!;
+      details.open = true;
+      return { ...view, details };
+    };
+
+    it("closes when a link in it is clicked, also the link of the current page", () => {
+      const { details } = openSheet();
+      fireEvent.click(within(details).getByRole("link", { name: "About" }));
+      expect(details.open).toBe(false);
+      details.open = true;
+      fireEvent.click(within(details).getByRole("link", { name: "Blog" }));
+      expect(details.open).toBe(false);
+    });
+
+    it("stays open when something else in it is clicked, or when the path changes by itself", () => {
+      const { details, rerender } = openSheet();
+      fireEvent.click(within(details).getByRole("button", { name: "Light theme" }));
+      expect(details.open).toBe(true);
+      nav.pathname = "/projects/";
+      rerender(<SiteShell>page</SiteShell>);
+      expect(details.open).toBe(true);
+    });
+
+    it("closes on Escape and returns focus to the Menu button; Escape does nothing when it is closed", () => {
+      const { details } = openSheet();
+      fireEvent.keyDown(document, { key: "Enter" });
+      expect(details.open).toBe(true);
+      fireEvent.keyDown(document, { key: "Escape" });
+      expect(details.open).toBe(false);
+      expect(details.querySelector("summary")).toHaveFocus();
+      (document.activeElement as HTMLElement).blur();
+      fireEvent.keyDown(document, { key: "Escape" });
+      expect(document.activeElement).toBe(document.body);
+    });
+
+    it("closes on a click outside it", () => {
+      const { details } = openSheet();
+      fireEvent.click(screen.getByRole("main"));
+      expect(details.open).toBe(false);
+    });
+
+    it("closes on back and forward (popstate)", () => {
+      const { details } = openSheet();
+      fireEvent(window, new PopStateEvent("popstate"));
+      expect(details.open).toBe(false);
+    });
+  });
+
   it("the toggle switches to light and remembers it, and back", async () => {
     render(<ThemeToggle />);
     const toggle = screen.getByRole("button", { name: "Light theme" });

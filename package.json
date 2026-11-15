@@ -11,6 +11,7 @@
     "test": "vitest run",
     "e2e": "node scripts/run-e2e.mjs fixture",
     "e2e:default": "node scripts/run-e2e.mjs default",
+    "e2e:webkit": "node scripts/run-e2e.mjs fixture --webkit menu-sheet",
     "check:fixture": "node scripts/check-no-fixture.mjs"
   },
   "dependencies": {
