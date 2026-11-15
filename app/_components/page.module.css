@@ -63,17 +63,11 @@
   max-width: var(--measure);
 }
 
-/* The About paragraphs: the reading measure, but on a tablet the column takes the full width, so the page keeps one
-   pair of margins (the inspector's off-centre rule: a 65ch column leaves about 115px on the right at 768px, 23px on
-   the left). */
+/* The About paragraphs: a reading measure of 75ch, a little wider than the other pages' 65ch. At 768px the column is then
+   as wide as the page (721px), so the two margins match (a 65ch column leaves 111px on the right, 23px on the left: the
+   inspector's off-centre rule). Above that the column keeps 75ch at every width. */
 .prose {
-  max-width: var(--measure);
-}
-
-@media (min-width: 48rem) and (max-width: 63.9375rem) {
-  .prose {
-    max-width: none;
-  }
+  max-width: 75ch;
 }
 
 .list {
@@ -90,8 +84,7 @@
   gap: var(--space-1);
 }
 
-/* Name and text side by side from a tablet up, so a list uses the width of the page instead of one narrow column.
-   The three-column form (Parts) puts its links at the right edge, on the same row as the text. */
+/* Name and text side by side from a tablet up, so a list uses the width of the page instead of one narrow column. */
 .rows {
   list-style: none;
   margin: 0;
@@ -116,10 +109,6 @@
     grid-template-columns: minmax(11rem, 18rem) minmax(0, 1fr);
     align-items: baseline;
   }
-
-  .rowWide {
-    grid-template-columns: minmax(9rem, 14rem) minmax(0, 1fr) auto;
-  }
 }
 
 .term {
@@ -136,13 +125,30 @@
   column-gap: var(--space-5);
 }
 
-/* Touch targets: every link in the pages is at least 44px high and wide. */
+/* Touch targets: a link that stands alone (in a list, on its own line, or as the whole of a paragraph) is at least 44px
+   high and wide. A link inside running text keeps the line height (a 44px box would break the lines). */
 .link {
   min-height: 2.75rem;
   min-width: 2.75rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+/* A link that leads a row sits at the start of its column, like the names beside it. */
+.linkStart {
+  justify-content: flex-start;
+}
+
+/* Groups inside one section are set apart from each other. */
+.group + .group {
+  margin-top: var(--space-6);
+}
+
+/* The title of a group inside a section (an h3). */
+.groupTitle {
+  font-weight: var(--weight-strong);
+  margin-bottom: var(--space-3);
 }
 
 .small {

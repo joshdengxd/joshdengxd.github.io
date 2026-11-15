@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { PROJECTS } from "../../lib/projects";
 import { ABOUT_LINKS } from "../about-text";
+import { MERGED_PRS_URL, PROJECT_BOARD_URL } from "../../lib/site";
 
 const HOME_LABEL = "Josh Deng, home";
 const NAV = [
@@ -251,13 +252,18 @@ test.describe("phone", () => {
         expect(await overflow(), `${path} open`).toBe(0);
 
         const small = await page.evaluate(() =>
-          [
-            ...document.querySelectorAll<HTMLElement>(
-              "header a, header button, header summary, footer a, main a:not(main p a)",
-            ),
-          ]
-            // Links inside a paragraph are exempt (WCAG 2.2 target size, inline exception): a 44px box would break the lines.
+          [...document.querySelectorAll<HTMLElement>("header a, header button, header summary, footer a, main a")]
             .filter((el) => el.offsetParent !== null || getComputedStyle(el).position === "fixed")
+            // A link inside running text is exempt (WCAG 2.2 target size, inline exception): a 44px box would break the
+            // lines. A link is inline when its paragraph holds other text; a link that is the whole paragraph is checked.
+            .filter((el) => {
+              const block = el.closest("p");
+              return !(
+                el.matches("main a") &&
+                block &&
+                (block.textContent ?? "").trim() !== (el.textContent ?? "").trim()
+              );
+            })
             .map((el) => ({ name: el.textContent?.trim(), r: el.getBoundingClientRect() }))
             .filter(({ r }) => r.width > 0 && (r.width < 44 || r.height < 44))
             .map(({ name, r }) => `${name} ${Math.round(r.width)}x${Math.round(r.height)}`),
@@ -319,7 +325,7 @@ test.describe("without JavaScript, on a phone", () => {
 });
 
 test.describe("personal details", () => {
-  test("the shell shows no contact detail, and outside links go only to GitHub, LinkedIn, the public repos and this repo's issues and PRs", async ({
+  test("the shell shows no contact detail, and outside links go only to GitHub, LinkedIn, the public repos, the two people About names, the project board and the merged pull requests", async ({
     page,
   }) => {
     const outside = new Set<string>();
@@ -340,13 +346,11 @@ test.describe("personal details", () => {
       "https://github.com/joshdengxd/job-search-skills",
       "https://github.com/joshdengxd/joshdengxd.github.io",
       ...ABOUT_LINKS.map((l) => l.href), // Matt Pocock and Lauren Tan, in About (ticket #35)
+      PROJECT_BOARD_URL,
+      MERGED_PRS_URL,
     ];
     for (const href of outside) {
-      expect(
-        allowed.includes(href) ||
-          /^https:\/\/github\.com\/joshdengxd\/joshdengxd\.github\.io\/(issues|pull)\/\d+$/.test(href),
-        href,
-      ).toBe(true);
+      expect(allowed.includes(href), href).toBe(true);
     }
     for (const href of allowed) {
       expect([...outside], href).toContain(href);

@@ -4,9 +4,9 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { expect, test } from "@playwright/test";
-import { REPO_URL } from "../../lib/build-log";
 import { PROJECTS } from "../../lib/projects";
 import { ABOUT_LINKS } from "../about-text";
+import { MERGED_PRS_URL, PROJECT_BOARD_URL } from "../../lib/site";
 
 const OUT = join(process.cwd(), "out");
 const ORIGIN = "https://joshdengxd.github.io";
@@ -244,14 +244,15 @@ test.describe("personal details", () => {
     }
   });
 
-  test("outside links go only to the GitHub and LinkedIn profiles, the three public repos, the two people About names and this repo's issues and PRs", () => {
+  test("outside links go only to the GitHub and LinkedIn profiles, the three public repos, the two people About names, the project board and the merged pull requests", () => {
     const allowed = [
       "https://github.com/joshdengxd",
       "https://www.linkedin.com/in/josh-deng-edm",
       ...PROJECTS.map((p) => p.repoUrl),
       ...ABOUT_LINKS.map((l) => l.href), // Matt Pocock and Lauren Tan, in About (ticket #35)
+      PROJECT_BOARD_URL,
+      MERGED_PRS_URL,
     ];
-    const issueOrPull = new RegExp(`^${REPO_URL.replace(/[.]/g, "\\.")}/(?:issues|pull)/\\d+$`);
     for (const p of pages) {
       for (const href of [...p.html.replace(/<script[\s\S]*?<\/script>/g, "").matchAll(/<a [^>]*href="([^"]+)"/g)].map(
         (m) => decode(m[1]),
@@ -259,7 +260,7 @@ test.describe("personal details", () => {
         if (href.startsWith("/") || href.startsWith("#")) {
           continue;
         }
-        expect(allowed.includes(href) || issueOrPull.test(href), `${p.file} links ${href}`).toBe(true);
+        expect(allowed.includes(href), `${p.file} links ${href}`).toBe(true);
       }
     }
   });

@@ -48,8 +48,14 @@ export default function Page() {
         </p>
         <p className={pageStyles.prose}>
           I mostly use Claude Code. Many of my ideas and workflows come from{" "}
-          <a href="https://www.aihero.dev/">Matt Pocock</a> and <a href="https://x.com/poteto">Lauren Tan</a>, along
-          with many other people.
+          <a href="https://www.aihero.dev/" rel="noreferrer">
+            Matt Pocock
+          </a>{" "}
+          and{" "}
+          <a href="https://x.com/poteto" rel="noreferrer">
+            Lauren Tan
+          </a>
+          , along with many other people.
         </p>
       </Section>
       <Section title="How I work">

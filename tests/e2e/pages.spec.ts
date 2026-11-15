@@ -1,8 +1,9 @@
 // The v1 pages in a browser (both builds): reachable from the navigation and the Projects index, the project pages
 // and their repo links, the home sections, and the visible placeholder labels.
 import { expect, test, type Page } from "@playwright/test";
-import { REPO_URL } from "../../lib/build-log";
 import { PROJECTS } from "../../lib/projects";
+import { MERGED_PRS_URL, PROJECT_BOARD_URL, SITE_REPO_URL } from "../../lib/site";
+import { SKILLS } from "../../lib/skills";
 
 const REPOS = {
   "josh-shared-skills": "https://github.com/joshdengxd/josh-shared-skills",
@@ -147,23 +148,22 @@ test.describe("placeholders", () => {
 });
 
 test.describe("how this site is built", () => {
-  test("links each part's issue, and its PR when known, for this repo only; names the five unused skills", async ({
-    page,
-  }) => {
+  test("no issue or PR numbers, the installed skills, and the three record links", async ({ page }) => {
     await page.goto("/how-this-site-is-built/");
-    await expect(page.getByRole("heading", { level: 2 })).toHaveText(["Workflow", "Parts", "Skills not used here"]);
-    await expect(page.getByRole("link", { name: "Issue #2" })).toHaveAttribute("href", `${REPO_URL}/issues/2`);
-    await expect(page.getByRole("link", { name: "PR #11" })).toHaveAttribute("href", `${REPO_URL}/pull/11`);
-    await expect(page.getByRole("link", { name: "Issue #7" })).toHaveAttribute("href", `${REPO_URL}/issues/7`);
-    await expect(page.getByRole("link", { name: "PR #7", exact: true })).toHaveCount(0);
-    for (const skill of [
-      "deploy-to-staging",
-      "run-e2e-automation",
-      "live-env-local-test",
-      "prod-release-gate",
-      "log-analysis",
-    ]) {
-      await expect(page.getByText(skill, { exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2 })).toHaveText([
+      "Workflow",
+      "Skills used",
+      "What it is made of",
+      "The record",
+    ]);
+    await expect(page.locator("[data-part]")).toHaveCount(0);
+    const hrefs = await page.locator("main a").evaluateAll((as) => as.map((a) => a.getAttribute("href") ?? ""));
+    expect(hrefs.filter((h) => /#\d+|\/(issues|pull)\/\d+/.test(h))).toEqual([]);
+    for (const name of Object.keys(SKILLS)) {
+      await expect(page.locator("[data-skill-group] code", { hasText: new RegExp(`^${name}$`) })).toHaveCount(1);
     }
+    await expect(page.getByRole("link", { name: "Project board" })).toHaveAttribute("href", PROJECT_BOARD_URL);
+    await expect(page.getByRole("link", { name: "Merged pull requests" })).toHaveAttribute("href", MERGED_PRS_URL);
+    await expect(page.getByRole("link", { name: "Repository" })).toHaveAttribute("href", SITE_REPO_URL);
   });
 });
