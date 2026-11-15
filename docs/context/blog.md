@@ -1,6 +1,6 @@
 # Blog engine (ticket #6)
 
-Read when you add a post or touch `lib/posts/`, `app/blog/`, `app/rss.xml/` or `app/sitemap.ts`.
+Read when you add a post or touch `lib/posts/`, `app/blog/` or `app/sitemap.ts`.
 
 ## Add a post
 One file: `content/posts/<slug>.md`. The file name is the slug (`^[a-z0-9]+(-[a-z0-9]+)*$`, not `tags`). Front matter, all four keys required, no others:
@@ -18,9 +18,9 @@ summary: One or two sentences (1-300 characters).
 - A bad file fails `npm run build` with `content/posts/<file>.md: <field>: <message>`.
 
 ## Pipeline and pages
-- `lib/posts/`: `loader.ts` (split `---`, `yaml`, `zod` strict schema in `schema.ts`, duplicate slugs, sorting, tags), `markdown.ts` (unified: remark-parse, remark-gfm, remark-rehype, rehype-sanitize, Shiki, rehype-stringify; build time only), `feed.ts` (RSS 2.0 by hand), `dates.ts`.
-- `/blog/`, `/blog/<slug>/`, `/blog/tags/<tag>/`, `/rss.xml`, `/sitemap.xml` (every public route, see `pages.md`; the blog part is `/blog/`, posts, tag pages). Blog page metadata comes from `pageMetadata` through `blogMetadata`. Home shows the three newest posts (Latest posts) or "No posts yet".
-- Static export refuses a dynamic route with no pages, so with no posts or tags each dynamic route generates one hidden page, `_none`: the 404 content with `noindex`, never linked, never in the sitemap or feed.
+- `lib/posts/`: `loader.ts` (split `---`, `yaml`, `zod` strict schema in `schema.ts`, duplicate slugs, sorting, tags), `markdown.ts` (unified: remark-parse, remark-gfm, remark-rehype, rehype-sanitize, Shiki, rehype-stringify; build time only), `dates.ts`.
+- `/blog/`, `/blog/<slug>/`, `/blog/tags/<tag>/`, `/sitemap.xml` (every public route, see `pages.md`; the blog part is `/blog/`, posts, tag pages). Blog page metadata comes from `pageMetadata` through `blogMetadata`. Home shows the three newest posts (Latest posts) or "No posts yet".
+- Static export refuses a dynamic route with no pages, so with no posts or tags each dynamic route generates one hidden page, `_none`: the 404 content with `noindex`, never linked, never in the sitemap.
 - Dates: HTML has `<time datetime=UTC>` with the UTC date; a client component swaps it for the reader's locale and zone after hydration.
 
 ## Code highlighting (ticket #16)
