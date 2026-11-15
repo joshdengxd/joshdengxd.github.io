@@ -31,3 +31,6 @@ Read when working on build, routing, metadata, content or CI. Verify against cur
 ## Verification
 - Browser checks can run against the dev server; when routing, 404 or trailing-slash behaviour matters, also check the static build (`out/`) served locally.
 - Useful e2e: click through every page and fail on any 404 or console error.
+
+## Windows builds
+- Next.js 16.4 export writes nested prefetch segment files into folders on Windows (`about/__next.about/__PAGE__.txt`) while the client asks for the flat name (`about/__next.about.__PAGE__.txt`), so every prefetch of a nested page 404s. `npm run build` runs `scripts/flatten-export-segments.mjs` after `next build` to move them; on Linux (CI, deploy) it moves nothing.

@@ -64,3 +64,24 @@ code {
 .name-last {
   color: var(--color-name-last);
 }
+
+/* The first Tab stop on every page: clipped to nothing until it has focus (it is out of the flow). */
+.skip-link {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--margin-page);
+  z-index: 3;
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  padding-inline: var(--space-4);
+  background: var(--color-ground);
+  color: var(--color-ink);
+  font-weight: var(--weight-strong);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+.skip-link:focus {
+  clip-path: none;
+}

@@ -2,7 +2,7 @@
 
 import { useLayoutEffect, useSyncExternalStore } from "react";
 import { THEME_KEY } from "../theme";
-import styles from "./design.module.css";
+import styles from "./shell.module.css";
 
 type Theme = "dark" | "light";
 

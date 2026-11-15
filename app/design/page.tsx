@@ -4,7 +4,6 @@ import type { Metadata } from "next";
 import type { CSSProperties } from "react";
 import { AA_LARGE, contrastPairs, sharedTokens, THEMES, themeColours, type Theme } from "@/lib/tokens";
 import styles from "./design.module.css";
-import { ThemeToggle } from "./theme-toggle";
 
 export const metadata: Metadata = {
   title: "Design language · Xindong Deng (Josh)",
@@ -66,7 +65,7 @@ export default function DesignPage() {
   const pairs = contrastPairs(css);
 
   return (
-    <main className={styles.page}>
+    <div className={styles.page}>
       <header className={styles.intro}>
         <div className={styles.introText}>
           <h1 className={styles.title}>Design language</h1>
@@ -74,7 +73,6 @@ export default function DesignPage() {
             Every token of direction D5, read from the token file the site imports. This page is a specimen for
             checking the tokens; it is not linked from the site.
           </p>
-          <ThemeToggle />
         </div>
         <p className={`name ${styles.nameSample}`} aria-label="Josh Deng, set in the name step">
           <span className="reveal-mask">
@@ -255,6 +253,6 @@ export default function DesignPage() {
           </pre>
         </div>
       </section>
-    </main>
+    </div>
   );
 }
