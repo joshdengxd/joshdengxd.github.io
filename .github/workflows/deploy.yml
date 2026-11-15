@@ -3,7 +3,15 @@ name: deploy
 on:
   push:
     branches: [main]
+  # Daily: picks up merges made with the workflow token (Dependabot auto-merge), which do not start a push run.
+  schedule:
+    - cron: "17 9 * * *"
   workflow_dispatch:
+    inputs:
+      force:
+        description: Redeploy even if the live site already serves this commit
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -13,7 +21,28 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Scheduled and manual runs skip build + deploy when the live site already serves this commit (green, not failed).
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      skip: ${{ steps.decide.outputs.skip }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - id: decide
+        run: node scripts/should-skip-deploy.mjs
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          FORCE: ${{ inputs.force }}
+          SHA: ${{ github.sha }}
+
   build:
+    needs: plan
+    if: needs.plan.outputs.skip != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -38,6 +67,7 @@ jobs:
         with:
           path: out
 
+  # Skipped (green) whenever build is skipped.
   deploy:
     needs: build
     runs-on: ubuntu-latest

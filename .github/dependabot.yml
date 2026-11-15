@@ -1,4 +1,4 @@
-# Dependency updates as small PRs that go through `checks`; the owner merges them.
+# Dependency updates as small PRs that go through `checks`; patch and minor ones merge on their own once `checks` passes, the owner merges the rest.
 version: 2
 updates:
   - package-ecosystem: "npm"
@@ -28,7 +28,11 @@ updates:
       interval: "weekly"
     labels: []
     groups:
-      # All action updates, majors included, in one PR.
-      github-actions:
+      # Minor and patch action updates in one PR (auto-merged when `checks` passes, see dependabot-auto-merge.yml);
+      # each action major stays its own PR for the owner.
+      github-actions-minor-and-patch:
         patterns:
           - "*"
+        update-types:
+          - "minor"
+          - "patch"
