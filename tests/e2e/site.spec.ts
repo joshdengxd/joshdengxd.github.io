@@ -10,10 +10,19 @@ test("home shows the placeholder and the build commit", async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
+test("the site icon is served", async ({ page, request }) => {
+  await page.goto("/");
+  const href = await page.locator('link[rel="icon"]').first().getAttribute("href");
+  expect(href).toBeTruthy();
+  const res = await request.get(href!);
+  expect(res.status()).toBe(200);
+});
+
 test("unknown URL shows the site's own 404 page", async ({ page }) => {
   const res = await page.goto("/no-such-page/");
   expect(res?.status()).toBe(404);
   await expect(page.getByText("This page does not exist.")).toBeVisible();
   await page.getByRole("link", { name: "Home" }).click();
-  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveURL("/");
+  await expect(page.getByText(/under construction/i)).toBeVisible();
 });
