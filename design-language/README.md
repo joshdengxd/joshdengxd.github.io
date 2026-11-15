@@ -130,7 +130,7 @@ Both families are under the SIL Open Font License 1.1. The files are the Latin s
 
 ## Taste skill gates and waivers
 
-The taste skill's lint and its browser inspector run on the static build at 1440, 768 and 390 px, on `/` and `/design/`, with 0 FAIL. Four inspector rules are waived in v1:
+The taste skill's lint and its browser inspector run on the static build at 1440, 768 and 390 px, on `/`, `/design/`, `/blog/` and a blog post page (fixture build), with 0 FAIL. Four inspector rules are waived in v1:
 
 - `few-pictures`, `no-real-pictures`, `no-footage`: the picture floor (at least four real pictures). v1 has no content and no photographs yet.
 - `still-page`: the motion minimum (at least eight moving elements). v1 has one deliberate effect, the name reveal.
@@ -138,6 +138,8 @@ The taste skill's lint and its browser inspector run on the static build at 1440
 A later ticket brings both back with real content and the motion layer.
 
 Warnings left on purpose (the inspector only warns about these):
+- `hero-void` on `/blog/` and the tag pages (about 29% of the first screen is empty at 1440 px): the empty block sits beside the reading column, the page's one rest; the list is held to the reading measure on purpose.
+- `name-only-title` on the tag pages: the h1 is `Tagged <tag>` and the line under it repeats the tag in plain words.
 - `first-action` on `/`: no button on the first screen yet; the navigation comes with the layout shell.
 - `palette-cream` on `/design/`: the light theme's ground `#f3f0e6`, the owner's chosen light ground from the D5 light mockup. The specimen shows it; on the site it appears only after the toggle.
 - `off-centre` on `/design/`: the theme samples sit inset in their own blocks, so the text in them stops short of the right margin.

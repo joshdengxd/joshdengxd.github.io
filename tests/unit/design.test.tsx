@@ -24,8 +24,10 @@ describe("/design/ specimen", () => {
 });
 
 describe("sitemap", () => {
-  it("lists only the home page", () => {
-    expect(sitemap().map((e) => e.url)).toEqual(["https://joshdengxd.github.io/"]);
+  it("lists the home page and the blog, not the specimen", async () => {
+    const urls = (await sitemap()).map((e) => e.url);
+    expect(urls).toContain("https://joshdengxd.github.io/");
+    expect(urls.some((u) => u.includes("/design/"))).toBe(false);
   });
 });
 
