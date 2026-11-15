@@ -1,10 +1,10 @@
 # joshdengxd.github.io
 
-My personal website: about me, my ideas on agent-assisted software delivery, what my public repos do, and a blog.
+My personal website: about me, what I am learning, what my public repos do, and a blog. It is live at [joshdengxd.github.io](https://joshdengxd.github.io).
 
-It is also a live demo. Every change goes through the workflow in [josh-shared-skills](https://github.com/joshdengxd/josh-shared-skills): an issue is refined, an agent implements it, a separate agent verifies each acceptance criterion with evidence, and I review and merge. The issues and PRs in this repo are the record.
+It is a static site built with Next.js and TypeScript and hosted on GitHub Pages. Every change goes through the workflow in [josh-shared-skills](https://github.com/joshdengxd/josh-shared-skills): a ticket is refined, an agent implements it, fresh agents verify each acceptance criterion with evidence and review the code, and the pull request merges automatically once every check has passed. The issues and pull requests in this repository are the record.
 
-Status: planning. Requirements: [PRD-0001](docs/prd/0001-personal-site-v1.md).
+Requirements: [PRD-0001](https://github.com/joshdengxd/joshdengxd.github.io/blob/main/docs/prd/0001-personal-site-v1.md).
 
 ## License
 Code: MIT. Blog posts and other writing: all rights reserved.
