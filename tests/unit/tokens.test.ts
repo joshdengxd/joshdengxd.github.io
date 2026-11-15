@@ -3,6 +3,10 @@ import { join } from "node:path";
 import {
   AA_LARGE,
   AA_NORMAL,
+  CODE_SURFACE_ROLE,
+  CODE_TEXT_ROLES,
+  codeColours,
+  codeContrastPairs,
   contrast,
   contrastPairs,
   DISPLAY_ROLES,
@@ -45,6 +49,36 @@ describe("design tokens", () => {
   it("dark is the default: :root carries the dark colours", () => {
     const block = /:root,\s*\[data-theme="dark"\]\s*\{/;
     expect(css).toMatch(block);
+  });
+});
+
+describe("code colours (--shiki-*)", () => {
+  it.each(["dark", "light"] as const)("the %s theme defines the code background and every code text role as #rrggbb", (theme) => {
+    const c = codeColours(css, theme);
+    for (const role of [CODE_SURFACE_ROLE, ...CODE_TEXT_ROLES]) expect(c[role], role).toMatch(/^#[0-9a-f]{6}$/i);
+  });
+
+  it("both themes define the same code roles, and they are exactly what Shiki's CSS-variables theme reads", () => {
+    const expected = [CODE_SURFACE_ROLE, ...CODE_TEXT_ROLES].sort();
+    expect(Object.keys(codeColours(css, "dark")).sort()).toEqual(expected);
+    expect(Object.keys(codeColours(css, "light")).sort()).toEqual(expected);
+  });
+
+  it("keeps the code colours out of the shared (theme-independent) tokens", () => {
+    expect(Object.keys(sharedTokens(css)).some((n) => n.startsWith("--shiki-"))).toBe(false);
+  });
+});
+
+describe("WCAG 2.2 AA contrast, every code colour on the code background of both themes", () => {
+  const pairs = codeContrastPairs(css);
+
+  it("checks every pair", () => {
+    expect(pairs).toHaveLength(2 * CODE_TEXT_ROLES.length);
+  });
+
+  it.each(pairs.map((p) => [p.theme, p.text, p] as const))("%s: %s on the code background", (_theme, _text, p) => {
+    expect(p.required).toBe(AA_NORMAL);
+    expect(p.ratio).toBeGreaterThanOrEqual(AA_NORMAL);
   });
 });
 

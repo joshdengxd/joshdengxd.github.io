@@ -98,6 +98,26 @@ Contrast (text on ground / on panel):
 | name-first | 3 | 5.64 / 4.60 | 3.54 / 3.14 |
 | name-last | 3 | 7.26 / 5.92 | 5.89 / 5.22 |
 
+### Code colours
+
+Code blocks in posts are highlighted at build time with Shiki's CSS-variables theme, so the built HTML carries no colour of its own, only `var(--shiki-*)`. The values live in [`tokens.css`](tokens.css), per theme, in the same ochre and sage palette. Every text role must reach WCAG 2.2 AA for normal text (4.5:1) on `--shiki-background`; `tests/unit/tokens.test.ts` checks all 20 pairs and `/design/` shows a highlighted sample with each ratio.
+
+| Role | Use | Dark (default) | Light |
+|---|---|---|---|
+| `--shiki-background` | the code block background (the panel colour) | `#2a3b2f` | `#dfe5d6` |
+| `--shiki-foreground` | plain code text | `#c2d2b8` | `#2c4a35` |
+| `--shiki-token-comment` | comments | `#98a694` | `#57645a` |
+| `--shiki-token-keyword` | keywords | `#d4a762` | `#7a501a` |
+| `--shiki-token-string` | strings, plain | `#a9bd9d` | `#3f6447` |
+| `--shiki-token-string-expression` | strings, quoted values | `#d9c08a` | `#6b5516` |
+| `--shiki-token-constant` | constants, numbers, names | `#e0b887` | `#6e4a10` |
+| `--shiki-token-function` | function names | `#e8d6a8` | `#5a4a12` |
+| `--shiki-token-parameter` | parameters | `#b4c7a4` | `#35553d` |
+| `--shiki-token-punctuation` | punctuation | `#a3b09f` | `#4f5c52` |
+| `--shiki-token-link` | links | `#c49a5a` | `#855a21` |
+
+Contrast on the code background (needs 4.5): see `/design/` for every ratio; the lowest are the link colour, 4.60 in dark and 4.69 in light.
+
 Changes from the mockup values, to pass the checks: dark ink is a lighter sage (`#c2d2b8`, so running text is not soft grey) while DENG keeps `#a9bd9d`; dark muted `#8c9a88` became `#98a694`; light muted `#5d6a5e` became `#57645a`; light accent text is a darker ochre (`#855a21`), while the light JOSH keeps the mockup's `#a8742f` because it is only ever large.
 
 ### Type

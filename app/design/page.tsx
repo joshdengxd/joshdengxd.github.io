@@ -2,7 +2,17 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Metadata } from "next";
 import type { CSSProperties } from "react";
-import { AA_LARGE, contrastPairs, sharedTokens, THEMES, themeColours, type Theme } from "@/lib/tokens";
+import { renderMarkdown } from "@/lib/posts/markdown";
+import {
+  AA_LARGE,
+  CODE_TEXT_ROLES,
+  codeContrastPairs,
+  contrastPairs,
+  sharedTokens,
+  THEMES,
+  themeColours,
+  type Theme,
+} from "@/lib/tokens";
 import styles from "./design.module.css";
 
 export const metadata: Metadata = {
@@ -20,11 +30,15 @@ const TYPE_SAMPLES: { token: string; sample: string }[] = [
   { token: "--step-small", sample: "Small print: captions, table notes and code." },
 ];
 
-const CODE_SAMPLE = `.name {
-  font-size: var(--step-name);
-  font-stretch: var(--stretch-name);
-  color: var(--color-name-first);
-}`;
+// Highlighted at build time by the same pipeline as the posts, so this shows what a post code block looks like.
+const CODE_SAMPLE = [
+  "```ts",
+  "// Say hello",
+  "export function greet(name: string) {",
+  "  return `Hi, ${name}`;",
+  "}",
+  "```",
+].join("\n");
 
 const role = (token: string) => token.replace(/^--color-/, "");
 
@@ -58,11 +72,13 @@ function TokenTable({ caption, tokens }: { caption: string; tokens: [string, str
   );
 }
 
-export default function DesignPage() {
+export default async function DesignPage() {
   const css = readTokens();
   const shared = Object.entries(sharedTokens(css));
   const pick = (prefixes: string[]) => shared.filter(([k]) => prefixes.some((p) => k.startsWith(p)));
   const pairs = contrastPairs(css);
+  const codePairs = codeContrastPairs(css);
+  const codeHtml = await renderMarkdown(CODE_SAMPLE);
 
   return (
     <div className={styles.page}>
@@ -245,12 +261,25 @@ export default function DesignPage() {
           <h2 id="code" className={styles.heading}>
             Code
           </h2>
-          <p>Code blocks use the code face on the panel colour, at the small step.</p>
+          <p>Code blocks use the code face at the small step, highlighted at build time with colours from the tokens.</p>
         </div>
         <div className={styles.body}>
-          <pre className={styles.code}>
-            <code>{CODE_SAMPLE}</code>
-          </pre>
+          <div className={styles.code} dangerouslySetInnerHTML={{ __html: codeHtml }} />
+          <ul className={styles.codeRoles} aria-label="Code colours and their contrast on the code background, 4.5:1 needed">
+            {CODE_TEXT_ROLES.map((role) => {
+              const [dark, light] = THEMES.map((theme) => codePairs.find((c) => c.theme === theme && c.text === role)!);
+              return (
+                <li
+                  key={role}
+                  data-code-pair={role}
+                  className={styles.codeRole}
+                  style={{ background: "var(--shiki-background)", color: `var(${role})` } as CSSProperties}
+                >
+                  <code>{`${role.replace(/^--shiki-/, "")}: dark ${dark.ratio.toFixed(2)}:1 ${dark.passes ? "passes" : "fails"}, light ${light.ratio.toFixed(2)}:1 ${light.passes ? "passes" : "fails"}`}</code>
+                </li>
+              );
+            })}
+          </ul>
         </div>
       </section>
     </div>

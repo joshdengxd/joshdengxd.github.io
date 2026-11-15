@@ -1,8 +1,12 @@
+import rehypeShikiFromHighlighter from "@shikijs/rehype/core";
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import rehypeStringify from "rehype-stringify";
 import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
+import { createHighlighter } from "shiki";
+import { createCssVariablesTheme } from "shiki/core";
+import { createJavaScriptRegexEngine } from "shiki/engine/javascript";
 import { unified } from "unified";
 
 type MdNode = { type: string; children?: MdNode[]; position?: { start: { line: number } } };
@@ -29,14 +33,59 @@ export function findRawHtml(markdown: string): number[] {
 // so the only ids are the prefixed footnote ones.
 const schema = { ...defaultSchema, clobber: [] };
 
-const processor = unified()
-  .use(remarkParse)
-  .use(remarkGfm)
-  .use(remarkRehype)
-  .use(rehypeSanitize, schema)
-  .use(rehypeStringify);
+// Code highlighting (ticket #16): Shiki at build time, after rehype-sanitize. Sanitizing first means the post content is
+// sanitized exactly as before, and Shiki's own markup (spans, a style attribute) is not stripped. Shiki replaces each
+// <pre> with its own element tree, built from the code text only: the only attributes it writes are `class`, `style`
+// (var(--shiki-*) references, never a colour value) and `tabindex`, so nothing an author writes (language, meta string,
+// code text) can become an id, an event handler or a class. Nothing runs in the browser.
+export const HIGHLIGHT_LANGUAGES = ["ts", "tsx", "js", "jsx", "json", "bash", "shell", "yaml", "md", "css", "html", "diff", "csharp"];
 
-/** Markdown to sanitized HTML. Never outputs raw HTML from the source or a javascript: link. */
+// Every colour comes from the variables in design-language/tokens.css, so the theme switch needs nothing extra.
+const CODE_THEME = createCssVariablesTheme({ name: "css-variables", variablePrefix: "--shiki-", fontStyle: true });
+
+type HastNode = { tagName?: string; properties?: Record<string, unknown>; children?: HastNode[] };
+type Processor = { process(markdown: string): Promise<{ toString(): string }> };
+let processor: Promise<Processor> | undefined;
+
+async function buildProcessor(): Promise<Processor> {
+  const highlighter = await createHighlighter({
+    themes: [CODE_THEME],
+    langs: HIGHLIGHT_LANGUAGES,
+    engine: createJavaScriptRegexEngine(),
+  });
+  const loaded = new Set(highlighter.getLoadedLanguages());
+
+  // The sanitize schema keeps `language-*` classes on code. Before Shiki reads them, drop any that name a language that
+  // is not loaded (this also keeps Shiki's special languages, such as ansi, out), so that block, and a block with no
+  // language, falls to the default plain text below.
+  const dropUnknownLanguages = () => (tree: object) => {
+    const walk = (node: HastNode) => {
+      const classes = node.properties?.className;
+      if (node.tagName === "code" && Array.isArray(classes)) {
+        const lang = classes.find((c) => typeof c === "string" && c.startsWith("language-"));
+        if (typeof lang === "string" && !loaded.has(lang.slice("language-".length))) delete node.properties!.className;
+      }
+      node.children?.forEach(walk);
+    };
+    walk(tree as HastNode);
+  };
+
+  return unified()
+    .use(remarkParse)
+    .use(remarkGfm)
+    .use(remarkRehype)
+    .use(rehypeSanitize, schema)
+    .use(dropUnknownLanguages)
+    .use(rehypeShikiFromHighlighter, highlighter, {
+      theme: "css-variables",
+      defaultLanguage: "text",
+      fallbackLanguage: "text",
+    })
+    .use(rehypeStringify);
+}
+
+/** Markdown to sanitized, highlighted HTML. Never outputs raw HTML from the source or a javascript: link. */
 export async function renderMarkdown(markdown: string): Promise<string> {
-  return String(await processor.process(markdown));
+  processor ??= buildProcessor();
+  return String(await (await processor).process(markdown));
 }

@@ -6,7 +6,9 @@
  *   text roles  (--color-ink, --color-muted, --color-accent): any size, WCAG AA 4.5:1 on every surface
  *   display roles (--color-name-first, --color-name-last): the name only, large and heavy, AA 3:1
  * Surfaces: --color-ground (page), --color-panel (one step lighter).
- * tests/unit/tokens.test.ts checks every text/surface pair of both themes.
+ * Code colours (--shiki-*) are the variables Shiki's CSS-variables theme reads (lib/posts/markdown.ts): the code
+ * background, the plain code text, and one text role per token kind, all AA 4.5:1 on --shiki-background.
+ * tests/unit/tokens.test.ts checks every text/surface pair of both themes and every code colour on its background.
  */
 
 /* Dark is the default for every visitor, with or without JavaScript. */
@@ -20,6 +22,19 @@
   --color-accent: #c49a5a;
   --color-name-first: #c49a5a;
   --color-name-last: #a9bd9d;
+
+  /* Code */
+  --shiki-background: #2a3b2f;
+  --shiki-foreground: #c2d2b8;
+  --shiki-token-comment: #98a694;
+  --shiki-token-keyword: #d4a762;
+  --shiki-token-string: #a9bd9d;
+  --shiki-token-string-expression: #d9c08a;
+  --shiki-token-constant: #e0b887;
+  --shiki-token-function: #e8d6a8;
+  --shiki-token-parameter: #b4c7a4;
+  --shiki-token-punctuation: #a3b09f;
+  --shiki-token-link: #c49a5a;
 }
 
 /* Light only through the toggle; the choice is stored as localStorage "theme". */
@@ -32,6 +47,19 @@
   --color-accent: #855a21;
   --color-name-first: #a8742f;
   --color-name-last: #3f6447;
+
+  /* Code */
+  --shiki-background: #dfe5d6;
+  --shiki-foreground: #2c4a35;
+  --shiki-token-comment: #57645a;
+  --shiki-token-keyword: #7a501a;
+  --shiki-token-string: #3f6447;
+  --shiki-token-string-expression: #6b5516;
+  --shiki-token-constant: #6e4a10;
+  --shiki-token-function: #5a4a12;
+  --shiki-token-parameter: #35553d;
+  --shiki-token-punctuation: #4f5c52;
+  --shiki-token-link: #855a21;
 }
 
 :root {
