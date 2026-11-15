@@ -45,7 +45,7 @@ Skeletons use clearly marked placeholder text only.
 2. Dates are stored in UTC (ISO 8601) and shown in the reader's locale and time zone. Without JavaScript, the UTC date is shown.
 3. Markdown is rendered to HTML at build time, with raw HTML disabled. No MDX.
 4. Navigation on every page; current page marked.
-5. Light and dark theme: follows the system setting, a toggle overrides it, the choice is remembered, and there is no flash of the wrong theme.
+5. Dark theme by default for every visitor (and without JavaScript); a toggle switches to a light theme, the choice is remembered, and there is no flash of the wrong theme.
 6. Responsive from 320 px wide.
 7. Accessibility: WCAG 2.2 AA, full keyboard use, visible focus, alt text.
 8. Content is readable without JavaScript.

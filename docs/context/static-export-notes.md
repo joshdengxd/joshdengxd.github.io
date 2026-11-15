@@ -17,7 +17,7 @@ Read when working on build, routing, metadata, content or CI. Verify against cur
 - Fixture post only when `INCLUDE_FIXTURES=1`; never in the deployed build.
 
 ## Theme
-- Default from CSS `prefers-color-scheme`. Saved choice in `localStorage`, applied by a small first-party inline script in `<head>` before first paint. Toggle hidden until JS runs. `suppressHydrationWarning` on `<html>`.
+- Default is dark for everyone (not `prefers-color-scheme`); light only by the toggle. Saved choice in `localStorage`, applied by a small first-party inline script in `<head>` before first paint. Toggle hidden until JS runs. `suppressHydrationWarning` on `<html>`.
 
 ## Fonts
 - Use `next/font/local` with font files in the repo (licences in `design-language/`), so the build does not fetch from a font service.
