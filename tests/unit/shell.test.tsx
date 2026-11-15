@@ -3,7 +3,6 @@ import { GITHUB_URL, HOME_LABEL, isCurrent, LINKEDIN_URL, NAV, trimSlash } from 
 import { SiteShell } from "@/app/_shell/site-shell";
 import { ThemeToggle } from "@/app/_shell/theme-toggle";
 import AboutPage, { metadata as aboutMetadata } from "@/app/about/page";
-import BlogPage, { metadata as blogMetadata } from "@/app/blog/page";
 import HowPage, { metadata as howMetadata } from "@/app/how-this-site-is-built/page";
 import ProjectsPage, { metadata as projectsMetadata } from "@/app/projects/page";
 import { THEME_KEY } from "@/app/theme";
@@ -95,7 +94,6 @@ describe("placeholder pages", () => {
   it.each([
     ["About", AboutPage, aboutMetadata],
     ["Projects", ProjectsPage, projectsMetadata],
-    ["Blog", BlogPage, blogMetadata],
     ["How this site is built", HowPage, howMetadata],
   ])("%s has its title, a marked placeholder line and noindex", (title, Page, metadata) => {
     render(<Page />);

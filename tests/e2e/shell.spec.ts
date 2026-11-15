@@ -7,7 +7,7 @@ const NAV = [
   { href: "/blog/", label: "Blog" },
   { href: "/how-this-site-is-built/", label: "How this site is built" },
 ];
-const STUBS = NAV;
+const STUBS = NAV.filter((n) => n.href !== "/blog/");
 const PAGES = ["/", ...NAV.map((n) => n.href), "/design/", "/no-such-page/"];
 const ACCENT_DARK = "rgb(196, 154, 90)";
 const DARK_GROUND = "rgb(30, 44, 35)";

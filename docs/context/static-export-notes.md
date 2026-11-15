@@ -14,7 +14,7 @@ Read when working on build, routing, metadata, content or CI. Verify against cur
 - Front matter is validated with a schema (for example zod); a bad file fails the build.
 - YAML turns `2026-11-14` into midnight UTC. Keep dates as ISO strings in UTC and convert for display in the reader's locale and time zone on the client; render the UTC date in the HTML for no-JS readers.
 - Markdown via remark/rehype at build, raw HTML off (or rehype-sanitize). Highlight code at build time if needed.
-- Fixture post only when `INCLUDE_FIXTURES=1`; never in the deployed build.
+- Fixture posts only when `BLOG_FIXTURES=1` (see `blog.md`); never in the deployed build: `deploy.yml` runs `npm run check:fixture` after the build.
 
 ## Theme
 - Default is dark for everyone (not `prefers-color-scheme`); light only by the toggle. Saved choice in `localStorage`, applied by a small first-party inline script in `<head>` before first paint. Toggle hidden until JS runs. `suppressHydrationWarning` on `<html>`.

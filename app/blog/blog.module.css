@@ -1,0 +1,193 @@
+/* Blog pages: the list, a tag page and a post. Built on the tokens; one column at the reading measure. */
+.page {
+  display: grid;
+  align-content: start;
+  gap: var(--space-5);
+  padding: var(--space-9) var(--margin-page) var(--space-6);
+  min-width: 0;
+}
+
+/* The page title leads the first screen: the name's condensed heavy face at display size (as on the other pages). */
+.title,
+.postTitle {
+  font-size: clamp(2.75rem, 1rem + 9vw, 9rem);
+  font-weight: var(--weight-name);
+  font-stretch: var(--stretch-name);
+  line-height: 0.95;
+  letter-spacing: var(--tracking-name);
+  color: var(--color-name-last);
+  overflow-wrap: anywhere;
+  padding-top: 0.06em;
+}
+
+.title {
+  text-transform: uppercase;
+}
+
+.lead,
+.list,
+.prose,
+.postMeta {
+  max-width: var(--measure);
+}
+
+.lead {
+  font-size: var(--step-lead);
+  color: var(--color-ink);
+}
+
+.empty {
+  font-size: var(--step-lead);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-panel);
+  justify-self: start;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-7);
+}
+
+.item {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.meta {
+  font-size: var(--step-small);
+  color: var(--color-muted);
+}
+
+.itemTitle {
+  font-size: var(--step-lead);
+  font-weight: var(--weight-title);
+  line-height: var(--leading-title);
+  overflow-wrap: anywhere;
+}
+
+.itemTitle a {
+  display: inline-block;
+  padding-block: var(--space-2);
+  min-height: 2.75rem;
+}
+
+.summary {
+  max-width: var(--measure);
+}
+
+.tags {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+  font-size: var(--step-small);
+}
+
+.tags a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+}
+
+.postHeader {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.postMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-5);
+}
+
+/* The post body: the HTML comes from the Markdown pipeline, so it is styled by element. */
+.prose {
+  display: grid;
+  gap: var(--space-4);
+  max-width: var(--measure);
+  min-width: 0;
+}
+
+.prose h2,
+.prose h3 {
+  font-weight: var(--weight-title);
+  line-height: var(--leading-title);
+  letter-spacing: var(--tracking-title);
+  margin-top: var(--space-5);
+}
+
+.prose h2 {
+  font-size: var(--step-lead);
+}
+
+.prose h3 {
+  font-size: var(--step-body);
+}
+
+.prose ul,
+.prose ol {
+  margin: 0;
+  padding-left: var(--space-5);
+}
+
+.prose li + li {
+  margin-top: var(--space-1);
+}
+
+.prose blockquote {
+  margin: 0;
+  padding-left: var(--space-4);
+  border-left: 2px solid var(--color-accent);
+  color: var(--color-muted);
+}
+
+.prose img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Code: the code face (set in the base styles) at the small step; a long line scrolls inside its block, never the page. */
+.prose pre {
+  max-width: 100%;
+  overflow-x: auto;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-panel);
+  line-height: var(--leading-text);
+}
+
+.prose :not(pre) > code {
+  background: var(--color-panel);
+  padding: 0.1em 0.35em;
+  overflow-wrap: anywhere;
+}
+
+.prose table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: var(--step-small);
+}
+
+.prose th,
+.prose td {
+  text-align: left;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-muted);
+}
+
+.prose th {
+  font-weight: var(--weight-strong);
+}
+
+.lead a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+}

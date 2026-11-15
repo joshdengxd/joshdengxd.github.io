@@ -44,9 +44,10 @@ Node 26 (`.nvmrc`). Install: `npm ci`; once per machine for e2e: `npx playwright
 - Lint: `npm run lint`
 - Type check: `npm run typecheck`
 - Unit: `npm test` (Vitest, `tests/unit/`)
-- e2e: `npm run e2e` (builds, serves `out/` on port 4173, runs Playwright Chromium, `tests/e2e/`)
+- e2e: `npm run e2e` (builds with the blog test fixture, `BLOG_FIXTURES=1`, through `scripts/build-fixture.mjs`; serves `out/` on port 4173, runs Playwright Chromium, `tests/e2e/`). It leaves a fixture build in `out/`: never deploy or upload it.
+- Fixture guard: `npm run check:fixture` (fails if the blog fixture's slug or title is anywhere in `out/`; run after the default `npm run build`)
 - Run: `npm run build && npm run serve` (serves `out/` on http://localhost:3000, as Pages does; this is what verifiers check)
-- CI: `.github/workflows/checks.yml`, one job `checks` on every PR: lint, type check, unit, build and e2e.
+- CI: `.github/workflows/checks.yml`, one job `checks` on every PR: lint, type check, unit, default build + fixture guard, and e2e. `deploy.yml` runs the same guard after its build.
 
 ## Stack
 Check code against the current docs for these versions before writing or approving it (`current-docs` skill; docs source Context7, id after the colon). Upgrades are their own tickets.
@@ -57,6 +58,15 @@ Check code against the current docs for these versions before writing or approvi
 - Vitest 5.1 (Vite 8): vitest-dev/vitest
 - Testing Library (react 16.3, dom 10.4, jest-dom 7.0): testing-library/react-testing-library
 - Playwright 1.65: microsoft/playwright
+- unified 11.0.5: unifiedjs/unified
+- remark-parse 11.0.0: remarkjs/remark (parser; no own id, use `remarkjs/remark`)
+- remark-gfm 4.0.1: remarkjs/remark-gfm
+- remark-rehype 11.1.2: remarkjs/remark-rehype
+- rehype-sanitize 6.0.0: rehypejs/rehype-sanitize
+- rehype-stringify 10.0.1: rehypejs/rehype
+- yaml 2.9.1 (post front matter): eemeli/yaml (use `--version v2.9.1`)
+- zod 4.6.7 (front matter schema): colinhacks/zod (use `--version v4.6.7`)
+- fast-xml-parser 5.12.0 (dev, feed test only): npm README
 - GitHub Actions (checkout v7, setup-node v7, configure-pages v6, upload-pages-artifact v5, deploy-pages v5, upload-artifact v7): each action's README at its pinned tag
 - npm override in `package.json`: `@typescript-eslint/typescript-estree` gets `minimatch ^11.0.1`, because its own `^10.2.2` range is in a Dependabot advisory (`>= 7.0.0, < 11.0.1`); scoped to that one package, since the other users need minimatch 3.x. Remove it when `@typescript-eslint/typescript-estree` requires minimatch >= 11.0.1.
 
