@@ -47,10 +47,26 @@ Node 26 (`.nvmrc`). Install: `npm ci`; once per machine for e2e: `npx playwright
 - Format check: `npm run format:check` (what CI runs, next to lint)
 - Type check: `npm run typecheck`
 - Unit: `npm test` (Vitest, `tests/unit/`)
-- e2e: `npm run e2e` (builds with the blog test fixture, `BLOG_FIXTURES=1`, through `scripts/run-e2e.mjs fixture`; serves `out/` on port 4173, runs Playwright Chromium, `tests/e2e/`; CI runs this only). It leaves a fixture build in `out/`: never deploy or upload it. `npm run e2e:default` does the same on the default build (no fixture, then `check:fixture`). Specs named `*.fixture.spec.ts` run only on the fixture build, `*.default.spec.ts` only on the default one, all others on both. `npm run e2e:webkit` (fixture build, `E2E_WEBKIT=1`) also runs `menu-sheet.spec.ts` in WebKit, the iPhone Safari engine; local and verification only, not in CI.
+- e2e: `npm run e2e` (builds with the blog test fixture, `BLOG_FIXTURES=1`, through `scripts/run-e2e.mjs fixture`; serves `out/` on port 4173, runs Playwright Chromium, `tests/e2e/`; CI runs this only, and only for a manual run or a Dependabot PR). It leaves a fixture build in `out/`: never deploy or upload it. `npm run e2e:default` does the same on the default build (no fixture, then `check:fixture`). Specs named `*.fixture.spec.ts` run only on the fixture build, `*.default.spec.ts` only on the default one, all others on both. `npm run e2e:webkit` (fixture build, `E2E_WEBKIT=1`) also runs `menu-sheet.spec.ts` in WebKit, the iPhone Safari engine; local and verification only, not in CI.
 - Fixture guard: `npm run check:fixture` (fails if the blog fixture's slug or title is anywhere in `out/`; run after the default `npm run build`)
 - Run: `npm run build && npm run serve` (serves `out/` on http://localhost:3000, as Pages does; this is what verifiers check)
-- CI: `.github/workflows/checks.yml`, one job `checks` on every PR: lint, format check, type check, unit, default build + fixture guard, e2e on the fixture build, and e2e on the default build. `deploy.yml` runs the same guard after its build.
+- CI: `.github/workflows/checks.yml`, one job `checks`, on every PR and by hand (`workflow_dispatch`). Every run: lint, format check, type check, unit, default build + fixture guard. The Playwright install, e2e on the fixture build and e2e on the default build run only for a manual run or a Dependabot PR (`github.event.pull_request.user.login == 'dependabot[bot]'`); for an ordinary PR the local e2e run is the verification (see CI rules). `deploy.yml` runs the same guard after its build.
+
+## CI rules and runbook
+The site is public on a free GitHub plan: CI must stay cheap and never hang, because the `main protection` ruleset requires `checks` with no bypass and deploy's `pages` concurrency group queues behind a stuck run.
+- Light: `checks` on an ordinary PR stays within 1.5 minutes, with e2e (Dependabot or manual) within 3. Any extra browser, matrix, job or scheduled workflow needs a stated reason; WebKit is local only.
+- E2E is not automatic on every PR, by the owner's decision on a free plan: a passing local e2e run (`npm run e2e`, `npm run e2e:default`, `npm run e2e:webkit`) verifies a PR, and its body records the result next to `Verified at <sha>`. CI runs e2e by hand and on Dependabot PRs. They are steps of `checks`, not a separate job, so the required check is never skipped and Dependabot auto-merge waits for them.
+- No workflow-level `paths` or `paths-ignore` on workflows that provide required checks: a skipped required check blocks the PR forever.
+- Every job has `timeout-minutes`, at most: `checks` 8, `plan` 2, `build` 5, `deploy` 6, `dependabot-auto-merge` 3. `tests/unit/workflows.test.ts` enforces this, the missing `paths` filters and the e2e condition.
+- A PR that changes a workflow records the measured step times (`gh run view`) in its body.
+
+Runbook (`gh` with `GH_TOKEN=$(gh auth token --user joshdengxd)`, repo joshdengxd/joshdengxd.github.io):
+- Find a stuck run: `gh run list --status in_progress` (or `--status queued`); cancel it: `gh run cancel <run-id>`. Cancelling a stuck deploy run unblocks the `pages` queue.
+- Rerun (for example after a timeout on a slow runner): `gh run rerun <run-id>` (`--failed` for failed jobs only).
+- Run the e2e in CI by hand on any branch: `gh workflow run checks.yml --ref <branch>`.
+- Redeploy by hand: `gh workflow run deploy.yml -f force=true`.
+- Stop automatic merging at once: turn off "Allow auto-merge" in the repository settings.
+- `checks` itself is broken and blocks every merge: the owner (never an agent) sets the ruleset `main protection` (id 27293374) to `disabled` in the repository settings, merges the fix through a PR, sets it back to `active`, and confirms with `gh api repos/joshdengxd/joshdengxd.github.io/rulesets/27293374 --jq .enforcement` (must print `active`).
 
 ## Stack
 Check code against the current docs for these versions before writing or approving it (`current-docs` skill; docs source Context7, id after the colon). Upgrades are their own tickets.

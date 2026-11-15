@@ -10,7 +10,7 @@ jobs:
   # Not named `checks`: it must never satisfy or shadow the required check.
   dependabot-auto-merge:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 3
     permissions:
       contents: write
       pull-requests: write
