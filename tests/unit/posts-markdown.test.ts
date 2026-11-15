@@ -35,6 +35,24 @@ describe("the Markdown pipeline", () => {
     expect(html).toContain('href="https://example.com"');
   });
 
+  it("keeps footnote links working: every # href has one matching id, once prefixed", async () => {
+    const html = await renderMarkdown("Text[^1] and more[^note].\n\n[^1]: First note.\n[^note]: Second note.\n");
+    const hrefs = [...html.matchAll(/href="#([^"]*)"/g)].map((m) => m[1]);
+    const ids = [...html.matchAll(/\sid="([^"]*)"/g)].map((m) => m[1]);
+    // two references and two back-references, each with exactly one matching id (reference, entry, back-reference)
+    expect(hrefs).toHaveLength(4);
+    for (const href of hrefs) expect(ids.filter((id) => id === href)).toHaveLength(1);
+    expect(hrefs).toEqual(expect.arrayContaining(["user-content-fn-1", "user-content-fnref-1", "user-content-fn-note"]));
+    // prefixed once, never twice; the only other id is the footnote heading that aria-describedby points at
+    expect(hrefs.every((v) => /^user-content-(fn|fnref)-[\w-]+$/.test(v))).toBe(true);
+    expect(ids.filter((id) => id !== "footnote-label").every((v) => /^user-content-(fn|fnref)-[\w-]+$/.test(v))).toBe(true);
+    expect(html).toContain('aria-describedby="footnote-label"');
+    expect(ids).toContain("footnote-label");
+    // nothing unsafe came with the footnotes
+    expect(html).not.toMatch(/(href|src)="(?!#|\/|https?:)/i);
+    expect(html).not.toMatch(/<script|\son\w+=/i);
+  });
+
   it("escapes angle brackets in code", async () => {
     expect(await renderMarkdown("`<b>`")).toContain("&#x3C;b>");
   });

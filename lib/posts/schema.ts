@@ -8,15 +8,9 @@ export const RESERVED_SLUGS = ["tags"];
 
 const slug = z.string().regex(SLUG_PATTERN, "must be lower-case words joined by hyphens (a-z, 0-9, -)");
 
-/** A full UTC timestamp: `2026-11-15T18:00:00Z`. A date alone, or a time with an offset, is refused. */
+/** A full UTC timestamp (z.iso.datetime also rejects dates that do not exist, like 2026-02-31): `2026-11-15T18:00:00Z`. A date alone, or a time with an offset, is refused. */
 const utcTimestamp = z.iso
-  .datetime({ message: "must be a full UTC timestamp ending in Z, like 2026-11-15T18:00:00Z" })
-  .refine((v) => {
-    // Only for text that has the shape of a timestamp; other text is already reported by the format check.
-    if (!/^d{4}-dd-ddTdd:dd:dd/.test(v)) return true;
-    const t = Date.parse(v);
-    return !Number.isNaN(t) && new Date(t).toISOString().slice(0, 19) === v.slice(0, 19);
-  }, "is not a real calendar date");
+  .datetime({ message: "must be a full UTC timestamp ending in Z, like 2026-11-15T18:00:00Z" });
 
 /** The front matter of a post: these four keys, all required, nothing else. */
 export const frontMatterSchema = z.strictObject({

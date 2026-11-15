@@ -37,7 +37,7 @@ export async function parsePost(file: string, slug: string, raw: string): Promis
     throw new PostError(
       file,
       "file name",
-      `the slug "${slug}" must be lower-case words joined by hyphens and not ${RESERVED_SLUGS.join(" or ")}`,
+      `the slug "${slug}" must be lower-case words joined by hyphens (a-z, 0-9, -), and "${RESERVED_SLUGS.join('" or "')}" is reserved for a route`,
     );
 
   const { yaml, body, bodyLine } = splitFrontMatter(file, raw);

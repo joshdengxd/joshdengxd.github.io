@@ -6,6 +6,7 @@ import { PostList } from "@/app/blog/_components/post-list";
 import BlogPage, { metadata as blogMeta } from "@/app/blog/page";
 import { generateStaticParams as slugParams } from "@/app/blog/[slug]/page";
 import { generateStaticParams as tagParams } from "@/app/blog/tags/[tag]/page";
+import sitemap from "@/app/sitemap";
 import { GET as rss } from "@/app/rss.xml/route";
 import { formatUtcDate } from "@/lib/posts/dates";
 import type { Post } from "@/lib/posts/loader";
@@ -34,6 +35,12 @@ describe("/blog/ with no posts (the deployed state)", () => {
   it("generates one hidden _none page per dynamic route, so the static export has something to build", async () => {
     expect(await slugParams()).toEqual([{ slug: "_none" }]);
     expect(await tagParams()).toEqual([{ tag: "_none" }]);
+  });
+
+  it("keeps the hidden _none pages out of the sitemap and the feed", async () => {
+    const urls = (await sitemap()).map((e) => e.url).join("\n");
+    expect(urls).not.toContain("_none");
+    expect(await (await rss()).text()).not.toContain("_none");
   });
 
   it("serves an empty feed", async () => {
@@ -85,6 +92,16 @@ describe("the fixture guard script", () => {
     const result = run("tests/fixtures/out-leak");
     expect(result.status).toBe(1);
     expect(result.stderr).toContain("blog-engine-fixture");
+  });
+
+  it("matches a non-ASCII fixture title in the build text", () => {
+    const result = spawnSync(
+      process.execPath,
+      ["scripts/check-no-fixture.mjs", "tests/fixtures/out-unicode-leak", "tests/fixtures/posts-unicode"],
+      { encoding: "utf8" },
+    );
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain("Café über naïve 日本語");
   });
 
   it("fails when there is no build", () => {

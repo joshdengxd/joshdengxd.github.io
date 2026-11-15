@@ -65,6 +65,16 @@ describe("front matter validation", () => {
     expect(await fails(good({ tags }))).toMatch(new RegExp(`^${FILE}: tags`));
   });
 
+  it.each([
+    ["February 31", "2026-02-31T00:00:00Z"],
+    ["month 13", "2026-13-01T00:00:00Z"],
+    ["hour 25", "2026-11-15T25:00:00Z"],
+  ])("fails a date that does not exist (%s), naming file and field", async (_name, date) => {
+    expect(await fails(good({ date }))).toBe(
+      `${FILE}: date: must be a full UTC timestamp ending in Z, like 2026-11-15T18:00:00Z`,
+    );
+  });
+
   it("fails a title over 120 characters", async () => {
     expect(await fails(good({ title: "x".repeat(121) }))).toMatch(`${FILE}: title: `);
   });
@@ -101,6 +111,27 @@ describe("splitFrontMatter", () => {
       body: "Body\n",
       bodyLine: 4,
     });
+  });
+});
+
+describe("BOM and Windows line endings", () => {
+  it("parses a whole post with a BOM and CRLF line endings", async () => {
+    const post = await parsePost(FILE, "my-post", "\uFEFF" + good().replace(/\n/g, "\r\n"));
+    expect(post).toMatchObject({ title: "A post", tags: ["learning", "agents"] });
+    expect(post.html).toBe("<p>Body text.</p>");
+  });
+
+  it("reports raw HTML on the right line in a CRLF file", async () => {
+    const raw = good().replace("Body text.", "First line.\n\n<div>raw</div>\n").replace(/\n/g, "\r\n");
+    expect(await fails(raw)).toBe(`${FILE}: body: line 10: raw HTML is not allowed, use Markdown`);
+  });
+});
+
+describe("the reserved slug", () => {
+  it("says tags is reserved for a route", async () => {
+    expect(await fails(good(), "tags")).toBe(
+      `${FILE}: file name: the slug "tags" must be lower-case words joined by hyphens (a-z, 0-9, -), and "tags" is reserved for a route`,
+    );
   });
 });
 

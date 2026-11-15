@@ -1,4 +1,4 @@
-import rehypeSanitize from "rehype-sanitize";
+import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import rehypeStringify from "rehype-stringify";
 import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
@@ -23,11 +23,17 @@ export function findRawHtml(markdown: string): number[] {
 
 // Second guard behind the build failure above: remark-rehype drops raw HTML (allowDangerousHtml stays off) and
 // rehype-sanitize (the GitHub schema) removes anything unsafe, such as javascript: links.
+// Footnote ids and their `#` links get the `user-content-` prefix once, from remark-rehype (its default clobberPrefix).
+// rehype-sanitize would prefix ids a second time and leave the hrefs alone, which breaks every footnote link, so its
+// own clobbering is switched off. That is safe here: Markdown has no way to set an id, and raw HTML never gets through,
+// so the only ids are the prefixed footnote ones.
+const schema = { ...defaultSchema, clobber: [] };
+
 const processor = unified()
   .use(remarkParse)
   .use(remarkGfm)
   .use(remarkRehype)
-  .use(rehypeSanitize)
+  .use(rehypeSanitize, schema)
   .use(rehypeStringify);
 
 /** Markdown to sanitized HTML. Never outputs raw HTML from the source or a javascript: link. */

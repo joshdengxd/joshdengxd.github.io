@@ -21,11 +21,11 @@ function filesUnder(dir) {
   );
 }
 
-/** The `[file, term]` pairs found: a term in a file's text or in its path. Empty means clean. */
+/** The `[file, term]` pairs (files read as UTF-8, the same encoding as the fixture titles) found: a term in a file's text or in its path. Empty means clean. */
 export function findLeaks(outDir, terms) {
   const leaks = [];
   for (const file of filesUnder(outDir)) {
-    const text = readFileSync(file, "latin1");
+    const text = readFileSync(file, "utf8");
     for (const term of terms) if (file.includes(term) || text.includes(term)) leaks.push([file, term]);
   }
   return leaks;
