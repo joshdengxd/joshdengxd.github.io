@@ -11,9 +11,10 @@ import ProjectPage, {
 } from "@/app/projects/[slug]/page";
 import robots from "@/app/robots";
 import sitemap from "@/app/sitemap";
-import { issueUrl, pullUrl } from "@/lib/build-log";
 import type { Post } from "@/lib/posts/loader";
 import { PROJECTS } from "@/lib/projects";
+import { MERGED_PRS_URL, PROJECT_BOARD_URL, SITE_REPO_URL } from "@/lib/site";
+import { SKILLS } from "@/lib/skills";
 
 vi.mock("next/navigation", () => ({
   usePathname: () => "/",
@@ -130,23 +131,42 @@ describe("a project page", () => {
 });
 
 describe("How this site is built", () => {
-  it("has Workflow, Parts and Skills not used here; each part links its issue and, when known, its PR", () => {
+  it("has Workflow, Skills used, What it is made of and The record", () => {
     render(<HowPage />);
-    expect(headings(2)).toEqual(["Workflow", "Parts", "Skills not used here"]);
-    expect(screen.getByRole("link", { name: "Issue #2" })).toHaveAttribute("href", issueUrl(2));
-    expect(screen.getByRole("link", { name: "PR #11" })).toHaveAttribute("href", pullUrl(11));
-    expect(screen.getByRole("link", { name: "Issue #7" })).toHaveAttribute("href", issueUrl(7));
-    expect(screen.queryByRole("link", { name: "PR #7" })).toBeNull();
-    for (const skill of [
-      "deploy-to-staging",
-      "run-e2e-automation",
-      "live-env-local-test",
-      "prod-release-gate",
-      "log-analysis",
-    ]) {
-      expect(screen.getByText(skill)).toBeInTheDocument();
-    }
+    expect(headings(2)).toEqual(["Workflow", "Skills used", "What it is made of", "The record"]);
+    expect(headings(3)).toEqual(["The ticket cycle", "Supporting skills"]);
     expect(howMeta.robots).toBeUndefined();
+  });
+
+  it("lists exactly the skills in lib/skills", () => {
+    const { container } = render(<HowPage />);
+    const listed = [...container.querySelectorAll("[data-skill-group] code")].map((c) => c.textContent);
+    expect(listed.sort()).toEqual(Object.keys(SKILLS).sort());
+  });
+
+  it("has no issue or PR numbers, no Parts and no unused skills", () => {
+    const { container } = render(<HowPage />);
+    expect(container.querySelector("[data-part]")).toBeNull();
+    expect(container.textContent).not.toMatch(/#\d+|Parts|not used/);
+    for (const a of container.querySelectorAll("a")) {
+      expect(a.getAttribute("href")).not.toMatch(/\/(issues|pull)\/\d+/);
+    }
+  });
+
+  it("links the board, the merged pull requests and the repository", () => {
+    render(<HowPage />);
+    expect(screen.getByRole("link", { name: "Project board" })).toHaveAttribute("href", PROJECT_BOARD_URL);
+    expect(screen.getByRole("link", { name: "Merged pull requests" })).toHaveAttribute("href", MERGED_PRS_URL);
+    expect(screen.getByRole("link", { name: "Repository" })).toHaveAttribute("href", SITE_REPO_URL);
+  });
+
+  it("What it is made of has 3 to 5 lines and no version or PR numbers", () => {
+    render(<HowPage />);
+    const section = screen.getByRole("region", { name: "What it is made of" });
+    const items = within(section).getAllByRole("listitem");
+    expect(items.length).toBeGreaterThanOrEqual(3);
+    expect(items.length).toBeLessThanOrEqual(5);
+    expect(section.textContent).not.toMatch(/\d/);
   });
 });
 

@@ -77,8 +77,7 @@
   gap: var(--space-1);
 }
 
-/* Name and text side by side from a tablet up, so a list uses the width of the page instead of one narrow column.
-   The three-column form (Parts) puts its links at the right edge, on the same row as the text. */
+/* Name and text side by side from a tablet up, so a list uses the width of the page instead of one narrow column. */
 .rows {
   list-style: none;
   margin: 0;
@@ -103,10 +102,6 @@
     grid-template-columns: minmax(11rem, 18rem) minmax(0, 1fr);
     align-items: baseline;
   }
-
-  .rowWide {
-    grid-template-columns: minmax(9rem, 14rem) minmax(0, 1fr) auto;
-  }
 }
 
 .term {
@@ -130,6 +125,17 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+/* A link that leads a row sits at the start of its column, like the names beside it. */
+.linkStart {
+  justify-content: flex-start;
+}
+
+/* The title of a group inside a section (an h3). */
+.groupTitle {
+  font-weight: var(--weight-strong);
+  margin-bottom: var(--space-3);
 }
 
 .small {
