@@ -18,8 +18,8 @@ Read the project's `AGENTS.md` (section "Ticket workflow settings"): tracker and
 - PR number (or the ticket number; then find its open PR).
 
 ## Steps
-1. **Confirm the ask.** Check that the user asked to land this PR in this conversation; otherwise stop.
-2. **Pre-merge check.** Find the linked ticket (the PR title ends with `(#N)` or `(KEY-123)`; the body says `Refs` with the same reference). Stop and report if any of these fail:
+1. **Confirm the ask.** Check that the user asked to land this PR in this conversation, or started `drain-refined` in it (which lands the PRs it opens); otherwise stop.
+2. **Pre-merge check.** Find the linked tickets (the PR title ends with `(#N)` or `(KEY-123)`; the body has one `Refs` line per ticket). With several, steps 5 and 6 cover every one of them. Stop and report if any of these fail:
    - all required checks on the PR are green;
    - the PR is mergeable and targets the default branch;
    - the PR description has the acceptance criteria table and every criterion is **met**.
@@ -33,7 +33,7 @@ Read the project's `AGENTS.md` (section "Ticket workflow settings"): tracker and
 8. **Report**: merged commit, deploy result, ticket state, comment link. Next: the person tries it and moves it to Done.
 
 ## Rules
-- Never land without the user's explicit request for this PR.
+- Never land without the user's explicit request for this PR (a `drain-refined` run the user started counts).
 - Never move a ticket to Done and never close it; the person does that after trying it. If the person finds a problem in review, they move it back to In progress (or Refined if the plan must change) with a comment.
 - Never skip a failed check, retry a failed deploy blindly, or revert without the user.
 - One comment per landing; if you land again after a fix, update that comment in place.

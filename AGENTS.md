@@ -17,8 +17,10 @@ Everything in this repo and on GitHub (code, docs, issues, PRs, commits, comment
 6. The user tries it and moves it to Done.
 7. `wrap-up` at the end of a session.
 
+Batch mode: `drain-refined` runs steps 3-5 unattended for every Refined ticket (grouped PRs, fresh verifiers, bounded fix rounds). The user starting it is the approval for its merges; tickets still end in In review for the user to try.
+
 ## Ticket workflow settings
-(read by create-ticket, refine-ticket, implement-and-verify-ticket, land-ticket)
+(read by create-ticket, refine-ticket, implement-and-verify-ticket, land-ticket, drain-refined)
 - Tracker: GitHub issues in joshdengxd/joshdengxd.github.io
 - Default branch: main; merge method: squash
 - States: board "Personal site" (https://github.com/users/joshdengxd/projects/1), field Status: Backlog, Refined, In progress, In review, Done. New tickets are added to the board in Backlog. Done = the user closes the issue (the board's built-in workflow moves it). No state labels.

@@ -42,6 +42,6 @@ A ticket moved back to In progress after review is fine: read the review comment
 - The verifier never sees the implementer's reasoning or earlier verdicts.
 - **Could not check** never counts as met.
 - Never skip, disable or loosen a check, and never edit a test just to make it pass.
-- Merge is always a human decision.
+- Merge is always a human decision: a person asks for it (`land-ticket`) or starts a `drain-refined` run.
 - If this skill already runs inside a subagent that cannot start its own subagents, stop after step 3 and return; the caller starts the verifier and the fix rounds.
 - For a code-level review of the diff (where each criterion is implemented, what tests cover it, loose ends), add `verify-against-criteria`. This skill shows behaviour; that one reads the code.
