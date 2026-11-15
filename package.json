@@ -7,6 +7,8 @@
     "build": "next build && node scripts/flatten-export-segments.mjs",
     "serve": "serve out --listen 3000",
     "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
     "e2e": "node scripts/run-e2e.mjs fixture",
@@ -40,10 +42,13 @@
     "@vitejs/plugin-react": "6.3.0",
     "eslint": "9.39.5",
     "eslint-config-next": "16.4.6",
+    "eslint-config-prettier": "10.1.8",
     "fast-xml-parser": "5.12.0",
     "jsdom": "31.0.1",
+    "prettier": "3.10.1",
     "serve": "14.2.8",
     "typescript": "5.9.3",
+    "typescript-eslint": "8.72.2",
     "vitest": "5.1.0"
   },
   "overrides": {
