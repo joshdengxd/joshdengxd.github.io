@@ -76,7 +76,7 @@ All tokens are CSS custom properties in [`tokens.css`](tokens.css).
 
 ### Colour (per theme)
 
-Two surfaces and five text roles. Text roles appear at any size and need WCAG 2.2 AA for normal text (4.5:1) on both surfaces. The name roles are used only for the name, set large and heavy, so they need AA for large text (3:1). `tests/unit/tokens.test.ts` checks all 20 pairs; `/design/` shows each ratio.
+Two surfaces and five text roles. Text roles appear at any size and need WCAG 2.2 AA for normal text (4.5:1) on both surfaces. The name roles are used only for the name, set large and heavy, so they need AA for large text (3:1). `tests/unit/tokens.test.ts` checks all 20 pairs (2 surfaces x 5 roles x 2 themes); `/design/` shows each ratio.
 
 | Role | Use | Dark (default) | Light |
 |---|---|---|---|
@@ -100,7 +100,7 @@ Contrast (text on ground / on panel):
 
 ### Code colours
 
-Code blocks in posts are highlighted at build time with Shiki's CSS-variables theme, so the built HTML carries no colour of its own, only `var(--shiki-*)`. The values live in [`tokens.css`](tokens.css), per theme, in the same ochre and sage palette. Every text role must reach WCAG 2.2 AA for normal text (4.5:1) on `--shiki-background`; `tests/unit/tokens.test.ts` checks all 20 pairs and `/design/` shows a highlighted sample with each ratio.
+Code blocks in posts are highlighted at build time with Shiki's CSS-variables theme, so the built HTML carries no colour of its own, only `var(--shiki-*)`. The values live in [`tokens.css`](tokens.css), per theme, in the same ochre and sage palette. Every text role must reach WCAG 2.2 AA for normal text (4.5:1) on `--shiki-background`; `tests/unit/tokens.test.ts` checks all 24 pairs (12 roles x 2 themes) and `/design/` shows a highlighted sample with each ratio.
 
 | Role | Use | Dark (default) | Light |
 |---|---|---|---|
@@ -115,8 +115,10 @@ Code blocks in posts are highlighted at build time with Shiki's CSS-variables th
 | `--shiki-token-parameter` | parameters | `#b4c7a4` | `#35553d` |
 | `--shiki-token-punctuation` | punctuation | `#a3b09f` | `#4f5c52` |
 | `--shiki-token-link` | links | `#c49a5a` | `#855a21` |
+| `--shiki-token-inserted` | diff: added lines (sage) | `#8fc47d` | `#2e6b3a` |
+| `--shiki-token-deleted` | diff: removed lines (muted terracotta) | `#e3937a` | `#954529` |
 
-Contrast on the code background (needs 4.5): see `/design/` for every ratio; the lowest are the link colour, 4.60 in dark and 4.69 in light.
+Contrast on the code background (needs 4.5): see `/design/` for every ratio; the lowest are the link colour, 4.60 in dark and 4.69 in light. Added and removed lines of a `diff` block differ in colour, and the leading `+` and `-` still say which is which (colour is not the only cue): added 5.87 / 4.97, removed 4.94 / 5.16 (dark / light).
 
 Changes from the mockup values, to pass the checks: dark ink is a lighter sage (`#c2d2b8`, so running text is not soft grey) while DENG keeps `#a9bd9d`; dark muted `#8c9a88` became `#98a694`; light muted `#5d6a5e` became `#57645a`; light accent text is a darker ochre (`#855a21`), while the light JOSH keeps the mockup's `#a8742f` because it is only ever large.
 
@@ -147,6 +149,15 @@ Both families are under the SIL Open Font License 1.1. The files are the Latin s
 |---|---|---|---|
 | `archivo-latin-wdth-normal.woff2` | Archivo, by the Archivo Project Authors (Omnibus-Type) | weight 100-900, width 62-125% | OFL 1.1, [text](fonts/OFL-Archivo.txt) |
 | `jetbrains-mono-latin-wght-normal.woff2` | JetBrains Mono, by the JetBrains Mono Project Authors | weight 100-800 | OFL 1.1, [text](fonts/OFL-JetBrains-Mono.txt) |
+
+### Fallbacks and the name safety net
+
+While Archivo loads (or if it never does) two layers keep the page from jumping or breaking; both live in `app/globals.css`:
+
+1. **Tuned fallbacks** (`@font-face`, built from local fonts, adjusted to Archivo's metrics): "Archivo text fallback" is Arial (or Helvetica, Liberation Sans) scaled to Archivo's size and line metrics, so text barely moves when the real font arrives; "Archivo name fallback" is Arial Bold scaled to 62%, because the web face is condensed to 62% and Arial cannot condense, so the name would otherwise overflow a phone until the font arrives. They are listed after `--font-archivo-face` in `--font-text` and in `.name`.
+2. **Safety net on the name**: `.name` has `max-width: 100%` and `overflow-wrap: anywhere`. Any device whose fallback is much wider than Arial (a system without Arial, a monospace default) breaks the name inside a word instead of scrolling the page sideways at 320 px. With the real font, or the tuned fallback, no word is wider than its line, so the net never acts and the name looks the same. There is no per-device font list.
+
+`tests/e2e/name-fallback.spec.ts` checks the net: it blocks the `.woff2` request, forces the name's family to `monospace` with a style tag, and asserts no horizontal overflow at 320 and 390 px on every page, with JavaScript on and off.
 
 ## Taste skill gates and waivers
 

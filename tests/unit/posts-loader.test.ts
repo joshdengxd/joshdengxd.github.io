@@ -89,6 +89,24 @@ describe("front matter validation", () => {
     expect(await fails(good().replace("---\n", "---\ntitle: Again\n"))).toMatch(`${FILE}: front matter: `);
   });
 
+  it("names the file and the line in the file for a YAML syntax error", async () => {
+    // line 1 is ---; the flow sequence opens on line 4 of the file and is never closed; the parser reports it on the next line, 5
+    const message = await fails("---\ntitle: T\ndate: 2026-11-15T18:00:00Z\ntags: [a, b\nsummary: S\n---\n\nBody.\n");
+    expect(message).toMatch(new RegExp(`^${FILE}: front matter: line 5: `));
+    expect(message).not.toMatch(/at line \d+, column/);
+    expect(message.split("\n")).toHaveLength(1);
+  });
+
+  it("counts the line from the top of the file, with a BOM and CRLF line ends too", async () => {
+    const message = await fails("﻿---\r\ntitle: T\r\n  bad: indent\r\nsummary: S\r\n---\r\n");
+    expect(message).toMatch(`${FILE}: front matter: line 2: `);
+  });
+
+  it("reports the line the parser flags, counted from the top of the file", async () => {
+    const message = await fails("---\ntitle: T\ndate: 2026-11-15T18:00:00Z\n  bad: indent\nsummary: S\n---\n");
+    expect(message).toMatch(`${FILE}: front matter: line 3: `);
+  });
+
   it("names every problem, one per line", async () => {
     const message = await fails("---\ntitle: T\nextra: 1\n---\n");
     expect(message.split("\n")).toEqual(

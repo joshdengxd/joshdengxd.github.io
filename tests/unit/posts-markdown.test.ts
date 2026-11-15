@@ -1,4 +1,6 @@
-import { findRawHtml, HIGHLIGHT_LANGUAGES, renderMarkdown } from "@/lib/posts/markdown";
+import rehypeSanitize from "rehype-sanitize";
+import { unified } from "unified";
+import { ALLOWED_ID, findRawHtml, HIGHLIGHT_LANGUAGES, renderMarkdown, schema } from "@/lib/posts/markdown";
 
 describe("the Markdown pipeline", () => {
   it("renders headings, emphasis, links, code and GFM tables", async () => {
@@ -67,7 +69,56 @@ describe("the Markdown pipeline", () => {
   });
 });
 
+describe("the id allow-list", () => {
+  type Node = { type: string; tagName?: string; properties?: { id?: unknown }; children?: Node[] };
+  const el = (tagName: string, id: string): Node => ({ type: "element", tagName, properties: { id }, children: [] });
+  const idsAfterSanitize = (...nodes: Node[]) => {
+    const tree = unified()
+      .use(rehypeSanitize, schema)
+      .runSync({ type: "root", children: nodes } as never) as Node;
+    const ids: string[] = [];
+    const walk = (n: Node) => {
+      if (typeof n.properties?.id === "string") {
+        ids.push(n.properties.id);
+      }
+      n.children?.forEach(walk);
+    };
+    walk(tree);
+    return ids;
+  };
+
+  it("removes every id that is not a footnote id, and keeps the footnote ones as they are", () => {
+    const ids = idsAfterSanitize(
+      el("div", "theme"),
+      el("div", "__next"),
+      el("section", "main"),
+      el("h2", "footnote-label"),
+      el("li", "user-content-fn-1"),
+      el("sup", "user-content-fnref-note"),
+      el("p", "user-content-other"),
+      el("p", "user-content-fn-"),
+      el("p", "footnote-label-2"),
+    );
+    expect(ids).toEqual(["footnote-label", "user-content-fn-1", "user-content-fnref-note"]);
+  });
+
+  it("allows exactly the three footnote id shapes", () => {
+    for (const id of ["footnote-label", "user-content-fn-1", "user-content-fnref-a-b"]) {
+      expect(ALLOWED_ID.test(id), id).toBe(true);
+    }
+    for (const id of ["theme", "__next", "main", "fn-1", "user-content-", "xuser-content-fn-1", "footnote-label\n"]) {
+      expect(ALLOWED_ID.test(id), id).toBe(false);
+    }
+  });
+});
+
 describe("code highlighting", () => {
+  it("colours added and removed lines of a diff block with their own token roles", async () => {
+    const html = await renderMarkdown("```diff\n- old\n+ new\n```");
+    expect(html).toMatch(/--shiki-token-deleted\)">- old</);
+    expect(html).toMatch(/--shiki-token-inserted\)">\+ new</);
+  });
+
   const block = (lang: string, code = "const a = 1; // note") => `\`\`\`${lang}\n${code}\n\`\`\``;
 
   it("highlights a block with a known language with --shiki-token-* variables and no colour value", async () => {

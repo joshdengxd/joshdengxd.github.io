@@ -64,8 +64,13 @@ code {
   font-size: var(--step-small);
 }
 
-/* The name: condensed, heavy, uppercase, two lines. */
+/* The name: condensed, heavy, uppercase, two lines. The first two declarations are the safety net: whatever font a
+   device falls back to (even a far wider one than the Arial-based fallback above), a word breaks inside itself
+   rather than pushing the page wider than the screen. With the real font nothing is wider than the line, so it
+   never acts. */
 .name {
+  max-width: 100%;
+  overflow-wrap: anywhere;
   font-size: var(--step-name);
   font-weight: var(--weight-name);
   font-stretch: var(--stretch-name);

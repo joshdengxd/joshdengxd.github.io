@@ -165,9 +165,9 @@ test("/design/ shows the highlighted code sample and a passing ratio for every c
   page,
 }) => {
   await page.goto("/design/");
-  await expect(page.locator("pre.shiki")).toHaveCount(1);
+  await expect(page.locator("pre.shiki")).toHaveCount(2);
   const rows = page.locator("li[data-code-pair]");
-  await expect(rows).toHaveCount(10);
+  await expect(rows).toHaveCount(12);
   for (const text of await rows.allTextContents()) {
     expect(text).toMatch(/dark \d+\.\d\d:1 passes, light \d+\.\d\d:1 passes/);
   }
@@ -181,10 +181,13 @@ test("the code colours on /design/ equal the token file, in both themes", async 
     }
     expect(await theme(page)).toBe(t);
     const colours = codeColours(css, t);
-    const seen = await page.locator("pre.shiki").evaluate((pre) => ({
-      background: getComputedStyle(pre).backgroundColor,
-      foreground: getComputedStyle(pre).color,
-    }));
+    const seen = await page
+      .locator("pre.shiki")
+      .first()
+      .evaluate((pre) => ({
+        background: getComputedStyle(pre).backgroundColor,
+        foreground: getComputedStyle(pre).color,
+      }));
     const hex = (h: string) => {
       const n = parseInt(h.slice(1), 16);
       return `rgb(${n >> 16}, ${(n >> 8) & 255}, ${n & 255})`;
@@ -214,6 +217,6 @@ test("the name rises from below on load", async ({ page }) => {
     .locator(".reveal-line")
     .evaluateAll((els) => els.map((e) => getComputedStyle(e).animationName));
   expect(names.every((n) => n !== "none")).toBe(true);
-  await expect(page.getByRole("heading", { level: 1, name: "Xindong Deng (Josh), home" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Josh Deng, home" })).toBeVisible();
   await expect(page.locator("h1")).toHaveText(/Josh\s*Deng/);
 });

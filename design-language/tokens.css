@@ -7,7 +7,7 @@
  *   display roles (--color-name-first, --color-name-last): the name only, large and heavy, AA 3:1
  * Surfaces: --color-ground (page), --color-panel (one step lighter).
  * Code colours (--shiki-*) are the variables Shiki's CSS-variables theme reads (lib/posts/markdown.ts): the code
- * background, the plain code text, and one text role per token kind, all AA 4.5:1 on --shiki-background.
+ * background, the plain code text, and one text role per token kind (diff: added and removed lines), all AA 4.5:1 on --shiki-background.
  * tests/unit/tokens.test.ts checks every text/surface pair of both themes and every code colour on its background.
  */
 
@@ -35,6 +35,8 @@
   --shiki-token-parameter: #b4c7a4;
   --shiki-token-punctuation: #a3b09f;
   --shiki-token-link: #c49a5a;
+  --shiki-token-inserted: #8fc47d; /* diff: added lines (sage) */
+  --shiki-token-deleted: #e3937a; /* diff: removed lines (muted terracotta) */
 }
 
 /* Light only through the toggle; the choice is stored as localStorage "theme". */
@@ -60,6 +62,8 @@
   --shiki-token-parameter: #35553d;
   --shiki-token-punctuation: #4f5c52;
   --shiki-token-link: #855a21;
+  --shiki-token-inserted: #2e6b3a;
+  --shiki-token-deleted: #954529;
 }
 
 :root {

@@ -1,5 +1,5 @@
 import rehypeShikiFromHighlighter from "@shikijs/rehype/core";
-import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
+import rehypeSanitize, { defaultSchema, type Options } from "rehype-sanitize";
 import rehypeStringify from "rehype-stringify";
 import remarkGfm from "remark-gfm";
 import remarkParse from "remark-parse";
@@ -31,9 +31,20 @@ export function findRawHtml(markdown: string): number[] {
 // rehype-sanitize (the GitHub schema) removes anything unsafe, such as javascript: links.
 // Footnote ids and their `#` links get the `user-content-` prefix once, from remark-rehype (its default clobberPrefix).
 // rehype-sanitize would prefix ids a second time and leave the hrefs alone, which breaks every footnote link, so its
-// own clobbering is switched off. That is safe here: Markdown has no way to set an id, and raw HTML never gets through,
-// so the only ids are the prefixed footnote ones.
-const schema = { ...defaultSchema, clobber: [] };
+// own clobbering is switched off. The ids are then limited by an allow-list instead: the prefixed footnote ids
+// (`user-content-fn-*`, `user-content-fnref-*`) and `footnote-label`, the one unprefixed id (the footnote heading that
+// aria-describedby points at). Any other id is removed, so a post can never set one that the page's own scripts
+// and styles use (`theme`, `__next`, `main`).
+export const ALLOWED_ID = /^(?:user-content-fn-.+|user-content-fnref-.+|footnote-label)$/;
+const attributes = defaultSchema.attributes ?? {};
+export const schema: Options = {
+  ...defaultSchema,
+  clobber: [],
+  attributes: {
+    ...attributes,
+    "*": [...(attributes["*"] ?? []).filter((a) => (Array.isArray(a) ? a[0] : a) !== "id"), ["id", ALLOWED_ID]],
+  },
+};
 
 // Code highlighting (ticket #16): Shiki at build time, after rehype-sanitize. Sanitizing first means the post content is
 // sanitized exactly as before, and Shiki's own markup (spans, a style attribute) is not stripped. Shiki replaces each

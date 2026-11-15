@@ -1,7 +1,7 @@
 /** "How this site is built": the parts of this site, each with its issue and PR, and the shared skills not used here. */
-import { GITHUB_OWNER_URL } from "./projects";
+import { SITE_REPO_URL } from "./site";
 
-export const REPO_URL = `${GITHUB_OWNER_URL}/joshdengxd.github.io`;
+export const REPO_URL = SITE_REPO_URL;
 
 /** Links are built for this repo only, from the numbers. */
 export const issueUrl = (n: number) => `${REPO_URL}/issues/${n}`;

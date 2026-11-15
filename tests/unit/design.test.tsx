@@ -21,10 +21,12 @@ describe("/design/ specimen", () => {
 
   it("shows a highlighted code sample and the ratio of every code colour, in both themes", async () => {
     const { container } = render(await DesignPage());
-    expect(container.querySelectorAll("pre.shiki")).toHaveLength(1);
+    expect(container.querySelectorAll("pre.shiki")).toHaveLength(2);
+    expect(container.querySelector('pre.shiki span[style*="--shiki-token-inserted"]')).not.toBeNull();
+    expect(container.querySelector('pre.shiki span[style*="--shiki-token-deleted"]')).not.toBeNull();
     expect(container.querySelectorAll('pre.shiki span[style*="--shiki-token-"]').length).toBeGreaterThan(0);
     const rows = container.querySelectorAll("li[data-code-pair]");
-    expect(rows).toHaveLength(10);
+    expect(rows).toHaveLength(12);
     for (const row of rows) {
       expect(row.textContent).toMatch(/dark \d+\.\d\d:1 passes, light \d+\.\d\d:1 passes/);
     }

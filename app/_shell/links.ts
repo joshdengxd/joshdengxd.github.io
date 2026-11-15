@@ -6,8 +6,8 @@ export const NAV = [
   { href: "/how-this-site-is-built/", label: "How this site is built" },
 ] as const;
 
-export const HOME_LABEL = "Xindong Deng (Josh), home";
-export const GITHUB_URL = "https://github.com/joshdengxd";
+/** Starts with the visible words (Josh Deng), so the accessible name contains the visible text (WCAG 2.5.3). */
+export const HOME_LABEL = "Josh Deng, home";
 export const LINKEDIN_URL = "https://www.linkedin.com/in/josh-deng-edm";
 
 /** Path without the trailing slash ("/" stays "/"); the static export and the client may differ here. */

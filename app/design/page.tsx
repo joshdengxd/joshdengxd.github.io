@@ -41,6 +41,11 @@ const CODE_SAMPLE = [
   "  return `Hi, ${name}`;",
   "}",
   "```",
+  "",
+  "```diff",
+  "- const label = 'Hi';",
+  "+ const label = `Hi, ${name}`;",
+  "```",
 ].join("\n");
 
 const role = (token: string) => token.replace(/^--color-/, "");

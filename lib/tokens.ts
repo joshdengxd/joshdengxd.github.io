@@ -23,6 +23,8 @@ export const CODE_TEXT_ROLES = [
   "--shiki-token-parameter",
   "--shiki-token-punctuation",
   "--shiki-token-link",
+  "--shiki-token-inserted",
+  "--shiki-token-deleted",
 ] as const;
 
 export const AA_NORMAL = 4.5;
