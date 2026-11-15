@@ -1,4 +1,3 @@
-import { getPosts } from "@/lib/posts/loader";
 import { pageMetadata } from "@/lib/metadata";
 import { SITE_NAME } from "@/lib/site";
 import { HomeView } from "./_home/home-view";
@@ -10,6 +9,6 @@ export const metadata = pageMetadata({
   path: "/",
 });
 
-export default async function Home() {
-  return <HomeView posts={await getPosts()} />;
+export default function Home() {
+  return <HomeView />;
 }

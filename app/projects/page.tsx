@@ -13,7 +13,7 @@ export const metadata = pageMetadata({
 export default function Page() {
   return (
     <PageLayout title="Projects" lead="My public repositories and what each one does.">
-      <ProjectCards projects={PROJECTS} headingLevel={2} />
+      <ProjectCards projects={PROJECTS} />
     </PageLayout>
   );
 }

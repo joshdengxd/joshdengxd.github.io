@@ -88,9 +88,7 @@ test.describe("projects", () => {
 });
 
 test.describe("home", () => {
-  test("the D5 first screen, then Focus, Featured repos and Latest posts on the ground, then the footer line", async ({
-    page,
-  }) => {
+  test("the D5 first screen and the footer line, nothing between or after", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     const problems = watch(page);
     await page.goto("/");
@@ -100,25 +98,18 @@ test.describe("home", () => {
     await expect(intro.locator("[data-placeholder]")).toBeVisible();
     await expect(intro).toContainText("Alberta, Canada");
 
-    await expect(page.getByRole("heading", { level: 2 })).toHaveText(["Focus", "Featured repos", "Latest posts"]);
-    // The sections start below the first screen, and the footer line ends the page.
-    const focusTop = await page
-      .getByRole("heading", { level: 2, name: "Focus" })
-      .evaluate((el) => el.getBoundingClientRect().top + scrollY);
-    expect(focusTop).toBeGreaterThanOrEqual(900);
+    // No heading but the name; no Focus, Featured repos or Latest posts.
+    await expect(page.getByRole("heading")).toHaveCount(1);
+    for (const name of ["Focus", "Featured repos", "Latest posts"]) {
+      await expect(page.getByRole("region", { name })).toHaveCount(0);
+    }
+    await expect(page.locator("main article")).toHaveCount(0);
     await expect(page.getByRole("contentinfo").getByRole("link", { name: "GitHub" })).toBeVisible();
     await expect(page.getByRole("contentinfo").getByRole("link", { name: "LinkedIn" })).toBeVisible();
-
-    // Featured repos: the same cards as the Projects index.
-    const featured = page.getByRole("region", { name: "Featured repos" });
-    await expect(featured.locator("article[data-project]")).toHaveCount(PROJECTS.length);
-    for (const p of PROJECTS) {
-      await expect(featured.getByRole("link", { name: p.name })).toHaveAttribute("href", `/projects/${p.slug}/`);
-    }
     expect(problems).toEqual([]);
   });
 
-  test("the home page has no horizontal overflow on a phone and the footer line follows the sections", async ({
+  test("the home page has no horizontal overflow on a phone and the footer line follows the first screen", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 390, height: 844 });
@@ -126,11 +117,42 @@ test.describe("home", () => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBe(0);
     const order = await page.evaluate(() => {
       const top = (sel: string) => document.querySelector(sel)!.getBoundingClientRect().top;
-      return [top("h1"), top("main section:last-of-type"), top("footer")];
+      return [top("h1"), top("section[aria-label=Intro]"), top("footer")];
     });
     expect([...order].sort((a, b) => a - b)).toEqual(order);
   });
 });
+
+for (const javaScriptEnabled of [true, false]) {
+  test.describe(`JavaScript ${javaScriptEnabled ? "on" : "off"}: home and About after the removals`, () => {
+    test.use({ javaScriptEnabled });
+
+    test("/ has only its first screen and the footer, no Focus, Featured repos or Latest posts", async ({ page }) => {
+      await page.goto("/");
+      await expect(page.getByRole("heading")).toHaveCount(1);
+      await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Josh\s*Deng/);
+      await expect(page.getByRole("heading", { level: 2 })).toHaveCount(0);
+      await expect(page.locator("main article, main ol")).toHaveCount(0);
+      await expect(page.getByRole("contentinfo").getByRole("link", { name: "GitHub" })).toBeVisible();
+    });
+
+    test("/about/ has no Links section and no GitHub or LinkedIn link in its main content; the footer links stay", async ({
+      page,
+    }) => {
+      await page.goto("/about/");
+      await expect(page.getByRole("heading", { level: 2 })).toHaveText([
+        "Background",
+        "What I am learning",
+        "How I work",
+      ]);
+      await expect(page.getByRole("heading", { name: "Links" })).toHaveCount(0);
+      await expect(page.locator("main a")).toHaveCount(0);
+      const footer = page.getByRole("contentinfo");
+      await expect(footer.getByRole("link", { name: "GitHub" })).toBeVisible();
+      await expect(footer.getByRole("link", { name: "LinkedIn" })).toBeVisible();
+    });
+  });
+}
 
 test.describe("placeholders", () => {
   test("each one shows the label 'Placeholder:' and has data-placeholder, on every v1 page", async ({ page }) => {

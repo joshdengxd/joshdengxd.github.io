@@ -4,7 +4,7 @@ import { GITHUB_OWNER_URL } from "@/lib/site";
 import NotFound, { metadata as notFoundMetadata } from "@/app/not-found";
 import { HomeView } from "@/app/_home/home-view";
 
-const Home = () => <HomeView posts={[]} />;
+const Home = () => <HomeView />;
 
 describe("home page and 404", () => {
   it("home shows the name as its heading, revealed line by line, as the current home mark", () => {
