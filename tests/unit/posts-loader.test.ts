@@ -90,9 +90,9 @@ describe("front matter validation", () => {
   });
 
   it("names the file and the line in the file for a YAML syntax error", async () => {
-    // line 1 is ---; the flow sequence opens on line 4 of the file (line 3 of the YAML) and is never closed
+    // line 1 is ---; the flow sequence opens on line 4 of the file and is never closed; the parser reports it on the next line, 5
     const message = await fails("---\ntitle: T\ndate: 2026-11-15T18:00:00Z\ntags: [a, b\nsummary: S\n---\n\nBody.\n");
-    expect(message).toMatch(new RegExp(`^${FILE}: front matter: line [45]: `));
+    expect(message).toMatch(new RegExp(`^${FILE}: front matter: line 5: `));
     expect(message).not.toMatch(/at line \d+, column/);
     expect(message.split("\n")).toHaveLength(1);
   });

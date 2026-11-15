@@ -76,7 +76,7 @@ All tokens are CSS custom properties in [`tokens.css`](tokens.css).
 
 ### Colour (per theme)
 
-Two surfaces and five text roles. Text roles appear at any size and need WCAG 2.2 AA for normal text (4.5:1) on both surfaces. The name roles are used only for the name, set large and heavy, so they need AA for large text (3:1). `tests/unit/tokens.test.ts` checks all 24 pairs; `/design/` shows each ratio.
+Two surfaces and five text roles. Text roles appear at any size and need WCAG 2.2 AA for normal text (4.5:1) on both surfaces. The name roles are used only for the name, set large and heavy, so they need AA for large text (3:1). `tests/unit/tokens.test.ts` checks all 20 pairs (2 surfaces x 5 roles x 2 themes); `/design/` shows each ratio.
 
 | Role | Use | Dark (default) | Light |
 |---|---|---|---|
@@ -100,7 +100,7 @@ Contrast (text on ground / on panel):
 
 ### Code colours
 
-Code blocks in posts are highlighted at build time with Shiki's CSS-variables theme, so the built HTML carries no colour of its own, only `var(--shiki-*)`. The values live in [`tokens.css`](tokens.css), per theme, in the same ochre and sage palette. Every text role must reach WCAG 2.2 AA for normal text (4.5:1) on `--shiki-background`; `tests/unit/tokens.test.ts` checks all 20 pairs and `/design/` shows a highlighted sample with each ratio.
+Code blocks in posts are highlighted at build time with Shiki's CSS-variables theme, so the built HTML carries no colour of its own, only `var(--shiki-*)`. The values live in [`tokens.css`](tokens.css), per theme, in the same ochre and sage palette. Every text role must reach WCAG 2.2 AA for normal text (4.5:1) on `--shiki-background`; `tests/unit/tokens.test.ts` checks all 24 pairs (12 roles x 2 themes) and `/design/` shows a highlighted sample with each ratio.
 
 | Role | Use | Dark (default) | Light |
 |---|---|---|---|
