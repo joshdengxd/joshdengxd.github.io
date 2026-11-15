@@ -1,6 +1,5 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { devices } from "@playwright/test";
 import { parse } from "yaml";
 
 // Parsed YAML is untyped on purpose; the tests assert its shape.
@@ -124,16 +123,25 @@ describe("dependabot.yml", () => {
 describe("checks.yml", () => {
   const { doc } = load("workflows/checks.yml");
 
-  it("installs every browser the Playwright projects use", () => {
-    const config = readFileSync(join(process.cwd(), "playwright.config.ts"), "utf8");
-    const used = new Set(
-      [...config.matchAll(/devices\["([^"]+)"\]/g)].map((m) => (devices as Record<string, Y>)[m[1]].defaultBrowserType),
-    );
-    expect(used.size).toBeGreaterThan(0);
+  /** The projects of playwright.config.ts with E2E_WEBKIT set or not (CI never sets it). */
+  const projectsOf = async (webkit: boolean) => {
+    vi.resetModules();
+    vi.stubEnv("E2E_WEBKIT", webkit ? "1" : "");
+    const config = (await import("../../playwright.config")).default;
+    vi.unstubAllEnvs();
+    return config.projects ?? [];
+  };
+  const browsersOf = async (webkit: boolean): Promise<string[]> =>
+    [...new Set((await projectsOf(webkit)).map((p) => (p.use?.defaultBrowserType as string) ?? "chromium"))].sort();
+
+  it("installs exactly the browsers the Playwright config runs in CI; WebKit is flag-only", async () => {
     const install = stepsOf(doc.jobs.checks).filter((s) => /playwright install/.test(s.run ?? ""));
     expect(install).toHaveLength(1);
-    const installed = String(install[0].run).split(/\s+/);
-    for (const browser of used) expect(installed, `${browser} is installed in CI`).toContain(browser);
-    expect(installed).toContain("--with-deps");
+    const words = String(install[0].run).split(/\s+/);
+    expect(words).toContain("--with-deps");
+    const installed = words.filter((w) => ["chromium", "firefox", "webkit"].includes(w)).sort();
+    expect(await browsersOf(false)).toEqual(installed);
+    expect(await browsersOf(false)).not.toContain("webkit");
+    expect(await browsersOf(true)).toContain("webkit");
   });
 });
