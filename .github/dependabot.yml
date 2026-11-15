@@ -1,0 +1,34 @@
+# Dependency updates as small PRs that go through `checks`; the owner merges them.
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    # No labels: the repo keeps only the workflow labels.
+    labels: []
+    groups:
+      # Minor and patch updates in one PR; majors stay separate PRs.
+      npm-minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    ignore:
+      # Majors held back for now (#2).
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels: []
+    groups:
+      # All action updates, majors included, in one PR.
+      github-actions:
+        patterns:
+          - "*"

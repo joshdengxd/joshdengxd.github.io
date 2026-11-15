@@ -33,7 +33,7 @@ Batch mode: `drain-refined` runs steps 3-4 unattended for every Refined ticket (
 - PRDs: `docs/prd/NNNN-name.md`
 - Ticket drafts: `drafts/tickets/`; scratch and run reports: `drafts/` (both git-ignored)
 - Checks: the Commands section below
-- Browser checks: local app via the run command (Chrome DevTools MCP); deployed: https://joshdengxd.github.io
+- Browser checks (Chrome DevTools MCP): before merge, locally against `out/` served by the run command; after merge, against the live site https://joshdengxd.github.io
 - Deploy: `.github/workflows/deploy.yml` on push to main (or run it by hand) -> https://joshdengxd.github.io; deployed commit: `<meta name="commit">` on every page holds the full SHA of the build
 - Max fix rounds: 3
 
