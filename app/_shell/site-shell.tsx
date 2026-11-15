@@ -19,10 +19,33 @@ export function SiteShell({ children }: { children: ReactNode }) {
   const home = isHome(pathname);
   const menu = useRef<HTMLDetailsElement>(null);
 
-  // Close the sheet after a client-side navigation.
+  const button = useRef<HTMLElement>(null);
+
+  // The sheet is closed by what the visitor does, never by the path changing: a late path change (slow
+  // network, quick taps) would close a sheet the visitor had just reopened.
+  // Links inside it close it in their click handler (see onClick below), also the link of the current page,
+  // which changes no path. Back and forward (popstate), Escape and a click or tap outside close it here.
   useEffect(() => {
-    if (menu.current) menu.current.open = false;
-  }, [pathname]);
+    const close = () => {
+      if (menu.current) menu.current.open = false;
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "Escape" || !menu.current?.open) return;
+      close();
+      button.current?.focus();
+    };
+    const onClick = (e: MouseEvent) => {
+      if (menu.current?.open && e.target instanceof Node && !menu.current.contains(e.target)) close();
+    };
+    window.addEventListener("popstate", close);
+    document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("click", onClick);
+    return () => {
+      window.removeEventListener("popstate", close);
+      document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("click", onClick);
+    };
+  }, []);
 
   return (
     <div className={styles.shell} data-home={home ? "" : undefined}>
@@ -34,8 +57,13 @@ export function SiteShell({ children }: { children: ReactNode }) {
             </Link>
           )}
           <details ref={menu} className={styles.menu}>
-            <summary className={styles.menuButton}>Menu</summary>
-            <div className={styles.sheet}>
+            <summary ref={button} className={styles.menuButton}>Menu</summary>
+            <div
+              className={styles.sheet}
+              onClick={(e) => {
+                if (e.target instanceof Element && e.target.closest("a") && menu.current) menu.current.open = false;
+              }}
+            >
               <NavLinks />
               <ThemeToggle />
             </div>

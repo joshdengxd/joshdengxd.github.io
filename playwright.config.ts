@@ -12,7 +12,11 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? "github" : "list",
   use: { baseURL: `http://localhost:${port}`, trace: "on-first-retry" },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  projects: [
+    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
+    // The phone Menu sheet behaves differently per engine (Safari on iPhones), so its spec also runs in WebKit.
+    { name: "webkit", testMatch: "**/menu-sheet.spec.ts", use: { ...devices["Desktop Safari"] } },
+  ],
   webServer: {
     command: `npx serve out --listen ${port} --no-port-switching`,
     url: `http://localhost:${port}/`,
