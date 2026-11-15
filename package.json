@@ -31,5 +31,10 @@
     "serve": "14.2.8",
     "typescript": "5.9.3",
     "vitest": "5.1.0"
+  },
+  "overrides": {
+    "@typescript-eslint/typescript-estree": {
+      "minimatch": "^11.0.1"
+    }
   }
 }
