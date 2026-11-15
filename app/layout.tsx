@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://joshdengxd.github.io"),
   title: "Xindong Deng (Josh)",
   description: "Personal site of Xindong Deng (Josh). Under construction.",
-  other: { commit: process.env.NEXT_PUBLIC_COMMIT ?? "unknown" },
+  other: { commit: process.env.COMMIT_SHA ?? "unknown" },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

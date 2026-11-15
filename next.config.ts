@@ -14,7 +14,8 @@ const nextConfig: NextConfig = {
   output: "export",
   trailingSlash: true,
   images: { unoptimized: true },
-  env: { NEXT_PUBLIC_COMMIT: commitSha() },
+  // Build-time constant for <meta name="commit"> (compiler.defineServer; the `env` key is legacy).
+  compiler: { defineServer: { "process.env.COMMIT_SHA": commitSha() } },
 };
 
 export default nextConfig;

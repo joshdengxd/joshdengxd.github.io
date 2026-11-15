@@ -47,6 +47,17 @@ Node 26 (`.nvmrc`). Install: `npm ci`; once per machine for e2e: `npx playwright
 - Run: `npm run build && npm run serve` (serves `out/` on http://localhost:3000, as Pages does; this is what verifiers check)
 - CI: `.github/workflows/checks.yml`, one job `checks` on every PR: lint, type check, unit, build and e2e.
 
+## Stack
+Check code against the current docs for these versions before writing or approving it (`current-docs` skill; docs source Context7, id after the colon). Upgrades are their own tickets.
+- Next.js 16.4.6: vercel/next.js (use `--version v16.4.5` or newer 16.x)
+- React 19.3: reactjs/react.dev
+- TypeScript 5.9: microsoft/typescript
+- ESLint 9.39 + eslint-config-next 16.4.6: eslint/eslint
+- Vitest 5.1 (Vite 8): vitest-dev/vitest
+- Testing Library (react 16.3, dom 10.4, jest-dom 7.0): testing-library/react-testing-library
+- Playwright 1.65: microsoft/playwright
+- GitHub Actions (checkout v7, setup-node v7, configure-pages v6, upload-pages-artifact v5, deploy-pages v5, upload-artifact v7): each action's README at its pinned tag
+
 ## Boundaries
 - Never merge, publish or post on GitHub without the user's approval (a `drain-refined` run the user started approves its own merges and landing comments). Any automated merge outside that (for example Dependabot) needs this line changed first.
 - No personal data beyond what the user approved for the site. No former-employer internals (names of internal systems, URLs, code, tickets). No local file paths.
