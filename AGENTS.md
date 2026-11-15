@@ -12,11 +12,11 @@ Everything in this repo and on GitHub (code, docs, issues, PRs, commits, comment
 1. `create-ticket`: PRD -> ticket drafts in `drafts/tickets/` -> user approves -> GitHub issues in Backlog. No code without a ticket (docs and skill syncs use the chore path in the settings below).
 2. `refine-ticket`: one refinement summary on the issue (criteria with phases local / PR / deployed, landing steps, out of scope), approved by the user -> Refined. Deferred work always becomes its own ticket in the same approval.
 3. `implement-and-verify-ticket`: -> In progress; worktree, implement, checks green, one fresh subagent checks each local criterion with evidence, another runs `verify-against-criteria` -> PR (`Refs #N`, title ends `(#N)`).
-4. The user reviews the PR and says "land #N" -> `land-ticket`: PR criteria, landing steps, merge, deploy, fresh subagent checks the deployed criteria on the live site -> In review.
-5. The user tries it and closes the issue (Done), or sends it back with a comment.
+4. The user reviews the PR and says "land #N" -> `land-ticket`: PR criteria, landing steps, merge, deploy, fresh subagent checks the deployed criteria on the live site -> issue closed, Done.
+5. The user samples the live site; a problem reopens the issue with a comment.
 6. `wrap-up` at the end of a session.
 
-Batch mode: `drain-refined` runs steps 3-4 unattended for every Refined ticket (grouped PRs, fresh verifiers, bounded fix rounds). The user starting it is the approval for its merges and landing steps; tickets still end in In review for the user to try. It needs Commands and Deploy set first.
+Batch mode: `drain-refined` runs steps 3-4 unattended for every Refined ticket (grouped PRs, fresh verifiers, bounded fix rounds). The user starting it is the approval for its merges and landing steps; tickets end in Done once their deployed check passes. It needs Commands and Deploy set first.
 
 ## Ticket workflow settings
 (read by create-ticket, refine-ticket, implement-and-verify-ticket, verify-against-criteria, land-ticket, drain-refined)
@@ -27,7 +27,8 @@ Batch mode: `drain-refined` runs steps 3-4 unattended for every Refined ticket (
 - Max wait: 30 min for PR checks and for a deploy
 - States: board "Personal site" (https://github.com/users/joshdengxd/projects/1), field Status: Backlog, Refined, In progress, In review, Done. New tickets are added to the board in Backlog. No state labels.
   Board ids: project `PVT_kwHOFRG3Ts4Brp0g`, Status field `PVTSSF_lAHOFRG3Ts4Brp0gzhp7iN8`, options Backlog `38d84374`, Refined `4468383d`, In progress `caa18168`, In review `5c7bb449`, Done `19ddfbc8`.
-- Done: the user closes the issue (the board's built-in workflow moves it). Reopened or sent back: In progress for a small fix, Refined if the plan changes, with a comment.
+- Landed tickets go to: Done. `land-ticket` closes the issue as completed once every deployed criterion is met, and sets the board to Done (the board's "Item closed" workflow is not relied on).
+- Reopened or sent back: In progress for a small fix, Refined if the plan changes, with a comment.
 - Labels: `ticket`, `prd-NNNN`
 - PRDs: `docs/prd/NNNN-name.md`
 - Ticket drafts: `drafts/tickets/`; scratch and run reports: `drafts/` (both git-ignored)

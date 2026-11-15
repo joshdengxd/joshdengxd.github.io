@@ -9,7 +9,7 @@ Second stage of the ticket workflow: create -> refine -> implement and verify ->
 
 ## Workflow states (shared by the ticket skills)
 Backlog -> Refined -> In progress -> In review -> Done.
-This skill moves a ticket from Backlog to **Refined** (or keeps it in Refined when re-run). Only a person moves a ticket to Done. When states are labels, each move replaces the previous state label.
+This skill moves a ticket from Backlog to **Refined** (or keeps it in Refined when re-run). A ticket reaches Done by a person, or by `land-ticket` when the project sets "Landed tickets go to: Done". When states are labels, each move replaces the previous state label.
 
 ## Project settings
 Read the project's `AGENTS.md` (section "Ticket workflow settings"): tracker and repo, identity (the account to post as), how states are shown (board column or label; default label `refined`), the project's docs (PRDs, context index), and the ticket drafts folder. If a setting is missing, use the default below and say so; where there is no default, ask.

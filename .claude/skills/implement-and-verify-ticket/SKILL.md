@@ -9,7 +9,7 @@ Third stage of the ticket workflow: create -> refine -> implement and verify -> 
 
 ## Workflow states (shared by the ticket skills)
 Backlog -> Refined -> In progress -> In review -> Done.
-This skill moves a ticket from Refined (or back from In review) to **In progress** when work starts; it stays there until `land-ticket`. Only a person moves a ticket to Done. When states are labels, each move replaces the previous state label. The user's request to implement this ticket is the approval for that move and for comments it posts.
+This skill moves a ticket from Refined (or back from In review) to **In progress** when work starts; it stays there until `land-ticket`. A ticket reaches Done by a person, or by `land-ticket` when the project sets "Landed tickets go to: Done". When states are labels, each move replaces the previous state label. The user's request to implement this ticket is the approval for that move and for comments it posts.
 
 ## Project settings
 Read the project's `AGENTS.md` (section "Ticket workflow settings"): tracker and repo, identity (use it for every push, PR and tracker call), default branch, how states are shown (board column or label; default label `in-progress`), check commands (type check, lint, unit, e2e), run command, max fix rounds (default 3). If a setting is missing, use the default and say so; where there is no default, ask. Commands have no default, with one exception: when this ticket's refinement is the one that defines them, use the commands it adds to `AGENTS.md` on the branch.
@@ -39,7 +39,7 @@ If the ticket is not refined, say so and suggest `refine-ticket` first; continue
    - Otherwise: fix, rerun all of step 3, and run steps 4 and 5 again with NEW subagents. At the max fix rounds, stop and hand the open items to the user; the ticket stays In progress until they decide.
 7. **PR.** Open a PR to the default branch (or update the existing one):
    - title: the ticket title followed by the ticket reference in parentheses: `(#N)` for GitHub, `(KEY-123)` for Jira;
-   - body: `Refs #N` or `Refs KEY-123` (never `Closes`/`Fixes`/`Resolves`, so merging does not close the ticket and skip In review); `Verified at <commit sha>`; the criteria table (criterion, phase, how checked, status, evidence); the code-review verdict; the docs consulted (library, version, topic, source); the check results; the landing steps copied from the refinement summary.
+   - body: `Refs #N` or `Refs KEY-123` (never `Closes`/`Fixes`/`Resolves`, so merging does not close the ticket before `land-ticket` has checked the deployed result); `Verified at <commit sha>`; the criteria table (criterion, phase, how checked, status, evidence); the code-review verdict; the docs consulted (library, version, topic, source); the check results; the landing steps copied from the refinement summary.
    Every push after verification means verifying again and rewriting the body, `Verified at` included. Leave it for a person to review; landing is `land-ticket`.
 
 ## When a ticket goes back

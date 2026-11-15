@@ -1,6 +1,6 @@
 ---
 name: drain-refined
-description: Unattended drain loop - take every ticket in Refined, group compatible ones into shared PRs, then per group run implement (fresh subagent) -> behaviour check and code review (two more fresh subagents) -> fix rounds -> PR -> land-ticket, one group at a time, until no Refined ticket is left that can be done. Starting it is the approval for every state move, PR, landing step, merge and landing comment it makes; tickets end in In review, never Done. Use when the user says "drain refined", "ship all refined tickets", "do all the refined issues", or runs /drain-refined.
+description: Unattended drain loop - take every ticket in Refined, group compatible ones into shared PRs, then per group run implement (fresh subagent) -> behaviour check and code review (two more fresh subagents) -> fix rounds -> PR -> land-ticket, one group at a time, until no Refined ticket is left that can be done. Starting it is the approval for every state move, PR, landing step, merge and landing comment it makes; tickets end where `land-ticket` puts them (In review, or Done when the project says so). Use when the user says "drain refined", "ship all refined tickets", "do all the refined issues", or runs /drain-refined.
 ---
 
 # Drain Refined
@@ -8,7 +8,7 @@ description: Unattended drain loop - take every ticket in Refined, group compati
 `implement-and-verify-ticket` and `land-ticket` run end to end for every Refined ticket, without stopping to ask. Speed comes from not waiting for a person between steps; correctness comes from gates no producer grades for itself: the project's checks, a fresh behaviour verifier, a fresh code reviewer, CI on the PR, and a fresh check on the deployed site. A ticket that cannot pass them is left for a person, never forced through.
 
 ## Approval and trust
-Starting this skill is the user's explicit request to move, implement, open PRs for, run the landing steps of, merge and land every ticket it picks in this run (rung 3 of the trust ladder: agent does, person samples). It still never moves a ticket to Done and never closes one: the person tries each ticket in In review. It never reverts, force-pushes the default branch, skips or loosens a check, edits a test just to make it pass, or runs a landing step that is not in the refinement summary.
+Starting this skill is the user's explicit request to move, implement, open PRs for, run the landing steps of, merge and land every ticket it picks in this run (rung 3 of the trust ladder: agent does, person samples). Tickets end where the project's "Landed tickets go to" setting says: In review (the person tries each one and moves it to Done) or Done (only after the deployed check passed; the person samples). It never reverts, force-pushes the default branch, skips or loosens a check, edits a test just to make it pass, or runs a landing step that is not in the refinement summary.
 
 ## Never ask mid-run
 The sibling skills ask the user in some places. Inside this run every such point is replaced:
@@ -78,7 +78,7 @@ On anything short of pass (including red CI in section 6), start a NEW implement
 On pass, the driver opens one PR from the branch, first checking the remote branch head equals the verified `sha`. Title, `Refs` lines and body follow `implement-and-verify-ticket` step 7, with one `Refs #N` line per ticket and the primary (lowest) ticket in the title; build the body (with `Verified at <sha>`) from the behaviour report and criteria file with `--body-file`, without reading them into context. Wait for the PR's checks, at most the max wait (`gh pr checks --watch` under a timeout). Red checks, no checks, a timeout or an unmergeable PR go to a fix round; the push updates the PR, verification runs again on the new `sha`, and the driver rewrites the body from the new reports.
 
 ### 7. Land
-Run `land-ticket` on the PR; this run is the request to land it. It runs the landing steps from the PR body that match the refinement summary, merges only if the PR head equals the `Verified at` commit, and gives its deployed check the `deployed` criteria. Each `Refs` ticket moves to **In review** with its own comment (the others may link to the primary ticket's comment for the evidence). Remove the group's worktree.
+Run `land-ticket` on the PR; this run is the request to land it. It runs the landing steps from the PR body that match the refinement summary, merges only if the PR head equals the `Verified at` commit, and gives its deployed check the `deployed` criteria. Each `Refs` ticket moves to its landed state (In review or Done) with its own comment (the others may link to the primary ticket's comment for the evidence). Remove the group's worktree.
 
 A failed landing step, failed deploy, deployed check not all met, or no fast-forward: stop the whole run; tickets stay In progress with the evidence commented. The next group would build on a broken default branch; a person decides whether to fix forward or revert.
 
@@ -93,12 +93,12 @@ When a group fails (implement failed, or still not passing after the fix rounds)
 Tickets that depend on a skipped ticket stay blocked and are reported.
 
 ## Finish
-Report the ledger, one row per group: tickets, PR, rounds used, result (landed / skipped + reason / stopped). Then: tickets still blocked and why, tickets left In progress, and the final candidate query (should be empty). Next step for the person: try each ticket in In review and move it to Done. If a ticket goes back from In review, `implement-and-verify-ticket` tells its dependents.
+Report the ledger, one row per group: tickets, PR, rounds used, result (landed / skipped + reason / stopped). Then: tickets still blocked and why, tickets left In progress, and the final candidate query (should be empty). Next step for the person: try the landed tickets (and move those in In review to Done). If a ticket goes back, `implement-and-verify-ticket` tells its dependents.
 
 ## Rules
 - One group at a time; the driver stays on the default branch in the main checkout.
 - Every verifier is new: never reuse a subagent, never pass it the implementer's reasoning, earlier verdicts or issue comments.
 - What was verified is what gets merged: same `sha` from verification to merge.
 - No fix loop past the limit, no merge with anything short of pass, no continuing after a failed landing.
-- Never move a ticket to Done, close it, or revert.
+- Never revert; never close a ticket or move it to Done except through `land-ticket` after a passing deployed check.
 - One-shot: runs until nothing is left, then stops. For a recurring version, wrap it in a scheduler.

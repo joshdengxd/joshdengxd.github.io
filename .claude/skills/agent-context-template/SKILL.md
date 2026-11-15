@@ -47,7 +47,8 @@ Never touch: generated files, migrations without review, production configs.
 - States: board <name/number> columns Backlog, Refined, In progress, In review, Done
   (no board: labels refined, in-progress, in-review; Backlog = no label)
   Board ids for scripted moves: project <id>, Status field <id>, options <name=id, ...>
-- Done: the person moves the ticket (or closes the issue). Reopened or sent back:
+- Landed tickets go to: In review (the person tries it and moves it to Done) | Done (land-ticket closes it after the deployed check passes)
+- Done: closing the issue; check whether the board moves it, or say that the agent sets it. Reopened or sent back:
   In progress for a small fix, Refined if the plan changes, always with a comment.
 - Labels: ticket, prd-NNNN
 - PRDs: docs/prd/NNNN-name.md
