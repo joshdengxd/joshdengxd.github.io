@@ -40,6 +40,14 @@ public class Greeter { public string Greet(string name) => $"Hello, {name}"; }
 a block with no language, and a line that is long enough to scroll inside its block as well ...........................................
 ```
 
+## A diff
+
+```diff
+- const label = 'old';
++ const label = 'new';
+  const same = true;
+```
+
 ## A table
 
 | Part | Job |

@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { GITHUB_URL, HOME_LABEL, isCurrent, LINKEDIN_URL, NAV, trimSlash } from "@/app/_shell/links";
+import { HOME_LABEL, isCurrent, LINKEDIN_URL, NAV, trimSlash } from "@/app/_shell/links";
+import { GITHUB_OWNER_URL } from "@/lib/site";
 import { SiteShell } from "@/app/_shell/site-shell";
 import { ThemeToggle } from "@/app/_shell/theme-toggle";
 import { THEME_KEY } from "@/app/theme";
@@ -53,7 +54,7 @@ describe("shell", () => {
     }
 
     const footer = screen.getByRole("contentinfo");
-    expect(within(footer).getByRole("link", { name: "GitHub" })).toHaveAttribute("href", GITHUB_URL);
+    expect(within(footer).getByRole("link", { name: "GitHub" })).toHaveAttribute("href", GITHUB_OWNER_URL);
     expect(within(footer).getByRole("link", { name: "LinkedIn" })).toHaveAttribute("href", LINKEDIN_URL);
     expect(screen.getByRole("main")).toHaveAttribute("id", "main");
   });
@@ -63,7 +64,7 @@ describe("shell", () => {
     render(<SiteShell>page</SiteShell>);
     expect(screen.queryByRole("link", { name: HOME_LABEL })).toBeNull();
     const footer = screen.getByRole("contentinfo");
-    expect(within(footer).getByRole("link", { name: "GitHub" })).toHaveAttribute("href", GITHUB_URL);
+    expect(within(footer).getByRole("link", { name: "GitHub" })).toHaveAttribute("href", GITHUB_OWNER_URL);
     expect(within(footer).getByRole("link", { name: "LinkedIn" })).toHaveAttribute("href", LINKEDIN_URL);
     expect(document.querySelectorAll('[aria-current="page"]')).toHaveLength(0);
   });

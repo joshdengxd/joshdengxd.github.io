@@ -1,7 +1,8 @@
 import { Placeholder } from "../_components/placeholder";
 import { PageLayout, Section } from "../_components/page-layout";
 import pageStyles from "../_components/page.module.css";
-import { GITHUB_URL, LINKEDIN_URL } from "../_shell/links";
+import { LINKEDIN_URL } from "../_shell/links";
+import { GITHUB_OWNER_URL } from "@/lib/site";
 import { pageMetadata } from "@/lib/metadata";
 
 export const metadata = pageMetadata({
@@ -27,7 +28,7 @@ export default function Page() {
       <Section title="Links">
         <ul className={pageStyles.links}>
           <li>
-            <a className={pageStyles.link} href={GITHUB_URL} rel="me">
+            <a className={pageStyles.link} href={GITHUB_OWNER_URL} rel="me">
               GitHub
             </a>
           </li>

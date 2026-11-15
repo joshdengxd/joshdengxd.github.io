@@ -123,15 +123,37 @@ test.describe("a post", () => {
     test("an unknown language and no language render as plain code", async ({ page }) => {
       await page.goto(POST);
       const blocks = page.locator("pre.shiki");
-      await expect(blocks).toHaveCount(6); // ts, json, bash, csharp, brainfuck, none
+      await expect(blocks).toHaveCount(7); // ts, json, bash, csharp, brainfuck, none, diff
       const plain = await blocks.evaluateAll((els) =>
-        els.slice(4).map((e) => e.querySelectorAll("[style*='--shiki-token-']").length),
+        els.slice(4, 6).map((e) => e.querySelectorAll("[style*='--shiki-token-']").length),
       );
       expect(plain).toEqual([0, 0]);
       await expect(blocks.nth(4)).toContainText("++++++++[>++++[>++>+++<<-]<-]>>.");
       await expect(blocks.nth(5)).toContainText("a block with no language");
       const classes = await page.locator("pre code").evaluateAll((els) => els.map((e) => e.className));
       expect(classes.every((c) => c === "")).toBe(true);
+    });
+
+    test("a diff block shows added and removed lines in different colours, from the token file, in both themes", async ({
+      page,
+    }) => {
+      await page.goto(POST);
+      for (const theme of ["dark", "light"] as const) {
+        if ((await page.evaluate(() => document.documentElement.getAttribute("data-theme"))) !== theme) {
+          await page.getByRole("button", { name: "Light theme" }).click();
+        }
+        await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+        const c = codeColours(codeTokens, theme);
+        const lines = page.locator("pre.shiki").nth(6).locator(".line");
+        await expect(lines).toHaveCount(3);
+        const colours = await lines.evaluateAll((els) =>
+          els.map((line) => getComputedStyle(line.querySelector("span[style]")!).color),
+        );
+        const [removed, added] = colours;
+        expect(added, `${theme}: added line`).toBe(rgb(c["--shiki-token-inserted"]));
+        expect(removed, `${theme}: removed line`).toBe(rgb(c["--shiki-token-deleted"]));
+        expect(added).not.toBe(removed);
+      }
     });
 
     test("the code colours follow the theme and equal the token file, in both themes", async ({ page }) => {

@@ -1,5 +1,6 @@
 import { render, screen, within } from "@testing-library/react";
-import { GITHUB_URL, HOME_LABEL, LINKEDIN_URL } from "@/app/_shell/links";
+import { HOME_LABEL, LINKEDIN_URL } from "@/app/_shell/links";
+import { GITHUB_OWNER_URL } from "@/lib/site";
 import NotFound, { metadata as notFoundMetadata } from "@/app/not-found";
 import { HomeView } from "@/app/_home/home-view";
 
@@ -24,7 +25,7 @@ describe("home page and 404", () => {
 
   it("home has the GitHub and LinkedIn links", () => {
     render(<Home />);
-    expect(screen.getByRole("link", { name: "GitHub" })).toHaveAttribute("href", GITHUB_URL);
+    expect(screen.getByRole("link", { name: "GitHub" })).toHaveAttribute("href", GITHUB_OWNER_URL);
     expect(screen.getByRole("link", { name: "LinkedIn" })).toHaveAttribute("href", LINKEDIN_URL);
   });
 

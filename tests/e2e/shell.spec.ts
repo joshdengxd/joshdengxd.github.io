@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { PROJECTS } from "../../lib/projects";
 
-const HOME_LABEL = "Xindong Deng (Josh), home";
+const HOME_LABEL = "Josh Deng, home";
 const NAV = [
   { href: "/about/", label: "About" },
   { href: "/projects/", label: "Projects" },
@@ -39,6 +39,25 @@ function watch(page: Page) {
 }
 
 for (const js of [true, false]) {
+  test.describe(`the home mark (JavaScript ${js ? "on" : "off"})`, () => {
+    test.use({ javaScriptEnabled: js });
+
+    // WCAG 2.5.3 (label in name): the accessible name starts with the words on screen.
+    for (const path of ["/", "/about/"]) {
+      test(`${path}: the link home is named "${HOME_LABEL}", which contains its visible text`, async ({ page }) => {
+        await page.goto(path);
+        const mark = page.getByRole("link", { name: HOME_LABEL, exact: true });
+        await expect(mark).toHaveCount(1);
+        await expect(mark).toHaveAttribute("href", "/");
+        await expect(mark).toBeVisible();
+        const visible = ((await mark.textContent()) ?? "").replace(/\s+/g, " ").trim();
+        expect(visible.toLowerCase()).toBe("josh deng");
+        expect(HOME_LABEL.toLowerCase()).toContain(visible.toLowerCase());
+        expect(HOME_LABEL.startsWith("Josh Deng")).toBe(true);
+      });
+    }
+  });
+
   test.describe(`every page is inside the shell (JavaScript ${js ? "on" : "off"})`, () => {
     test.use({ javaScriptEnabled: js });
 

@@ -1,6 +1,6 @@
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
-import { parse as parseYaml } from "yaml";
+import { parse as parseYaml, type YAMLParseError } from "yaml";
 import type { z } from "zod";
 import { findRawHtml, renderMarkdown } from "./markdown";
 import { frontMatterSchema, RESERVED_SLUGS, SLUG_PATTERN, type FrontMatter } from "./schema";
@@ -35,6 +35,14 @@ export function splitFrontMatter(file: string, raw: string): { yaml: string; bod
   return { yaml: lines.slice(1, end).join("\n"), body: lines.slice(end + 1).join("\n"), bodyLine: end + 2 };
 }
 
+/** The first line of a YAML error, with the line in the file (the parser counts from the line after the opening ---). */
+function yamlProblem(error: YAMLParseError): string {
+  // The parser's own "at line N, column M" counts inside the front matter, which would mislead; the file line replaces it.
+  const text = error.message.split("\n")[0].replace(/ at line \d+, column \d+:?$/, "");
+  const line = error.linePos?.[0].line;
+  return line === undefined ? text : `line ${line + 1}: ${text}`;
+}
+
 /** Parses and validates one post file; `file` is only used in messages. Throws with the file and the field named. */
 export async function parsePost(file: string, slug: string, raw: string): Promise<Post> {
   if (!SLUG_PATTERN.test(slug) || RESERVED_SLUGS.includes(slug)) {
@@ -52,7 +60,7 @@ export async function parsePost(file: string, slug: string, raw: string): Promis
     // YAML 1.2: a date stays a string; a repeated key is an error.
     data = parseYaml(yaml);
   } catch (error) {
-    throw new PostError(file, "front matter", (error as Error).message.split("\n")[0]);
+    throw new PostError(file, "front matter", yamlProblem(error as YAMLParseError));
   }
   if (data === null || typeof data !== "object" || Array.isArray(data)) {
     throw new PostError(file, "front matter", "must list title, date, tags and summary");

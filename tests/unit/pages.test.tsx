@@ -1,6 +1,7 @@
 import { render, screen, within } from "@testing-library/react";
 import { HomeView } from "@/app/_home/home-view";
-import { GITHUB_URL, LINKEDIN_URL } from "@/app/_shell/links";
+import { LINKEDIN_URL } from "@/app/_shell/links";
+import { GITHUB_OWNER_URL } from "@/lib/site";
 import AboutPage, { metadata as aboutMeta } from "@/app/about/page";
 import HowPage, { metadata as howMeta } from "@/app/how-this-site-is-built/page";
 import ProjectsPage, { metadata as projectsMeta } from "@/app/projects/page";
@@ -85,7 +86,7 @@ describe("About", () => {
     render(<AboutPage />);
     expect(screen.getByRole("heading", { level: 1, name: "About" })).toBeInTheDocument();
     expect(headings(2)).toEqual(["Background", "What I am learning", "How I work", "Links"]);
-    expect(screen.getByRole("link", { name: "GitHub" })).toHaveAttribute("href", GITHUB_URL);
+    expect(screen.getByRole("link", { name: "GitHub" })).toHaveAttribute("href", GITHUB_OWNER_URL);
     expect(screen.getByRole("link", { name: "LinkedIn" })).toHaveAttribute("href", LINKEDIN_URL);
     expect(aboutMeta.robots).toBeUndefined();
     expect(aboutMeta.title).toBe("About");
