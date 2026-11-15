@@ -38,13 +38,13 @@ Batch mode: `drain-refined` runs steps 3-4 unattended for every Refined ticket (
 - Max fix rounds: 3
 
 ## Commands
-Node 26 (`.nvmrc`). Install: `npm ci`; once per machine for e2e: `npx playwright install chromium`.
+Node 26 (`.nvmrc`). Install: `npm ci`; once per machine for e2e: `npx playwright install chromium firefox webkit`.
 - Build: `npm run build` (static export to `out/`)
 - Dev: `npm run dev` (dev server, http://localhost:3000; routing and 404 differ from Pages)
 - Lint: `npm run lint`
 - Type check: `npm run typecheck`
 - Unit: `npm test` (Vitest, `tests/unit/`)
-- e2e: `npm run e2e` (builds, serves `out/` on port 4173, runs Playwright Chromium, `tests/e2e/`)
+- e2e: `npm run e2e` (builds, serves `out/` on port 4173, runs every Playwright test in Chromium, Firefox and WebKit, `tests/e2e/`)
 - Run: `npm run build && npm run serve` (serves `out/` on http://localhost:3000, as Pages does; this is what verifiers check)
 - CI: `.github/workflows/checks.yml`, one job `checks` on every PR: lint, type check, unit, build and e2e.
 
