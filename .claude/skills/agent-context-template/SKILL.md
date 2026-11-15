@@ -42,12 +42,12 @@ Never touch: generated files, migrations without review, production configs.
 - Identity: the account every tracker call, push and merge uses, and how
   (e.g. gh with GH_TOKEN=$(gh auth token --user <account>) on each call; never switch the active account)
 - Default branch: main; merge method: squash
-- Changes without a ticket (skill syncs, docs, PRD edits): <path, e.g. a PR titled "chore: ..." the owner merges>
+- Changes without a ticket (skill syncs, docs, PRD edits): <path, e.g. a PR titled "chore: ..." landed like a ticket (asked for, or by an unattended run the owner started)>
 - Max wait: 30 min for PR checks and for a deploy
 - States: board <name/number> columns Backlog, Refined, In progress, In review, Done
   (no board: labels refined, in-progress, in-review; Backlog = no label)
   Board ids for scripted moves: project <id>, Status field <id>, options <name=id, ...>
-- Landed tickets go to: In review (the person tries it and moves it to Done) | Done (land-ticket closes it after the deployed check passes)
+- Landed tickets go to: In review (step by step: the person tries it and moves it to Done) | Done (unattended, `drain-refined`: land-ticket closes it after the deployed check passes; the person samples)
 - Done: closing the issue; check whether the board moves it, or say that the agent sets it. Reopened or sent back:
   In progress for a small fix, Refined if the plan changes, always with a comment.
 - Labels: ticket, prd-NNNN

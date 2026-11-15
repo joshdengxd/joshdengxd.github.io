@@ -3,6 +3,7 @@
 - Status: Approved (2026-11-14)
 - Created: 2026-11-14
 - Tickets: GitHub issues labelled `prd-0001`
+- Amendment 2026-11-15: the workflow runs in two modes, unattended (`drain-refined`: only machine gates decide, the owner starts the run and samples the results) and step by step (the owner reviews and approves by hand). Wherever this PRD says the owner reviews or merges, read it as the step-by-step mode; irreversible actions outside the repository stay with the owner in both. Approved text otherwise unchanged. Tracked in issue #28.
 
 ## Summary
 A personal website that introduces me, shares how I think about agent-assisted software delivery, explains what my public repos do, and hosts a blog. The site is built with my own shared skills, so its issues and PRs are a public record of that workflow.
@@ -68,7 +69,7 @@ Skeletons use clearly marked placeholder text only.
 | Checks | ESLint, TypeScript check, Vitest, Playwright | `implement-and-verify-ticket` requires checks and e2e to be green. |
 | Verification | Browser checks run locally before merge, and on the live site after merge | No staging environment is needed for a static site. |
 | CI/CD | GitHub Actions: checks on every PR; build and deploy to GitHub Pages on merge to main; least-privilege permissions, pinned actions, Dependabot | |
-| Branch rules | main changes only through a PR with green checks; the owner merges | Nothing reaches main unchecked. |
+| Branch rules | main changes only through a PR with green checks; the owner merges (see the amendment of 2026-11-15) | Nothing reaches main unchecked. |
 | Design | Direction chosen with the open-source taste skill (MIT, Leonxlnx/taste-skill) as a dev tool | Avoids a generic template look; checked in a real browser. |
 
 Implementation notes from the architecture review are in `docs/context/static-export-notes.md`.

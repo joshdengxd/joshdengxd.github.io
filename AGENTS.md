@@ -12,18 +12,18 @@ Everything in this repo and on GitHub (code, docs, issues, PRs, commits, comment
 1. `create-ticket`: PRD -> ticket drafts in `drafts/tickets/` -> user approves -> GitHub issues in Backlog. No code without a ticket (docs and skill syncs use the chore path in the settings below).
 2. `refine-ticket`: one refinement summary on the issue (criteria with phases local / PR / deployed, landing steps, out of scope), approved by the user -> Refined. Deferred work always becomes its own ticket in the same approval.
 3. `implement-and-verify-ticket`: -> In progress; worktree, implement, checks green, one fresh subagent checks each local criterion with evidence, another runs `verify-against-criteria` -> PR (`Refs #N`, title ends `(#N)`).
-4. The user reviews the PR and says "land #N" -> `land-ticket`: PR criteria, landing steps, merge, deploy, fresh subagent checks the deployed criteria on the live site -> issue closed, Done.
-5. The user samples the live site; a problem reopens the issue with a comment.
+4. `land-ticket` (the user says "land #N", or starts `drain-refined`): PR criteria, landing steps, merge, deploy, fresh subagent checks the deployed criteria on the live site -> issue closed, Done. Step by step, the user may first review the PR by hand; the machine gates run either way and must pass.
+5. The user samples the live site (step by step, tries it); a problem reopens the issue with a comment.
 6. `wrap-up` at the end of a session.
 
-Batch mode: `drain-refined` runs steps 3-4 unattended for every Refined ticket (grouped PRs, fresh verifiers, bounded fix rounds). The user starting it is the approval for its merges and landing steps; tickets end in Done once their deployed check passes. It needs Commands and Deploy set first.
+Two modes. Anything agents, code or tests can verify is verified that way in both: checks, a fresh behaviour verifier, a fresh code reviewer, CI on the PR and a fresh deployed check. **Unattended** (`drain-refined`) is the ticket factory: it runs steps 3-4 for every Refined ticket (grouped PRs, fresh verifiers, bounded fix rounds) with no manual approval or verification inside the run, because that would stop it. The user starting it is the approval for its merges and landing steps; tickets end in Done once their deployed check passes, and the user samples the results. **Step by step** (steps 1-5, one ticket at a time) is how the user tests and debugs the workflow itself or steers one ticket: the user verifies and approves by hand, on top of the machine gates. Drain needs Commands and Deploy set first. Irreversible actions outside the repository stay with the user in both modes.
 
 ## Ticket workflow settings
 (read by create-ticket, refine-ticket, implement-and-verify-ticket, verify-against-criteria, land-ticket, drain-refined)
 - Tracker: GitHub issues in joshdengxd/joshdengxd.github.io
 - Identity: joshdengxd. Run gh with `GH_TOKEN=$(gh auth token --user joshdengxd)` on each call and push with that token as an HTTP auth header; never switch the active gh account.
 - Default branch: main; merge method: squash
-- Changes without a ticket (skill syncs, docs, PRD edits): a PR titled `chore: ...`, `checks` green, the user merges it.
+- Changes without a ticket (skill syncs, docs, PRD edits): a PR titled `chore: ...`, `checks` green, then the user merges it or asks for it to be landed.
 - Auto-merge: Dependabot PRs whose update type is patch or minor (grouped PRs count as their highest type, security updates included) merge themselves once `checks` is green (`.github/workflows/dependabot-auto-merge.yml`, needs the repo setting "Allow auto-merge"); majors and everything else wait for the user. A merge made with the workflow token starts no push run, so the daily `deploy.yml` schedule deploys it within a day.
 - Max wait: 30 min for PR checks and for a deploy
 - States: board "Personal site" (https://github.com/users/joshdengxd/projects/1), field Status: Backlog, Refined, In progress, In review, Done. New tickets are added to the board in Backlog. No state labels.
@@ -79,7 +79,7 @@ Check code against the current docs for these versions before writing or approvi
 - npm override in `package.json`: `@typescript-eslint/typescript-estree` gets `minimatch ^11.0.1`, because its own `^10.2.2` range is in a Dependabot advisory (`>= 7.0.0, < 11.0.1`); scoped to that one package, since the other users need minimatch 3.x. Remove it when `@typescript-eslint/typescript-estree` requires minimatch >= 11.0.1.
 
 ## Boundaries
-- Never merge, publish or post on GitHub without the user's approval (a `drain-refined` run the user started approves its own merges and landing comments). One automated merge is allowed: Dependabot patch and minor PRs, merged by `.github/workflows/dependabot-auto-merge.yml` through GitHub auto-merge once `checks` is green. Majors, failed checks and every other PR still need the user. Any other automated merge needs this line changed first.
+- Never merge, publish or post on GitHub without the user's approval: asking for the landing, or starting a `drain-refined` run, is that approval for its own merges and landing comments; nothing else in the run waits for a manual one. One automated merge is allowed: Dependabot patch and minor PRs, merged by `.github/workflows/dependabot-auto-merge.yml` through GitHub auto-merge once `checks` is green. Majors, failed checks and every other PR still need the user. Any other automated merge needs this line changed first.
 - No personal data beyond what the user approved for the site. No former-employer internals (names of internal systems, URLs, code, tickets). No local file paths.
 - Skills in `.claude/skills/` are copied from josh-shared-skills; change them there, not here.
 

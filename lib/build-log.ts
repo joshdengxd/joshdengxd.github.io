@@ -41,9 +41,12 @@ export const WORKFLOW: readonly { skill: string; step: string }[] = [
   },
   {
     skill: "implement-and-verify-ticket",
-    step: "Implement in a worktree, run the checks, then fresh subagents check each criterion and review the code. A PR opens.",
+    step: "Implement in a worktree, run the checks, then fresh subagents check each criterion and review the code. A PR opens; the machine checks must pass before anything merges.",
   },
-  { skill: "land-ticket", step: "After my go: merge, deploy, and a fresh subagent checks the live site." },
+  {
+    skill: "land-ticket",
+    step: "On my go (or when I start an unattended run): merge, deploy, and a fresh subagent checks the live site.",
+  },
 ];
 
 /** Shared skills this site does not use, each with the reason. Names are from the josh-shared-skills README. */

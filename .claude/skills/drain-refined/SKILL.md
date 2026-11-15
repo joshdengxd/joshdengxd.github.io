@@ -8,7 +8,7 @@ description: Unattended drain loop - take every ticket in Refined, group compati
 `implement-and-verify-ticket` and `land-ticket` run end to end for every Refined ticket, without stopping to ask. Speed comes from not waiting for a person between steps; correctness comes from gates no producer grades for itself: the project's checks, a fresh behaviour verifier, a fresh code reviewer, CI on the PR, and a fresh check on the deployed site. A ticket that cannot pass them is left for a person, never forced through.
 
 ## Approval and trust
-Starting this skill is the user's explicit request to move, implement, open PRs for, run the landing steps of, merge and land every ticket it picks in this run (rung 3 of the trust ladder: agent does, person samples). Tickets end where the project's "Landed tickets go to" setting says: In review (the person tries each one and moves it to Done) or Done (only after the deployed check passed; the person samples). It never reverts, force-pushes the default branch, skips or loosens a check, edits a test just to make it pass, or runs a landing step that is not in the refinement summary.
+Starting this skill is the user's explicit request to move, implement, open PRs for, run the landing steps of, merge and land every ticket it picks in this run (rung 3 of the trust ladder: agent does, the gates decide, person samples). This is the unattended mode: no manual approval or verification happens inside the run, so only machine gates (checks, fresh verifier, fresh reviewer, CI, deployed check) decide. Tickets end where the project's "Landed tickets go to" setting says: Done (only after the deployed check passed; the person samples), which fits this mode, or In review (a person can still try each one and move it to Done). It never reverts, force-pushes the default branch, skips or loosens a check, edits a test just to make it pass, or runs a landing step that is not in the refinement summary.
 
 ## Never ask mid-run
 The sibling skills ask the user in some places. Inside this run every such point is replaced:
@@ -93,7 +93,7 @@ When a group fails (implement failed, or still not passing after the fix rounds)
 Tickets that depend on a skipped ticket stay blocked and are reported.
 
 ## Finish
-Report the ledger, one row per group: tickets, PR, rounds used, result (landed / skipped + reason / stopped). Then: tickets still blocked and why, tickets left In progress, and the final candidate query (should be empty). Next step for the person: try the landed tickets (and move those in In review to Done). If a ticket goes back, `implement-and-verify-ticket` tells its dependents.
+Report the ledger, one row per group: tickets, PR, rounds used, result (landed / skipped + reason / stopped). Then: tickets still blocked and why, tickets left In progress, and the final candidate query (should be empty). Next step for the person: sample the landed tickets (and move those in In review to Done, if the project keeps that setting). If a ticket goes back, `implement-and-verify-ticket` tells its dependents.
 
 ## Rules
 - One group at a time; the driver stays on the default branch in the main checkout.
