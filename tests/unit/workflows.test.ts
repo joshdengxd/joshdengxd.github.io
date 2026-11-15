@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { devices } from "@playwright/test";
 import { parse } from "yaml";
 
 // Parsed YAML is untyped on purpose; the tests assert its shape.
@@ -117,5 +118,22 @@ describe("dependabot.yml", () => {
     const groups = Object.values<Y>(actions.groups);
     expect(groups).toHaveLength(1);
     expect(groups[0]["update-types"]).toEqual(["minor", "patch"]);
+  });
+});
+
+describe("checks.yml", () => {
+  const { doc } = load("workflows/checks.yml");
+
+  it("installs every browser the Playwright projects use", () => {
+    const config = readFileSync(join(process.cwd(), "playwright.config.ts"), "utf8");
+    const used = new Set(
+      [...config.matchAll(/devices\["([^"]+)"\]/g)].map((m) => (devices as Record<string, Y>)[m[1]].defaultBrowserType),
+    );
+    expect(used.size).toBeGreaterThan(0);
+    const install = stepsOf(doc.jobs.checks).filter((s) => /playwright install/.test(s.run ?? ""));
+    expect(install).toHaveLength(1);
+    const installed = String(install[0].run).split(/\s+/);
+    for (const browser of used) expect(installed, `${browser} is installed in CI`).toContain(browser);
+    expect(installed).toContain("--with-deps");
   });
 });
