@@ -133,7 +133,7 @@ test.describe("home", () => {
 
 test.describe("placeholders", () => {
   test("each one shows the label 'Placeholder:' and has data-placeholder, on every v1 page", async ({ page }) => {
-    for (const path of ["/", "/about/", "/projects/this-site/", "/how-this-site-is-built/"]) {
+    for (const path of ["/", "/projects/this-site/", "/how-this-site-is-built/"]) {
       await page.goto(path);
       const marked = page.locator("[data-placeholder]");
       expect(await marked.count(), path).toBeGreaterThan(0);

@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { PROJECTS } from "../../lib/projects";
+import { ABOUT_LINKS } from "../about-text";
 
 const HOME_LABEL = "Josh Deng, home";
 const NAV = [
@@ -178,7 +179,7 @@ test.describe("keyboard", () => {
     await page.goto("/about/");
     await page.getByRole("button", { name: "Light theme" }).waitFor();
     const order: string[] = [];
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < 14; i++) {
       await page.keyboard.press("Tab");
       const info = await page.evaluate(() => {
         const el = document.activeElement as HTMLElement | null;
@@ -197,12 +198,14 @@ test.describe("keyboard", () => {
       order.push(info.name);
       expect(info.ring, `focus ring on ${info.name}`).toBe(true);
     }
-    // The About page's own Links section comes before the footer line.
+    // The About text links and the page's own Links section come before the footer line.
     expect(order).toEqual([
       "Skip to content",
       HOME_LABEL,
       ...NAV.map((n) => n.label),
       "Light theme",
+      "Matt Pocock", // the two names in the About text (ticket #35)
+      "Lauren Tan",
       "GitHub",
       "LinkedIn",
       "GitHub",
@@ -248,7 +251,12 @@ test.describe("phone", () => {
         expect(await overflow(), `${path} open`).toBe(0);
 
         const small = await page.evaluate(() =>
-          [...document.querySelectorAll<HTMLElement>("header a, header button, header summary, footer a, main a")]
+          [
+            ...document.querySelectorAll<HTMLElement>(
+              "header a, header button, header summary, footer a, main a:not(main p a)",
+            ),
+          ]
+            // Links inside a paragraph are exempt (WCAG 2.2 target size, inline exception): a 44px box would break the lines.
             .filter((el) => el.offsetParent !== null || getComputedStyle(el).position === "fixed")
             .map((el) => ({ name: el.textContent?.trim(), r: el.getBoundingClientRect() }))
             .filter(({ r }) => r.width > 0 && (r.width < 44 || r.height < 44))
@@ -331,6 +339,7 @@ test.describe("personal details", () => {
       "https://github.com/joshdengxd/josh-shared-skills",
       "https://github.com/joshdengxd/job-search-skills",
       "https://github.com/joshdengxd/joshdengxd.github.io",
+      ...ABOUT_LINKS.map((l) => l.href), // Matt Pocock and Lauren Tan, in About (ticket #35)
     ];
     for (const href of outside) {
       expect(

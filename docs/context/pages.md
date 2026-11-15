@@ -10,7 +10,7 @@ Read when you add or edit a page, change metadata, the sitemap or robots, the so
 - `lib/build-log.ts`: the parts of the site with issue and PR numbers (`pr: null` shows "PR pending" and no link), the ticket-cycle steps, and the shared skills not used here with a reason. Links are built from the numbers for this repo only. Add a part and its PR number when a ticket lands.
 
 ## Placeholders
-`<Placeholder>` (`app/_components/placeholder.tsx`) renders a muted paragraph with the visible label "Placeholder:" and `data-placeholder`. List what is left: `grep -r data-placeholder out/` after a build. Replacing one with real copy is deleting the component, nothing else. No check fails while placeholders remain.
+`<Placeholder>` (`app/_components/placeholder.tsx`) renders a muted paragraph with the visible label "Placeholder:" and `data-placeholder`. List what is left: `grep -r data-placeholder out/` after a build. Replacing one with real copy is deleting the component, nothing else. No check fails while placeholders remain. About has none left: its three text sections are the owner's own paragraphs (a test compares them with `tests/about-text.ts`; change both together), and the two names in "What I am learning" are plain links.
 
 ## Metadata
 - Root layout: `title: { default, template: "%s · Xindong Deng (Josh)" }`, `metadataBase`. A page passes the bare title.

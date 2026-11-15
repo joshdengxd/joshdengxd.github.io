@@ -171,7 +171,8 @@ A later ticket brings both back with real content and the motion layer.
 Warnings left on purpose (the inspector only warns about these):
 - `hero-void` on `/blog/` and the tag pages (about 29% of the first screen is empty at 1440 px): the empty block sits beside the reading column, the page's one rest; the list is held to the reading measure on purpose.
 - `name-only-title` on the tag pages: the h1 is `Tagged <tag>` and the line under it repeats the tag in plain words.
-- `grey-body` on `/about/` and the project pages (1440 px and down): the running text is the placeholder paragraphs, muted on purpose (4.5:1 or more) so they never read as final copy; real copy replaces them in the full ink.
+- `grey-body` on the project pages (1440 px and down): the running text is the placeholder paragraphs, muted on purpose (4.5:1 or more) so they never read as final copy; real copy replaces them in the full ink. `/about/` has real copy now (tickets #34-#36) and no longer warns.
+- `lopsided` on `/about/` (1440 px): each section is its text held to the reading measure, with the right of the page empty, the page's one rest, as on `/blog/`. On a tablet (48 to 64 rem) the About paragraphs take the full width, so the two margins stay level (the `off-centre` rule).
 - `hero-void` on `/about/`, `/projects/` and the project pages (about 30% of the first screen at 1440 px): the short title leaves the right of the reading column empty, the page's one rest, as on `/blog/`.
 - Home (`/`) is a new layout: the D5 first screen (name and panel, one viewport high), then Focus, Featured repos and Latest posts on the ground, one column set per section and the footer line. It passes with no WARN.
 - `palette-cream` on `/design/`: the light theme's ground `#f3f0e6`, the owner's chosen light ground from the D5 light mockup. The specimen shows it; on the site it appears only after the toggle.

@@ -14,6 +14,7 @@ import sitemap from "@/app/sitemap";
 import { issueUrl, pullUrl } from "@/lib/build-log";
 import type { Post } from "@/lib/posts/loader";
 import { PROJECTS } from "@/lib/projects";
+import { ABOUT_LINKS, ABOUT_TEXT } from "../about-text";
 
 vi.mock("next/navigation", () => ({
   usePathname: () => "/",
@@ -90,6 +91,25 @@ describe("About", () => {
     expect(screen.getByRole("link", { name: "LinkedIn" })).toHaveAttribute("href", LINKEDIN_URL);
     expect(aboutMeta.robots).toBeUndefined();
     expect(aboutMeta.title).toBe("About");
+  });
+});
+
+describe("About text", () => {
+  it.each(Object.entries(ABOUT_TEXT))(
+    "%s shows the approved text word for word and no placeholder",
+    (title, expected) => {
+      const { container } = render(<AboutPage />);
+      const section = screen.getByRole("region", { name: title });
+      expect(Array.from(section.querySelectorAll("p"), (p) => p.textContent)).toEqual(expected);
+      expect(container.querySelector("[data-placeholder]")).toBeNull();
+    },
+  );
+
+  it("links the two names to their own pages", () => {
+    render(<AboutPage />);
+    for (const { name, href } of ABOUT_LINKS) {
+      expect(screen.getByRole("link", { name })).toHaveAttribute("href", href);
+    }
   });
 });
 

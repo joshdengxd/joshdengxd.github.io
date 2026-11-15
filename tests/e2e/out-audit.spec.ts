@@ -6,6 +6,7 @@ import { join, relative, sep } from "node:path";
 import { expect, test } from "@playwright/test";
 import { REPO_URL } from "../../lib/build-log";
 import { PROJECTS } from "../../lib/projects";
+import { ABOUT_LINKS } from "../about-text";
 
 const OUT = join(process.cwd(), "out");
 const ORIGIN = "https://joshdengxd.github.io";
@@ -203,8 +204,8 @@ test.describe("placeholders", () => {
     expect(total).toBeGreaterThan(5);
   });
 
-  test("the v1 pages each have at least one placeholder", () => {
-    for (const path of ["/", "/about/", ...PROJECTS.map((p) => `/projects/${p.slug}/`)]) {
+  test("the v1 pages that still have placeholder copy each have at least one (About has none left)", () => {
+    for (const path of ["/", ...PROJECTS.map((p) => `/projects/${p.slug}/`)]) {
       expect(pages.find((p) => p.path === path)?.html, path).toContain("data-placeholder");
     }
   });
@@ -235,15 +236,20 @@ test.describe("personal details", () => {
     const home = pages.find((p) => p.path === "/")!;
     expect(home.text).toContain("Alberta, Canada");
     for (const p of pages) {
-      expect(p.text.replace(/Alberta, Canada/g, ""), p.file).not.toMatch(/Alberta|Canada/);
+      // The Background text names the university and two employers with Alberta in their names (ticket #34).
+      const rest = p.text
+        .replace(/Alberta, Canada/g, "")
+        .replace(/University of Alberta|Alberta Motor Association|College of Registered Nurses of Alberta/g, "");
+      expect(rest, p.file).not.toMatch(/Alberta|Canada/);
     }
   });
 
-  test("outside links go only to the GitHub and LinkedIn profiles, the three public repos and this repo's issues and PRs", () => {
+  test("outside links go only to the GitHub and LinkedIn profiles, the three public repos, the two people About names and this repo's issues and PRs", () => {
     const allowed = [
       "https://github.com/joshdengxd",
       "https://www.linkedin.com/in/josh-deng-edm",
       ...PROJECTS.map((p) => p.repoUrl),
+      ...ABOUT_LINKS.map((l) => l.href), // Matt Pocock and Lauren Tan, in About (ticket #35)
     ];
     const issueOrPull = new RegExp(`^${REPO_URL.replace(/[.]/g, "\\.")}/(?:issues|pull)/\\d+$`);
     for (const p of pages) {
