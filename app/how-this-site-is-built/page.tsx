@@ -15,7 +15,7 @@ export default function Page() {
   return (
     <PageLayout
       title="How this site is built"
-      lead="Every change here goes through a ticket, checks and a pull request. The issues and PRs are the demo."
+      lead="Every change here goes through a ticket, checks and a pull request. Agents, code and tests verify the work; I decide what gets built and sample the results. The issues and PRs are the demo."
     >
       <Section title="Workflow">
         <ol className={pageStyles.rows}>

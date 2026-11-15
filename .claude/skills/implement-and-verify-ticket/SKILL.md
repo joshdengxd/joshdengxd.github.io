@@ -9,7 +9,7 @@ Third stage of the ticket workflow: create -> refine -> implement and verify -> 
 
 ## Workflow states (shared by the ticket skills)
 Backlog -> Refined -> In progress -> In review -> Done.
-This skill moves a ticket from Refined (or back from In review) to **In progress** when work starts; it stays there until `land-ticket`. A ticket reaches Done by a person, or by `land-ticket` when the project sets "Landed tickets go to: Done". When states are labels, each move replaces the previous state label. The user's request to implement this ticket is the approval for that move and for comments it posts.
+This skill moves a ticket from Refined (or back from In review) to **In progress** when work starts; it stays there until `land-ticket`. A ticket reaches Done by `land-ticket` when the project sets "Landed tickets go to: Done", or by a person after trying it. When states are labels, each move replaces the previous state label. The user's request to implement this ticket is the approval for that move and for comments it posts.
 
 ## Project settings
 Read the project's `AGENTS.md` (section "Ticket workflow settings"): tracker and repo, identity (use it for every push, PR and tracker call), default branch, how states are shown (board column or label; default label `in-progress`), check commands (type check, lint, unit, e2e), run command, max fix rounds (default 3). If a setting is missing, use the default and say so; where there is no default, ask. Commands have no default, with one exception: when this ticket's refinement is the one that defines them, use the commands it adds to `AGENTS.md` on the branch.
@@ -40,12 +40,12 @@ If the ticket is not refined, say so and suggest `refine-ticket` first; continue
 7. **PR.** Open a PR to the default branch (or update the existing one):
    - title: the ticket title followed by the ticket reference in parentheses: `(#N)` for GitHub, `(KEY-123)` for Jira;
    - body: `Refs #N` or `Refs KEY-123` (never `Closes`/`Fixes`/`Resolves`, so merging does not close the ticket before `land-ticket` has checked the deployed result); `Verified at <commit sha>`; the criteria table (criterion, phase, how checked, status, evidence); the code-review verdict; the docs consulted (library, version, topic, source); the check results; the landing steps copied from the refinement summary.
-   Every push after verification means verifying again and rewriting the body, `Verified at` included. Leave it for a person to review; landing is `land-ticket`.
+   Every push after verification means verifying again and rewriting the body, `Verified at` included. The machine gates have already run; a person may add a review by hand when driving step by step. Landing is `land-ticket`.
 
 ## When a ticket goes back
 | Event | Ticket goes to | Moved by | Next |
 |---|---|---|---|
-| Review asks for changes | stays In progress | - | this skill again; it continues on the PR |
+| Review asks for changes (a person's, or a failed gate) | stays In progress | - | this skill again; it continues on the PR |
 | PR closed without merging | Refined (or Backlog if the plan is wrong), with a comment why | whoever closes it | refine again if needed, then this skill on a new branch |
 | Deploy or deployed check fails after merge | stays In progress | `land-ticket` | this skill on a new branch to fix forward, or a person reverts |
 | A revert is merged | Refined, with a comment linking the revert | the person who reverts | refine again if needed |
@@ -56,5 +56,5 @@ If the ticket is not refined, say so and suggest `refine-ticket` first; continue
 - The verifiers never see the implementer's reasoning or earlier verdicts.
 - **Could not check** never counts as met.
 - Never skip, disable or loosen a check, and never edit a test just to make it pass.
-- Merge is always a human decision: a person asks for it (`land-ticket`) or starts a `drain-refined` run.
+- Never merge from this skill: a merge happens only through `land-ticket`, which a person asks for or which a `drain-refined` run the person started calls.
 - If this skill already runs inside a subagent that cannot start its own subagents, stop after step 3 and return; the caller starts the verifiers and the fix rounds.
