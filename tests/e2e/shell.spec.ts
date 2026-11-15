@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { PROJECTS } from "../../lib/projects";
+import { MERGED_PRS_URL, PROJECT_BOARD_URL } from "../../lib/site";
 
 const HOME_LABEL = "Josh Deng, home";
 const NAV = [
@@ -311,7 +312,7 @@ test.describe("without JavaScript, on a phone", () => {
 });
 
 test.describe("personal details", () => {
-  test("the shell shows no contact detail, and outside links go only to GitHub, LinkedIn, the public repos and this repo's issues and PRs", async ({
+  test("the shell shows no contact detail, and outside links go only to GitHub, LinkedIn, the public repos, the project board and the merged pull requests", async ({
     page,
   }) => {
     const outside = new Set<string>();
@@ -331,13 +332,11 @@ test.describe("personal details", () => {
       "https://github.com/joshdengxd/josh-shared-skills",
       "https://github.com/joshdengxd/job-search-skills",
       "https://github.com/joshdengxd/joshdengxd.github.io",
+      PROJECT_BOARD_URL,
+      MERGED_PRS_URL,
     ];
     for (const href of outside) {
-      expect(
-        allowed.includes(href) ||
-          /^https:\/\/github\.com\/joshdengxd\/joshdengxd\.github\.io\/(issues|pull)\/\d+$/.test(href),
-        href,
-      ).toBe(true);
+      expect(allowed.includes(href), href).toBe(true);
     }
     for (const href of allowed) {
       expect([...outside], href).toContain(href);
