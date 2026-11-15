@@ -1,14 +1,11 @@
 import { render, screen, within } from "@testing-library/react";
 import { GITHUB_URL, HOME_LABEL, LINKEDIN_URL } from "@/app/_shell/links";
 import NotFound, { metadata as notFoundMetadata } from "@/app/not-found";
-import Home from "@/app/page";
+import { HomeView } from "@/app/_home/home-view";
 
-describe("placeholder pages", () => {
-  it("home shows the placeholder sentence", () => {
-    render(<Home />);
-    expect(screen.getByText(/under construction/i)).toBeInTheDocument();
-  });
+const Home = () => <HomeView posts={[]} />;
 
+describe("home page and 404", () => {
   it("home shows the name as its heading, revealed line by line, as the current home mark", () => {
     render(<Home />);
     const h1 = screen.getByRole("heading", { level: 1, name: HOME_LABEL });
@@ -36,6 +33,6 @@ describe("placeholder pages", () => {
     expect(screen.getByRole("heading", { level: 1, name: "Page not found" })).toBeInTheDocument();
     expect(screen.getByText("This page does not exist.")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Back to the home page" })).toHaveAttribute("href", "/");
-    expect(notFoundMetadata.title).toBe("Page not found · Xindong Deng (Josh)");
+    expect(notFoundMetadata.title).toBe("Page not found");
   });
 });

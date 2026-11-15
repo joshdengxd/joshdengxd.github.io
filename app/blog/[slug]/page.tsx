@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getPosts } from "@/lib/posts/loader";
-import { SITE_NAME } from "@/lib/site";
-import { blogMetadata, hiddenMetadata, rssLink } from "../_components/metadata";
+import { blogMetadata, hiddenMetadata } from "../_components/metadata";
 import { PostDate } from "../_components/post-date";
 import { TagLinks } from "../_components/tag-links";
 import styles from "../blog.module.css";
@@ -21,11 +20,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const post = (await getPosts()).find((p) => p.slug === slug);
   if (!post) return hiddenMetadata;
-  return {
-    ...blogMetadata(post.title, post.summary, `/blog/${post.slug}/`),
-    openGraph: { type: "article", title: `${post.title} · ${SITE_NAME}`, description: post.summary, publishedTime: post.date },
-    alternates: { canonical: `/blog/${post.slug}/`, types: rssLink },
-  };
+  const meta = blogMetadata(post.title, post.summary, `/blog/${post.slug}/`);
+  return { ...meta, openGraph: { ...meta.openGraph, type: "article", publishedTime: post.date } };
 }
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {

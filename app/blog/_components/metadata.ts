@@ -1,19 +1,15 @@
 import type { Metadata } from "next";
-import { SITE_NAME } from "@/lib/site";
+import { pageMetadata } from "@/lib/metadata";
 
 export const rssLink = { "application/rss+xml": "/rss.xml" };
 
-/** Title (with the site name), description, canonical URL and the feed's alternate link for a blog page. */
+/** The metadata every page has (see lib/metadata.ts) plus the feed's alternate link, for a blog page. */
 export function blogMetadata(title: string, description: string, path: string): Metadata {
-  return {
-    title: `${title} · ${SITE_NAME}`,
-    description,
-    alternates: { canonical: path, types: rssLink },
-  };
+  return { ...pageMetadata({ title, description, path }), alternates: { canonical: path, types: rssLink } };
 }
 
 /** The hidden `_none` page that keeps the static export valid when a route has nothing to generate. */
 export const hiddenMetadata: Metadata = {
-  title: `Page not found · ${SITE_NAME}`,
+  title: "Page not found",
   robots: { index: false, follow: false },
 };

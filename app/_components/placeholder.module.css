@@ -1,0 +1,9 @@
+/* Muted on both surfaces (4.5:1 or more on the ground and on the panel), so it never reads as final copy. */
+.placeholder {
+  color: var(--color-muted);
+  max-width: var(--measure);
+}
+
+.label {
+  font-weight: var(--weight-strong);
+}

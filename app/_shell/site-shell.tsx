@@ -12,7 +12,7 @@ import { ThemeToggle } from "./theme-toggle";
 /**
  * The D5 shell around every page. Wide screens: the panel on the right is the header (navigation, toggle).
  * Phones: one top row with the wordmark and a "Menu" sheet (<details>, so it opens without JavaScript).
- * On the home page the big name is the home mark, so there is no small wordmark and no footer line.
+ * On the home page the big name is the home mark, so there is no small wordmark; the footer line is on every page.
  */
 export function SiteShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -49,12 +49,10 @@ export function SiteShell({ children }: { children: ReactNode }) {
       <main id="main" tabIndex={-1} className={styles.main}>
         {children}
       </main>
-      {home ? null : (
-        <footer className={styles.footer}>
-          <p>Xindong Deng (Josh)</p>
-          <ProfileLinks />
-        </footer>
-      )}
+      <footer className={styles.footer}>
+        <p>Xindong Deng (Josh)</p>
+        <ProfileLinks />
+      </footer>
     </div>
   );
 }

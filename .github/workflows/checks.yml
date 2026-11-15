@@ -35,8 +35,10 @@ jobs:
           npm run check:fixture
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
-      - name: Build and e2e
+      - name: Build and e2e (blog fixture build)
         run: npm run e2e
+      - name: Build and e2e (default build)
+        run: npm run e2e:default
       - name: Upload e2e results on failure
         if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
