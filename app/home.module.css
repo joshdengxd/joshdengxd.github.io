@@ -1,0 +1,37 @@
+/* Direction D5 on the placeholder home: the name fills the left, a panel one step lighter on the right.
+   The layout shell and navigation come later; this keeps only the name and the intro. */
+.home {
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--width-panel);
+}
+
+.name {
+  align-self: end;
+  padding: var(--margin-page);
+}
+
+.panel {
+  background: var(--color-panel);
+  padding: var(--margin-page);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--space-4);
+}
+
+.intro {
+  font-size: var(--step-lead);
+}
+
+.note {
+  color: var(--color-muted);
+}
+
+/* Below desktop the panel moves under the name. */
+@media (max-width: 63.99rem) {
+  .home {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 1fr auto;
+  }
+}

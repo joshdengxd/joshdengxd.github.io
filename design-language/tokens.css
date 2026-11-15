@@ -1,0 +1,116 @@
+/*
+ * Design tokens, direction D5 ("name as a monument", stacked, two-tone name).
+ * The site imports this file once, in the root layout. See README.md for the reasons.
+ *
+ * Colour roles come in two kinds:
+ *   text roles  (--color-ink, --color-muted, --color-accent): any size, WCAG AA 4.5:1 on every surface
+ *   display roles (--color-name-first, --color-name-last): the name only, large and heavy, AA 3:1
+ * Surfaces: --color-ground (page), --color-panel (one step lighter).
+ * tests/unit/tokens.test.ts checks every text/surface pair of both themes.
+ */
+
+/* Dark is the default for every visitor, with or without JavaScript. */
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+  --color-ground: #1e2c23;
+  --color-panel: #2a3b2f;
+  --color-ink: #c2d2b8;
+  --color-muted: #98a694;
+  --color-accent: #c49a5a;
+  --color-name-first: #c49a5a;
+  --color-name-last: #a9bd9d;
+}
+
+/* Light only through the toggle; the choice is stored as localStorage "theme". */
+[data-theme="light"] {
+  color-scheme: light;
+  --color-ground: #f3f0e6;
+  --color-panel: #dfe5d6;
+  --color-ink: #2c4a35;
+  --color-muted: #57645a;
+  --color-accent: #855a21;
+  --color-name-first: #a8742f;
+  --color-name-last: #3f6447;
+}
+
+:root {
+  /* Families. The face variables are set on <html> by next/font/local (app/fonts.ts). */
+  --font-text: var(--font-archivo-face), system-ui, sans-serif;
+  --font-code: var(--font-code-face), monospace;
+
+  /* Type steps: five sizes do the work. */
+  --step-name: min(43svh, 30vw);
+  --step-name-narrow: min(43svh, 48vw); /* phones: the name runs margin to margin */
+  --step-title: clamp(2rem, 1.25rem + 3vw, 3.5rem);
+  --step-lead: 1.5rem;
+  --step-body: 1.0625rem;
+  --step-small: 0.875rem;
+
+  /* Type settings */
+  --weight-text: 400;
+  --weight-strong: 500;
+  --weight-title: 700;
+  --weight-name: 800;
+  --stretch-text: 100%;
+  --stretch-name: 62%;
+  --leading-name: 0.82;
+  --leading-title: 1;
+  --leading-text: 1.5;
+  --tracking-name: -0.03em;
+  --tracking-title: -0.02em;
+  --measure: 65ch;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
+  --space-10: 8rem;
+  --margin-page: clamp(1rem, 0.5rem + 2vw, 2rem);
+  --width-panel: 21.25rem;
+
+  /* Radius: square corners; the full round is kept for a control that must read as a toggle. */
+  --radius-none: 0;
+  --radius-round: 9999px;
+
+  /* Motion: one effect in v1, the name revealed from below on load. */
+  --duration-reveal: 700ms;
+  --delay-reveal-step: 90ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --distance-reveal: 100%;
+}
+
+/* The reveal utility: wrap each line in .reveal-mask, put the text in .reveal-line. */
+.reveal-mask {
+  display: block;
+  overflow: hidden;
+  /* room for the cap tops so the mask never clips the letters */
+  padding-block-start: 0.06em;
+}
+
+.reveal-line {
+  display: block;
+  animation: reveal-from-below var(--duration-reveal) var(--ease-out) both;
+  animation-delay: calc(var(--reveal-index, 0) * var(--delay-reveal-step));
+}
+
+@keyframes reveal-from-below {
+  from {
+    transform: translateY(var(--distance-reveal));
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-line {
+    animation: none;
+  }
+}
