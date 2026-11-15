@@ -31,6 +31,15 @@ summary: One or two sentences (1-300 characters).
 - The regex engine is Shiki's JavaScript one (no WebAssembly file, works in Vitest and the Next build).
 - Why author text cannot leak: the Shiki output is built from the code text only. Its attributes are `class` (`shiki css-variables`, `line`), `style` (`var(--shiki-*)`) and `tabindex`; a `language-*` class the author wrote is dropped before Shiki reads it when that language is not loaded, and Shiki drops the element anyway. `tests/unit/posts-markdown.test.ts` has the check, including footnote ids (they are still the only ids).
 
+## Images in posts (ticket #41)
+- Put the file in `public/blog/<slug>/` (the post's slug) and write `![alt text](diagram.svg "Caption")` in the post: the file name only. The page serves it as `/blog/<slug>/diagram.svg`. Formats: `.svg`, `.png`, `.jpg`, `.jpeg`, `.webp` (no GIF or video; motion is ticket #10). The caption (the Markdown title string) is optional.
+- The picture must stand alone in its own paragraph (not in a sentence, link, list or table). Alt text is required.
+- Each of these fails `npm run build` with `content/posts/<file>.md: body: line N: <message>`: empty alt text, a remote URL, a path (`/` or `..`), a data URL, a file that is not in the post's folder, another format, a file whose size cannot be read, a picture that is not alone in its paragraph.
+- Output: `<figure><div><img ...></div><figcaption>...</figcaption></figure>`. `lib/posts/markdown.ts` (`rehypePictures`) writes it after `rehype-sanitize`, so sanitizing is unchanged and raw HTML is still refused. The `<img>` gets the file's real `width` and `height` (read with `image-size`; an SVG needs a `viewBox` or width and height), `loading="lazy"` and `decoding="async"`; CSS makes it `max-width: 100%; height: auto`, so the space is reserved from the aspect ratio and nothing shifts when the file loads.
+- Look: the `<div>` is a plate in `--color-plate` (`#f3f0e6` in both themes, tokens.css), so a light diagram stays readable on the dark theme. The caption is muted text under it.
+- Without an image folder (`renderMarkdown(markdown)` with no second argument, as the `/design/` sample does) pictures are dropped.
+- Fixture: the fixture post ends with a picture; its file is `tests/fixtures/post-images/blog-engine-fixture/diagram.svg`, never in `public/`. `scripts/build-fixture.mjs` copies that folder into `out/blog/` after the build, and `check:fixture` fails if a fixture slug is in any path under `out/`.
+
 ## Test fixture
 - `tests/fixtures/posts/` holds two test posts (one with code blocks in several languages, one with an unknown and one with no language, and a GFM table; the second sits 30 minutes after midnight UTC for the time-zone tests). They load only when `BLOG_FIXTURES=1`.
 - `npm run e2e` builds with the flag through `scripts/run-e2e.mjs fixture` (which calls `scripts/build-fixture.mjs`, Windows-safe). The default build never reads them; `npm run e2e:default` tests that build (home shows "No posts yet").
