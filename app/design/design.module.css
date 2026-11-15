@@ -222,6 +222,12 @@
   background: var(--color-name-last);
 }
 
+/* The plate sample: the colour under every picture in a post. */
+.plate {
+  height: var(--space-8);
+  background: var(--color-plate);
+}
+
 /* One line per code colour: the ratio text is set in the colour it measures, on the code background. */
 .codeRoles {
   list-style: none;

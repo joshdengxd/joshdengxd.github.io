@@ -55,4 +55,10 @@ a block with no language, and a line that is long enough to scroll inside its bl
 | Loader | Reads the Markdown files |
 | Pipeline | Turns Markdown into safe HTML |
 
+## A picture
+
+![Diagram of a Markdown file turning into a figure](diagram.svg "Figure 1: the build turns the picture into a figure")
+
+![The same diagram without a caption](diagram.svg)
+
 A [link to the blog](/blog/) and some `inline code`.

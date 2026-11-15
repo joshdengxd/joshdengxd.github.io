@@ -89,6 +89,7 @@ Check code against the current docs for these versions before writing or approvi
 - shiki 4.6.0 (build-time code highlighting, CSS-variables theme, JavaScript regex engine): shikijs/shiki
 - @shikijs/rehype 4.6.0 (the rehype plugin; import the default export from `@shikijs/rehype/core`): shikijs/shiki (its docs live in the same repo)
 - yaml 2.9.1 (post front matter): eemeli/yaml (use `--version v2.9.1`)
+- image-size 2.1.0 (build-time picture sizes for blog posts; buffer API `imageSize(buffer)`, no `fromFile` needed): image-size/image-size
 - zod 4.6.7 (front matter schema): colinhacks/zod (use `--version v4.6.7`)
 - GitHub Actions (checkout v7, setup-node v7, configure-pages v6, upload-pages-artifact v5, deploy-pages v5, upload-artifact v7, dependabot/fetch-metadata v3.1.0): each action's README at its pinned tag
 - npm override in `package.json`: `@typescript-eslint/typescript-estree` gets `minimatch ^11.0.1`, because its own `^10.2.2` range is in a Dependabot advisory (`>= 7.0.0, < 11.0.1`); scoped to that one package, since the other users need minimatch 3.x. Remove it when `@typescript-eslint/typescript-estree` requires minimatch >= 11.0.1.

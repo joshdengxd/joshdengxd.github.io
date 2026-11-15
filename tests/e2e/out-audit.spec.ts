@@ -222,11 +222,20 @@ test.describe("personal details", () => {
     ["a photo", /<img[\s>]/i],
   ];
 
+  // A blog post may show its own pictures (ticket #41): an <img> whose src is in that post's folder, /blog/<slug>/.
+  // Every other <img>, and any <img> on any other page, is still a photo. The src may sit in the page's HTML or, escaped,
+  // in the data the page carries for the client.
+  const photoPattern = (p: Page): RegExp => {
+    const slug = /^\/blog\/([a-z0-9-]+)\/$/.exec(p.path)?.[1];
+    return slug ? new RegExp(`<img(?![^>]*[ ]src=.?"/blog/${slug}/[A-Za-z0-9._-]+.?")(?![A-Za-z])`, "i") : /<img[\s>]/i;
+  };
+
   test("no page shows a city, email, phone number, job-search status or photo", () => {
     for (const p of pages) {
       for (const [what, pattern] of FORBIDDEN) {
         const where = what === "a photo" ? p.html : p.text;
-        expect(pattern.test(where), `${p.file} shows ${what}`).toBe(false);
+        const re = what === "a photo" ? photoPattern(p) : pattern;
+        expect(re.test(where), `${p.file} shows ${what}`).toBe(false);
       }
     }
   });

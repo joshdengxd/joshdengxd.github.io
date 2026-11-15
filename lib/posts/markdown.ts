@@ -1,4 +1,7 @@
+import { readdirSync, readFileSync, statSync } from "node:fs";
+import { join } from "node:path";
 import rehypeShikiFromHighlighter from "@shikijs/rehype/core";
+import { imageSize } from "image-size";
 import rehypeSanitize, { defaultSchema, type Options } from "rehype-sanitize";
 import rehypeStringify from "rehype-stringify";
 import remarkGfm from "remark-gfm";
@@ -9,7 +12,14 @@ import { createCssVariablesTheme } from "shiki/core";
 import { createJavaScriptRegexEngine } from "shiki/engine/javascript";
 import { unified } from "unified";
 
-type MdNode = { type: string; children?: MdNode[]; position?: { start: { line: number } } };
+type MdNode = {
+  type: string;
+  children?: MdNode[];
+  position?: { start: { line: number } };
+  value?: string;
+  url?: string;
+  alt?: string | null;
+};
 
 // Build time only: nothing in here is imported by a client component, so none of it ships to the browser.
 const parser = unified().use(remarkParse).use(remarkGfm);
@@ -70,8 +80,169 @@ export const HIGHLIGHT_LANGUAGES = [
 // Every colour comes from the variables in design-language/tokens.css, so the theme switch needs nothing extra.
 const CODE_THEME = createCssVariablesTheme({ name: "css-variables", variablePrefix: "--shiki-", fontStyle: true });
 
-type HastNode = { tagName?: string; properties?: Record<string, unknown>; children?: HastNode[] };
-type Processor = { process(markdown: string): Promise<{ toString(): string }> };
+// Pictures in posts (ticket #41). A post names a file only by its bare name, `![alt text](diagram.svg "Caption")`; the file
+// sits in the post's image folder (public/blog/<slug>/, copied into the site as it is) and the build maps the name to
+// /blog/<slug>/<name>. Two steps: `checkImages` runs on the Markdown tree, before sanitizing (a data: URL would be
+// stripped by the sanitizer and could no longer be named), and fails the build with the line; `figureImages` runs after
+// rehype-sanitize, the same place as Shiki, and writes the <figure> from the sanitized `img` (a bare src, alt, title).
+// Sanitizing itself is unchanged, and raw HTML stays refused.
+export const IMAGE_EXTENSIONS = ["svg", "png", "jpg", "jpeg", "webp"] as const;
+const IMAGE_NAME = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
+/** The type image-size reports for each allowed extension. */
+const IMAGE_TYPES: Record<string, string> = { svg: "svg", png: "png", jpg: "jpg", jpeg: "jpg", webp: "webp" };
+
+/** Where a post's pictures are: its slug (for the public path) and the folder that holds the files. */
+export type ImageContext = { slug: string; imageDir?: string };
+
+/** A picture problem. `line` is 1-based within the Markdown body; the loader adds the front matter and names the file. */
+export class ImageError extends Error {
+  constructor(
+    message: string,
+    readonly line?: number,
+  ) {
+    super(message);
+    this.name = "ImageError";
+  }
+}
+
+/** The file names in a folder (exact case, on every platform); none when the folder does not exist. */
+function listFiles(dir: string): string[] {
+  return statSync(dir, { throwIfNoEntry: false })?.isDirectory()
+    ? readdirSync(dir, { withFileTypes: true })
+        .filter((e) => e.isFile())
+        .map((e) => e.name)
+    : [];
+}
+
+/** Checks one picture name against the image folder and returns its real size (what the browser shows, EXIF turn included). */
+function inspectImage(name: string, ctx: ImageContext | undefined): { width: number; height: number } {
+  const shown = JSON.stringify(name);
+  const where = ctx ? `public/blog/${ctx.slug}/` : "the post's image folder";
+  if (/^[a-z][a-z0-9+.-]*:/i.test(name) || name.startsWith("//")) {
+    throw new ImageError(
+      `image ${shown}: remote and data URLs are not allowed; put the file in ${where} and use its file name`,
+    );
+  }
+  if (/[\\/]/.test(name) || name.includes("..")) {
+    throw new ImageError(`image ${shown}: use only a file name, not a path; the file sits in ${where}`);
+  }
+  const ext = name.includes(".") ? name.slice(name.lastIndexOf(".") + 1).toLowerCase() : "";
+  if (!IMAGE_NAME.test(name) || !(ext in IMAGE_TYPES)) {
+    throw new ImageError(
+      `image ${shown}: the format must be ${IMAGE_EXTENSIONS.join(", ")} and the name only letters, digits, dot, hyphen or underscore`,
+    );
+  }
+  if (!ctx?.imageDir || !listFiles(ctx.imageDir).includes(name)) {
+    throw new ImageError(`image ${shown}: no such file in ${where}`);
+  }
+  let size: ReturnType<typeof imageSize>;
+  try {
+    size = imageSize(readFileSync(join(ctx.imageDir, name)));
+  } catch (error) {
+    throw new ImageError(`image ${shown}: cannot read the size (${(error as Error).message})`);
+  }
+  if (size.type !== IMAGE_TYPES[ext] || !size.width || !size.height) {
+    throw new ImageError(`image ${shown}: the file is not a valid .${ext} image`);
+  }
+  const turned = (size.orientation ?? 1) >= 5; // EXIF 5-8: the browser shows the picture turned by 90 degrees
+  return turned ? { width: size.height, height: size.width } : { width: size.width, height: size.height };
+}
+
+type FileData = { data: object };
+const imagesOf = (file: FileData) => (file.data as { images?: ImageContext }).images;
+
+/** Markdown tree step: every picture needs alt text, a bare file name that exists, and a paragraph of its own. */
+const checkImages = () => (tree: object, file: FileData) => {
+  const ctx = imagesOf(file);
+  const walk = (node: MdNode, parent?: MdNode) => {
+    const line = node.position?.start.line;
+    if (node.type === "imageReference") {
+      throw new ImageError('image: use the inline form ![alt text](file.png "Caption")', line);
+    }
+    if (node.type === "image") {
+      try {
+        if (!node.alt?.trim()) {
+          throw new ImageError("image: alt text is required, write it inside the brackets: ![alt text](file.png)");
+        }
+        const others = (parent?.children ?? []).filter((c) => c !== node && !(c.type === "text" && !c.value?.trim()));
+        if (parent?.type !== "paragraph" || others.length > 0) {
+          throw new ImageError("image: put the picture in a paragraph of its own, with no other text or link");
+        }
+        inspectImage(node.url ?? "", ctx);
+      } catch (error) {
+        throw error instanceof ImageError ? new ImageError(error.message, line) : error;
+      }
+    }
+    node.children?.forEach((child) => walk(child, node));
+  };
+  walk(tree as MdNode);
+};
+
+type HastNode = {
+  type?: string;
+  value?: string;
+  tagName?: string;
+  properties?: Record<string, unknown>;
+  children?: HastNode[];
+};
+
+/** After rehype-sanitize: a paragraph that holds one `img` becomes <figure> with the size, lazy loading and the caption. */
+const figureImages = () => (tree: object, file: FileData) => {
+  const ctx = imagesOf(file);
+  const toFigure = (img: HastNode): HastNode => {
+    const name = String(img.properties?.src ?? "");
+    const alt = String(img.properties?.alt ?? "").trim();
+    if (!alt) {
+      throw new ImageError(`image ${JSON.stringify(name)}: alt text is required`);
+    }
+    const { width, height } = inspectImage(name, ctx);
+    const figure: HastNode = {
+      type: "element",
+      tagName: "figure",
+      properties: {},
+      children: [
+        {
+          type: "element",
+          tagName: "img",
+          properties: { src: `/blog/${ctx?.slug}/${name}`, alt, width, height, loading: "lazy", decoding: "async" },
+          children: [],
+        },
+      ],
+    };
+    const caption = String(img.properties?.title ?? "").trim();
+    if (caption) {
+      figure.children?.push({
+        type: "element",
+        tagName: "figcaption",
+        properties: {},
+        children: [{ type: "text", value: caption }],
+      });
+    }
+    return figure;
+  };
+  const walk = (node: HastNode) => {
+    node.children = node.children?.map((child) => {
+      if (child.tagName === "p") {
+        const content = (child.children ?? []).filter((c) => !(c.type === "text" && !c.value?.trim()));
+        if (content.length === 1 && content[0].tagName === "img") {
+          return toFigure(content[0]);
+        }
+      }
+      if (child.tagName === "img") {
+        throw new ImageError(
+          `image ${JSON.stringify(child.properties?.src ?? "")}: put the picture in a paragraph of its own`,
+        );
+      }
+      walk(child);
+      return child;
+    });
+  };
+  walk(tree as HastNode);
+};
+
+type Processor = {
+  process(input: { value: string; data: { images?: ImageContext } }): Promise<{ toString(): string }>;
+};
 let processor: Promise<Processor> | undefined;
 
 async function buildProcessor(): Promise<Processor> {
@@ -102,8 +273,10 @@ async function buildProcessor(): Promise<Processor> {
   return unified()
     .use(remarkParse)
     .use(remarkGfm)
+    .use(checkImages)
     .use(remarkRehype)
     .use(rehypeSanitize, schema)
+    .use(figureImages)
     .use(dropUnknownLanguages)
     .use(rehypeShikiFromHighlighter, highlighter, {
       theme: "css-variables",
@@ -113,8 +286,11 @@ async function buildProcessor(): Promise<Processor> {
     .use(rehypeStringify);
 }
 
-/** Markdown to sanitized, highlighted HTML. Never outputs raw HTML from the source or a javascript: link. */
-export async function renderMarkdown(markdown: string): Promise<string> {
+/**
+ * Markdown to sanitized, highlighted HTML. Never outputs raw HTML from the source or a javascript: link.
+ * `images` says where the post's pictures are; without it a picture is an error. A bad picture throws an ImageError.
+ */
+export async function renderMarkdown(markdown: string, images?: ImageContext): Promise<string> {
   processor ??= buildProcessor();
-  return String(await (await processor).process(markdown));
+  return String(await (await processor).process({ value: markdown, data: { images } }));
 }

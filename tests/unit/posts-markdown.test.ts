@@ -27,11 +27,14 @@ describe("the Markdown pipeline", () => {
     "[x](JaVaScRiPt:alert(1))",
     "[x](vbscript:alert(1))",
     "[x](data:text/html;base64,PHNjcmlwdD4=)",
-    "![x](javascript:alert(1))",
     "<javascript:alert(1)>",
   ])("never outputs a script link for %s", async (markdown) => {
     const html = await renderMarkdown(markdown);
     expect(html).not.toMatch(/(href|src)="(javascript|vbscript|data):/i);
+  });
+
+  it("refuses, rather than outputs, a picture with a script source (ticket #41: pictures are bare file names only)", async () => {
+    await expect(renderMarkdown("![x](javascript:alert(1))")).rejects.toThrow("remote and data URLs are not allowed");
   });
 
   it("keeps ordinary relative and https links", async () => {

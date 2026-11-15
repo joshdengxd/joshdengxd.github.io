@@ -220,3 +220,16 @@ test("the name rises from below on load", async ({ page }) => {
   await expect(page.getByRole("heading", { level: 1, name: "Josh Deng, home" })).toBeVisible();
   await expect(page.locator("h1")).toHaveText(/Josh\s*Deng/);
 });
+
+test("/design/ shows the picture plate in both themes with a passing ratio for each check", async ({ page }) => {
+  await page.goto("/design/");
+  await expect(page.getByRole("heading", { level: 2, name: "Picture plate" })).toBeVisible();
+  const rows = page.locator("li[data-plate-pair]");
+  await expect(rows).toHaveCount(3);
+  for (const text of await rows.allTextContents()) {
+    expect(text).toMatch(/\d+\.\d\d:1, needs \d(\.\d)?:1, passes/);
+  }
+  for (const theme of ["dark", "light"]) {
+    await expect(page.locator(`[data-plate="${theme}"]`)).toHaveCSS("background-color", "rgb(243, 240, 230)");
+  }
+});

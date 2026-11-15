@@ -87,6 +87,7 @@ Two surfaces and five text roles. Text roles appear at any size and need WCAG 2.
 | `--color-accent` | links, current page, focus | `#c49a5a` | `#855a21` |
 | `--color-name-first` | JOSH | `#c49a5a` | `#a8742f` |
 | `--color-name-last` | DENG | `#a9bd9d` | `#3f6447` |
+| `--color-plate` | the plate under a picture in a post (see Picture plate) | `#f3f0e6` | `#f3f0e6` |
 
 Contrast (text on ground / on panel):
 
@@ -97,6 +98,15 @@ Contrast (text on ground / on panel):
 | accent | 4.5 | 5.64 / 4.60 | 5.29 / 4.69 |
 | name-first | 3 | 5.64 / 4.60 | 3.54 / 3.14 |
 | name-last | 3 | 7.26 / 5.92 | 5.89 / 5.22 |
+
+### Picture plate
+
+Every picture in a blog post sits on one light plate, `--color-plate`, in both themes (the light theme's ground colour), so a light diagram stays readable in the dark theme. It is not a text or surface role, so it is not in the 20 pairs above; `tests/unit/tokens.test.ts` checks it separately: the dark ink of the light theme (`--color-ink`, what a picture is drawn in) must reach 4.5:1 on it, and in the dark theme the plate must reach 3:1 against the ground so it reads as a shape. `/design/` shows the plate and each ratio.
+
+| Check | Needs | Dark | Light |
+|---|---|---|---|
+| picture ink (`#2c4a35`) on the plate | 4.5 | 8.61 | 8.61 |
+| plate against the ground | 3 | 12.79 | not checked (same colour) |
 
 ### Code colours
 

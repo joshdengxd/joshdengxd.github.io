@@ -8,6 +8,7 @@ import {
   CODE_TEXT_ROLES,
   codeContrastPairs,
   contrastPairs,
+  platePairs,
   sharedTokens,
   THEMES,
   themeColours,
@@ -94,6 +95,7 @@ export default async function DesignPage() {
     return pair;
   };
   const codeHtml = await renderMarkdown(CODE_SAMPLE);
+  const plates = platePairs(css);
 
   return (
     <div className={styles.page}>
@@ -181,6 +183,36 @@ export default async function DesignPage() {
               </div>
             );
           })}
+        </div>
+      </section>
+
+      <section className={styles.section} aria-labelledby="plate">
+        <div className={styles.lead}>
+          <h2 id="plate" className={styles.heading}>
+            Picture plate
+          </h2>
+          <p>
+            Every picture in a post sits on one light plate, in both themes, so a light diagram stays readable in the
+            dark theme. The plate is checked against the dark ink a picture is drawn in (4.5:1) and, in the dark theme,
+            against the ground (3:1).
+          </p>
+        </div>
+        <div className={styles.body}>
+          {THEMES.map((theme) => (
+            <div key={theme} data-theme={theme} className={styles.theme}>
+              <h3 className={styles.subheading}>{THEME_NAME[theme]}</h3>
+              <div className={styles.plate} data-plate={theme} aria-hidden="true" />
+              <ul className={styles.codeRoles} aria-label={`Plate contrast, ${theme} theme`}>
+                {plates
+                  .filter((p) => p.theme === theme)
+                  .map((p) => (
+                    <li key={p.label} data-plate-pair={`${theme} ${p.label}`} className={styles.codeRole}>
+                      <code>{`${p.label}: ${p.ratio.toFixed(2)}:1, needs ${p.required}:1, ${p.passes ? "passes" : "fails"}`}</code>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </section>
 

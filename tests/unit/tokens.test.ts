@@ -10,6 +10,8 @@ import {
   contrast,
   contrastPairs,
   DISPLAY_ROLES,
+  PLATE_ROLE,
+  platePairs,
   SURFACE_ROLES,
   sharedTokens,
   TEXT_ROLES,
@@ -111,5 +113,39 @@ describe("WCAG 2.2 AA contrast, every text and surface pair of both themes", () 
     const required = (TEXT_ROLES as readonly string[]).includes(text) ? AA_NORMAL : AA_LARGE;
     expect(p.required).toBe(required);
     expect(p.ratio).toBeGreaterThanOrEqual(required);
+  });
+});
+
+describe("the picture plate (--color-plate)", () => {
+  it.each(["dark", "light"] as const)("the %s theme defines it as #rrggbb", (theme) => {
+    expect(themeColours(css, theme)[PLATE_ROLE]).toMatch(/^#[0-9a-f]{6}$/i);
+  });
+
+  it("is the same light colour in both themes, so a light diagram stays readable in the dark one", () => {
+    const [dark, light] = [themeColours(css, "dark"), themeColours(css, "light")];
+    expect(dark[PLATE_ROLE]).toBe(light[PLATE_ROLE]);
+    expect(light[PLATE_ROLE]).toBe(light["--color-ground"]);
+  });
+
+  it("is not part of the text/surface/display roles that the other contrast tests list", () => {
+    for (const roles of [SURFACE_ROLES, TEXT_ROLES, DISPLAY_ROLES]) {
+      expect(roles as readonly string[]).not.toContain(PLATE_ROLE);
+    }
+  });
+
+  const pairs = platePairs(css);
+
+  it("checks the picture ink in both themes and the plate against the ground in the dark theme", () => {
+    expect(pairs.map((p) => `${p.theme}: ${p.label}`)).toEqual([
+      "dark: picture ink on the plate",
+      "dark: plate against the ground",
+      "light: picture ink on the plate",
+    ]);
+  });
+
+  it.each(pairs.map((p) => [p.theme, p.label, p] as const))("%s: %s meets its contrast", (_theme, _label, p) => {
+    expect(p.required).toBe(p.label.startsWith("picture ink") ? AA_NORMAL : AA_LARGE);
+    expect(p.ratio).toBeGreaterThanOrEqual(p.required);
+    expect(p.passes).toBe(true);
   });
 });

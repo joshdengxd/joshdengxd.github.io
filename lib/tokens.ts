@@ -27,6 +27,10 @@ export const CODE_TEXT_ROLES = [
   "--shiki-token-deleted",
 ] as const;
 
+// The plate under a picture in a post: light in both themes. A picture is drawn in dark ink, so the light theme's ink
+// must be AA (4.5:1) on it; in the dark theme it must also stand out from the ground (3:1, non-text contrast).
+export const PLATE_ROLE = "--color-plate";
+
 export const AA_NORMAL = 4.5;
 export const AA_LARGE = 3;
 
@@ -153,6 +157,32 @@ export function codeContrastPairs(css: string): CodePair[] {
         required: AA_NORMAL,
         passes: ratio >= AA_NORMAL,
       });
+    }
+  }
+  return pairs;
+}
+
+export type PlatePair = {
+  theme: Theme;
+  /** What is measured: the dark picture ink on the plate, or the plate against the page ground. */
+  label: string;
+  ratio: number;
+  required: number;
+  passes: boolean;
+};
+
+/** The plate against the picture ink (both themes) and against the ground (dark theme, where the plate must show). */
+export function platePairs(css: string): PlatePair[] {
+  const ink = themeColours(css, "light")["--color-ink"];
+  const pairs: PlatePair[] = [];
+  for (const theme of THEMES) {
+    const c = themeColours(css, theme);
+    const rows: [string, number, number][] = [["picture ink on the plate", contrast(ink, c[PLATE_ROLE]), AA_NORMAL]];
+    if (theme === "dark") {
+      rows.push(["plate against the ground", contrast(c[PLATE_ROLE], c["--color-ground"]), AA_LARGE]);
+    }
+    for (const [label, ratio, required] of rows) {
+      pairs.push({ theme, label, ratio, required, passes: ratio >= required });
     }
   }
   return pairs;
