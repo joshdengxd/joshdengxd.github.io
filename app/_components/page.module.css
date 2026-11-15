@@ -132,6 +132,11 @@
   justify-content: flex-start;
 }
 
+/* Groups inside one section are set apart from each other. */
+.group + .group {
+  margin-top: var(--space-6);
+}
+
 /* The title of a group inside a section (an h3). */
 .groupTitle {
   font-weight: var(--weight-strong);

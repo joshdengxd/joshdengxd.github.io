@@ -61,7 +61,7 @@ export default function Page() {
       </Section>
       <Section title="Skills used">
         {SKILL_GROUPS.map(({ group, title }) => (
-          <div key={group} data-skill-group={group}>
+          <div key={group} className={pageStyles.group} data-skill-group={group}>
             <h3 className={pageStyles.groupTitle}>{title}</h3>
             <ul className={pageStyles.rows}>
               {skillsIn(group).map(({ name, line }) => (
