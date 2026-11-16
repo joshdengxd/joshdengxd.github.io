@@ -3,7 +3,7 @@
 export const ABOUT_TEXT = {
   Background: [
     "I built my first website in third grade, with Microsoft FrontPage. I liked it right away, and ever since I have liked building things that solve people's problems.",
-    "So I studied Computing Science at the University of Alberta. In my third year, in 2015, six of us, all friends, helped a local startup, Yardley, get started.",
+    "So I studied Computing Science at the University of Alberta. In my third year, in 2015, six of us, all friends, helped a local startup called SnowTapp get started. It later became Yardly and was acquired in 2022.",
     "After university I worked at Origami Accounting, then at Alberta Motor Association, the College of Registered Nurses of Alberta, Noralta Technologies, Intellimedia and SurveyMonkey.",
     "Since 2024 I have seen AI change how I build things, and I have spent a lot of time learning it.",
   ],
