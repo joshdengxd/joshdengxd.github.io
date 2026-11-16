@@ -1,5 +1,4 @@
 import type { CSSProperties } from "react";
-import { ProfileLinks } from "../_shell/profile-links";
 import styles from "./home.module.css";
 
 const second = { "--reveal-index": 1 } as CSSProperties;
@@ -27,7 +26,6 @@ export function HomeView() {
             Xindong Deng (Josh). A software developer since 2018 and an AI-native builder, in Alberta, Canada.
           </p>
         </section>
-        <ProfileLinks />
       </div>
     </>
   );
