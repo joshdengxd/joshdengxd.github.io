@@ -1,6 +1,7 @@
 // The v1 pages in a browser (both builds): reachable from the navigation and the Projects index, the project pages
 // and their repo links, the home sections, and the visible placeholder labels.
 import { expect, test, type Page } from "@playwright/test";
+import { watch } from "./watch";
 import { PROJECTS } from "../../lib/projects";
 import { MERGED_PRS_URL, PROJECT_BOARD_URL, SITE_REPO_URL } from "../../lib/site";
 import { SKILLS } from "../../lib/skills";
@@ -10,14 +11,6 @@ const REPOS = {
   "job-search-skills": "https://github.com/joshdengxd/job-search-skills",
   "this-site": "https://github.com/joshdengxd/joshdengxd.github.io",
 };
-
-function watch(page: Page) {
-  const problems: string[] = [];
-  page.on("response", (r) => r.status() >= 400 && problems.push(`${r.status()} ${r.url()}`));
-  page.on("console", (m) => m.type() === "error" && problems.push(`console: ${m.text()}`));
-  page.on("pageerror", (e) => problems.push(`pageerror: ${e.message}`));
-  return problems;
-}
 
 const nav = (page: Page) => page.getByRole("navigation", { name: "Main" }).filter({ visible: true });
 

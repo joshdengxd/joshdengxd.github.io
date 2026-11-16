@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { watch } from "./watch";
 import { PROJECTS } from "../../lib/projects";
 import { ABOUT_LINKS } from "../about-text";
 import { MERGED_PRS_URL, PROJECT_BOARD_URL } from "../../lib/site";
@@ -29,15 +30,6 @@ function recordFirstFrameTheme() {
 async function firstFrameTheme(page: Page) {
   await page.waitForFunction(() => (window as Recorded).firstFrameTheme !== undefined);
   return page.evaluate(() => (window as Recorded).firstFrameTheme);
-}
-
-/** Watches a page for failed responses (404 and up), console errors and uncaught errors. */
-function watch(page: Page) {
-  const problems: string[] = [];
-  page.on("response", (r) => r.status() >= 400 && problems.push(`${r.status()} ${r.url()}`));
-  page.on("console", (m) => m.type() === "error" && problems.push(`console: ${m.text()}`));
-  page.on("pageerror", (e) => problems.push(`pageerror: ${e.message}`));
-  return problems;
 }
 
 for (const js of [true, false]) {
