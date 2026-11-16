@@ -5,7 +5,7 @@ import { expect, test, type Page } from "@playwright/test";
 const POST = "/blog/blog-engine-fixture/";
 const ALT = "A diagram of three boxes, One, Two and Three, joined by arrows";
 const CAPTION = "Figure 1: three boxes in a row, drawn on a light background.";
-const PLATE = "rgb(243, 240, 230)"; // --color-plate, the same in both themes
+const PLATE = "rgb(239, 238, 234)"; // --color-plate, the same in both themes
 
 const figure = (page: Page) => page.locator("figure");
 const picture = (page: Page) => page.getByRole("img", { name: ALT });

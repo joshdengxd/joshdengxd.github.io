@@ -86,3 +86,18 @@ test("the post is in the list, the three tag pages and the sitemap", async ({ pa
   const xml = await (await request.get("/sitemap.xml")).text();
   expect(xml).toContain(URL);
 });
+
+test("on a tablet the picture plate runs to the page margin on both sides (the page stays centred)", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 768, height: 1024 });
+  await page.goto(URL);
+  const plate = page.locator("figure > div").first();
+  await plate.scrollIntoViewIfNeeded();
+  const box = await plate.boundingBox();
+  expect(box).not.toBeNull();
+  const left = box!.x;
+  const right = 768 - (box!.x + box!.width);
+  expect(Math.abs(left - right)).toBeLessThanOrEqual(2);
+  expect(left).toBeLessThan(40);
+});

@@ -156,6 +156,9 @@
    colour in both themes, so a light diagram stays readable on the dark theme. */
 .prose figure {
   margin: 0;
+  /* On a tablet the plate runs to the right page margin (it closes the column's empty side); on a desktop it stays a
+     little wider than the text. */
+  max-width: max(var(--measure), min(100%, 46rem));
   display: grid;
   gap: var(--space-2);
 }
