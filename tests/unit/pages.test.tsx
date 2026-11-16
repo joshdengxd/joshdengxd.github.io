@@ -26,13 +26,15 @@ const headings = (level: number) => screen.getAllByRole("heading", { level }).ma
 const slashed = (href: string | null) => href?.replace(/\/?$/, "/");
 
 describe("home", () => {
-  it("has the intro (placeholder-marked) and no 'under construction' line", () => {
+  it("has the written intro, word for word, no placeholder, and no 'under construction' line", () => {
     const { container } = render(<HomeView />);
     expect(screen.queryByText(/under construction/i)).toBeNull();
     const intro = screen.getByRole("region", { name: "Intro" });
-    expect(intro.querySelector("[data-placeholder]")).not.toBeNull();
-    expect(intro).toHaveTextContent("Alberta, Canada");
-    expect(container.querySelectorAll("[data-placeholder]")).toHaveLength(1);
+    expect(intro).toHaveTextContent(
+      "Xindong Deng (Josh). A software developer since 2018 and an AI-native builder, in Alberta, Canada.",
+    );
+    expect(intro).not.toHaveTextContent(/Placeholder|training/);
+    expect(container.querySelectorAll("[data-placeholder]")).toHaveLength(0);
   });
 
   it("is its first screen only: no heading but the name, and no Focus, Featured repos or Latest posts", () => {

@@ -113,8 +113,10 @@ test.describe("home", () => {
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Josh\s*Deng/);
     await expect(page.getByText(/under construction/i)).toHaveCount(0);
     const intro = page.getByRole("region", { name: "Intro" });
-    await expect(intro.locator("[data-placeholder]")).toBeVisible();
-    await expect(intro).toContainText("Alberta, Canada");
+    await expect(intro.locator("[data-placeholder]")).toHaveCount(0);
+    await expect(intro).toHaveText(
+      "Xindong Deng (Josh). A software developer since 2018 and an AI-native builder, in Alberta, Canada.",
+    );
 
     // No heading but the name; no Focus, Featured repos or Latest posts.
     await expect(page.getByRole("heading")).toHaveCount(1);
@@ -127,18 +129,31 @@ test.describe("home", () => {
     expect(problems).toEqual([]);
   });
 
-  test("the home page has no horizontal overflow on a phone and the footer line follows the first screen", async ({
-    page,
-  }) => {
-    await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto("/");
-    expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(0);
-    const order = await page.evaluate(() => {
-      const top = (sel: string) => document.querySelector(sel)!.getBoundingClientRect().top;
-      return [top("h1"), top("section[aria-label=Intro]"), top("footer")];
+  for (const width of [320, 390, 1440]) {
+    test(`the home page at ${width}px: no horizontal overflow; the name, then the intro under it, then the footer line`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: width > 500 ? 900 : 844 });
+      await page.goto("/");
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(
+        0,
+      );
+      const box = (sel: string) =>
+        page.evaluate((s) => {
+          const r = document.querySelector(s)!.getBoundingClientRect();
+          return { top: r.top, bottom: r.bottom };
+        }, sel);
+      const [name, intro, links, footer] = [
+        await box("h1"),
+        await box("section[aria-label=Intro]"),
+        await box("main a[href*='github.com']"),
+        await box("footer"),
+      ];
+      expect(intro.top, "the intro is under the name").toBeGreaterThanOrEqual(name.bottom - 1);
+      expect(links.top, "the profile links are under the intro").toBeGreaterThanOrEqual(intro.bottom - 1);
+      expect(footer.top, "the footer line follows").toBeGreaterThanOrEqual(links.bottom - 1);
     });
-    expect([...order].sort((a, b) => a - b)).toEqual(order);
-  });
+  }
 });
 
 for (const javaScriptEnabled of [true, false]) {
@@ -152,6 +167,15 @@ for (const javaScriptEnabled of [true, false]) {
       await expect(page.getByRole("heading", { level: 2 })).toHaveCount(0);
       await expect(page.locator("main article, main ol")).toHaveCount(0);
       await expect(page.getByRole("contentinfo").getByRole("link", { name: "GitHub" })).toBeVisible();
+    });
+
+    test("/ shows the written intro word for word, with no Placeholder label", async ({ page }) => {
+      await page.goto("/");
+      await expect(page.getByRole("region", { name: "Intro" })).toHaveText(
+        "Xindong Deng (Josh). A software developer since 2018 and an AI-native builder, in Alberta, Canada.",
+      );
+      await expect(page.locator("[data-placeholder]")).toHaveCount(0);
+      await expect(page.getByText("Placeholder:")).toHaveCount(0);
     });
 
     test("/about/ has no Links section and no GitHub or LinkedIn link in its main content; the footer links stay", async ({
@@ -174,7 +198,7 @@ for (const javaScriptEnabled of [true, false]) {
 
 test.describe("placeholders", () => {
   test("each one shows the label 'Placeholder:' and has data-placeholder, on every v1 page", async ({ page }) => {
-    for (const path of ["/", "/about/", "/projects/job-search-skills/", "/how-this-site-is-built/"]) {
+    for (const path of ["/about/", "/projects/job-search-skills/", "/how-this-site-is-built/"]) {
       await page.goto(path);
       const marked = page.locator("[data-placeholder]");
       expect(await marked.count(), path).toBeGreaterThan(0);

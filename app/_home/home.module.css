@@ -26,17 +26,16 @@
   font-size: var(--step-lead);
 }
 
-/* Wide screens: the panel (from the shell) is the same on every page, so the first screen is one column: the intro at
-   the top, the name filling the rest from the foot. */
+/* Wide screens: the panel (from the shell) is the same on every page, so the first screen is a single column: the name
+   fills it from the top, the intro and the profile links sit under it (no link above the name). */
 @media (min-width: 64rem) {
   .name {
     min-height: calc(100svh - 14rem);
   }
 
   .panel {
-    order: -1;
     background: none;
     max-width: var(--measure);
-    padding-bottom: 0;
+    padding-top: 0;
   }
 }
