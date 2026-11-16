@@ -56,3 +56,7 @@ a block with no language, and a line that is long enough to scroll inside its bl
 | Pipeline | Turns Markdown into safe HTML |
 
 A [link to the blog](/blog/) and some `inline code`.
+
+## A picture
+
+![A diagram of three boxes, One, Two and Three, joined by arrows](diagram.svg "Figure 1: three boxes in a row, drawn on a light background.")

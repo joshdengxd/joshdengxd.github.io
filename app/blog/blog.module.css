@@ -150,9 +150,34 @@
   color: var(--color-muted);
 }
 
+/* Pictures (ticket #41): the build writes <figure><div><img></div><figcaption></figure> with the real size on the <img>
+   (width and height), so the space is reserved before the file loads. The plate behind the picture is the same light
+   colour in both themes, so a light diagram stays readable on the dark theme. */
+.prose figure {
+  margin: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.prose figure > div {
+  display: flex;
+  justify-content: center;
+  box-sizing: border-box;
+  max-width: 100%;
+  padding: var(--space-3);
+  background: var(--color-plate);
+}
+
 .prose img {
+  display: block;
+  min-width: 0;
   max-width: 100%;
   height: auto;
+}
+
+.prose figcaption {
+  color: var(--color-muted);
+  font-size: var(--step-small);
 }
 
 /* Code: the code face (set in the base styles) at the small step; a long line scrolls inside its block, never the page. */

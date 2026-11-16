@@ -82,11 +82,14 @@ Two surfaces and five text roles. Text roles appear at any size and need WCAG 2.
 |---|---|---|---|
 | `--color-ground` | page ground | `#1e2c23` | `#f3f0e6` |
 | `--color-panel` | the panel, one step lighter | `#2a3b2f` | `#dfe5d6` |
+| `--color-plate` | behind a picture in a post; the same light colour in both themes (not a text surface) | `#f3f0e6` | `#f3f0e6` |
 | `--color-ink` | running text | `#c2d2b8` | `#2c4a35` |
 | `--color-muted` | secondary notes | `#98a694` | `#57645a` |
 | `--color-accent` | links, current page, focus | `#c49a5a` | `#855a21` |
 | `--color-name-first` | JOSH | `#c49a5a` | `#a8742f` |
 | `--color-name-last` | DENG | `#a9bd9d` | `#3f6447` |
+
+The plate is not a surface for text roles, so it has its own checks in `tests/unit/tokens.test.ts`: the same `#rrggbb` in both themes, equal to the light ground, 3:1 or more against the dark ground (the edge of the picture is visible), and the light theme's ink on it at 4.5:1 (a broken picture's alt text).
 
 Contrast (text on ground / on panel):
 
@@ -171,9 +174,9 @@ A later ticket brings both back with real content and the motion layer.
 Warnings left on purpose (the inspector only warns about these):
 - `hero-void` on `/blog/` and the tag pages (about 29% of the first screen is empty at 1440 px): the empty block sits beside the reading column, the page's one rest; the list is held to the reading measure on purpose.
 - `name-only-title` on the tag pages: the h1 is `Tagged <tag>` and the line under it repeats the tag in plain words.
-- `grey-body` on the project pages (1440 px and down): the running text is the placeholder paragraphs, muted on purpose (4.5:1 or more) so they never read as final copy; real copy replaces them in the full ink. `/about/` has real copy now (tickets #34-#36) and no longer warns.
+- `grey-body` on `/` and the project pages (1440 px and down): the running text is the placeholder paragraphs, muted on purpose (4.5:1 or more) so they never read as final copy; real copy replaces them in the full ink. `/about/` has real copy now (tickets #34-#36) and no longer warns.
 - `hero-void` on `/projects/` and the project pages (33% and 29% of the first screen at 1440 px): the short title leaves the right of the reading column empty, the page's one rest, as on `/blog/`. `/about/` no longer warns about it.
 - `lopsided` on `/about/` (1440 px; the only warning the inspector reports for `/about/`, none at 768 or 390 px): each section is its text held to a 75ch measure, with the right of the page empty, the page's one rest, as on `/blog/`. The honest measure: 75ch is 731 px (721 px at 768, the whole page; 358 px at 390), which is about 98 characters a line (spaces included; 90 to 107, measured on the rendered lines at 768, 1000 and 1440 px; about 46 at 390 px), because Archivo's `0` is wide so `ch` overstates the average glyph. That is wider than the 80 characters of WCAG 1.4.8 (level AAA, not required) and wider than the 65ch of the other pages. The trade-off: 75ch was chosen so the `off-centre` rule passes at 768 px, where the column then fills the page and the two margins stay level; at 768 px a 65ch column fails it (23 px left, 115 px right) and a 72ch column only warns (23 px left, 44 px right). A narrower, easier measure would need `off-centre` waived for `/about/`. The owner decides that later; the width stays 75ch for now.
-- Home (`/`) is a new layout: the D5 first screen (name and panel, one viewport high), then Focus, Featured repos and Latest posts on the ground, one column set per section and the footer line. It passes with no WARN.
+- Home (`/`) is a new layout: the D5 first screen (name and panel, one viewport high), and the footer line, nothing else (Focus, Featured repos and Latest posts were removed on 2026-11-15, #45). It passes with no FAIL; its only WARN is the `grey-body` waiver above.
 - `palette-cream` on `/design/`: the light theme's ground `#f3f0e6`, the owner's chosen light ground from the D5 light mockup. The specimen shows it; on the site it appears only after the toggle.
 - `off-centre` on `/design/`: the theme samples sit inset in their own blocks, so the text in them stops short of the right margin.

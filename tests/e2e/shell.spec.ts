@@ -199,7 +199,7 @@ test.describe("keyboard", () => {
       order.push(info.name);
       expect(info.ring, `focus ring on ${info.name}`).toBe(true);
     }
-    // The About text links and the page's own Links section come before the footer line.
+    // The About text links (its two names) come before the footer links.
     expect(order).toEqual([
       "Skip to content",
       HOME_LABEL,
@@ -207,8 +207,6 @@ test.describe("keyboard", () => {
       "Light theme",
       "Matt Pocock", // the two names in the About text (ticket #35)
       "Lauren Tan",
-      "GitHub",
-      "LinkedIn",
       "GitHub",
       "LinkedIn",
     ]);

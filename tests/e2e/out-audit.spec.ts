@@ -226,8 +226,19 @@ test.describe("personal details", () => {
   test("no page shows a city, email, phone number, job-search status or photo", () => {
     for (const p of pages) {
       for (const [what, pattern] of FORBIDDEN) {
-        const where = what === "a photo" ? p.html : p.text;
+        // The one picture the site allows is a post's own <figure> (ticket #41), checked in the next test.
+        const where = what === "a photo" ? p.html.replace(/<figure>[\s\S]*?<\/figure>/g, "") : p.text;
         expect(pattern.test(where), `${p.file} shows ${what}`).toBe(false);
+      }
+    }
+  });
+
+  test("a picture appears only inside a post's figure, from that post's own folder", () => {
+    for (const p of pages) {
+      for (const [tag] of p.html.matchAll(/<img\s[^>]*>/gi)) {
+        expect(p.path, `${p.file} has a picture outside a post`).toMatch(/^\/blog\/[a-z0-9-]+\/$/);
+        const src = /\ssrc="([^"]*)"/.exec(tag)?.[1];
+        expect(src, `${p.file}: ${tag}`).toContain(`${p.path}`);
       }
     }
   });

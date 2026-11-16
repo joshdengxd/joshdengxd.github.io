@@ -6,7 +6,7 @@ Read when you add or edit a page, change metadata, the sitemap or robots, the so
 `/`, `/about/`, `/projects/`, `/projects/<slug>/` (`josh-shared-skills`, `job-search-skills`, `this-site`), `/how-this-site-is-built/`, `/blog/` (and its posts and tags, see `blog.md`), `/design/` (specimen, noindex, not in the sitemap). Every other route is the 404 page.
 
 ## Data lists (no network at build)
-- `lib/projects.ts`: slug, name, repo URL, one-line summary for exactly the three public repos. Drives the Projects index, the project pages, Featured repos on home, and the sitemap. A new repo is one entry here (and the allowlists in the tests that name the three URLs).
+- `lib/projects.ts`: slug, name, repo URL, one-line summary for exactly the three public repos. Drives the Projects index, the project pages, and the sitemap. A new repo is one entry here (and the allowlists in the tests that name the three URLs).
 - `lib/skills.ts`: one line per skill in `.claude/skills/`, keyed by folder name, in two groups (ticket cycle, supporting). A unit test compares the keys with the folders both ways, so adding or removing a skill needs a line change here. The How this site is built page (Workflow, Skills used, What it is made of, The record) has no per-PR data: the record links (board, merged PRs, repo) come from `lib/site.ts`.
 
 ## Placeholders
@@ -25,4 +25,4 @@ Only what PRD-0001 allows: name "Xindong Deng (Josh)", "Alberta, Canada", past e
 ## Tests
 - `tests/unit/`: `projects`, `skills`, `placeholder`, `metadata`, `pages` (home, About, Projects, project page, How this site is built, sitemap, robots).
 - `tests/e2e/out-audit.spec.ts` (no browser, both builds): every HTML page is in the sitemap or noindex, unique titles and descriptions, canonical equals sitemap URL, Open Graph and Twitter tags with absolute URLs, social image file, robots.txt, placeholder labels, personal-data scan.
-- `tests/e2e/pages.spec.ts` (both builds): navigation, cards, repo links, home sections, placeholder colour. `home-posts.default.spec.ts` / `home-posts.fixture.spec.ts`: Latest posts on each build.
+- `tests/e2e/pages.spec.ts` (both builds): navigation, cards, repo links, home (first screen and footer only) and About (no links section) with JavaScript on and off, placeholder colour.

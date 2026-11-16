@@ -1,7 +1,5 @@
 import { PageLayout, Section } from "../_components/page-layout";
 import pageStyles from "../_components/page.module.css";
-import { LINKEDIN_URL } from "../_shell/links";
-import { GITHUB_OWNER_URL } from "@/lib/site";
 import { pageMetadata } from "@/lib/metadata";
 
 export const metadata = pageMetadata({
@@ -81,20 +79,6 @@ export default function Page() {
           rest I give the AI context, not control, and I do not micromanage it. With the right context, the right
           constraints and a good way to verify, AI can make production-ready software.
         </p>
-      </Section>
-      <Section title="Links">
-        <ul className={pageStyles.links}>
-          <li>
-            <a className={pageStyles.link} href={GITHUB_OWNER_URL} rel="me">
-              GitHub
-            </a>
-          </li>
-          <li>
-            <a className={pageStyles.link} href={LINKEDIN_URL} rel="me">
-              LinkedIn
-            </a>
-          </li>
-        </ul>
       </Section>
     </PageLayout>
   );

@@ -1,7 +1,5 @@
 import { render, screen, within } from "@testing-library/react";
 import { HomeView } from "@/app/_home/home-view";
-import { LINKEDIN_URL } from "@/app/_shell/links";
-import { GITHUB_OWNER_URL } from "@/lib/site";
 import AboutPage, { metadata as aboutMeta } from "@/app/about/page";
 import HowPage, { metadata as howMeta } from "@/app/how-this-site-is-built/page";
 import ProjectsPage, { metadata as projectsMeta } from "@/app/projects/page";
@@ -11,7 +9,6 @@ import ProjectPage, {
 } from "@/app/projects/[slug]/page";
 import robots from "@/app/robots";
 import sitemap from "@/app/sitemap";
-import type { Post } from "@/lib/posts/loader";
 import { PROJECTS } from "@/lib/projects";
 import { ABOUT_LINKS, ABOUT_TEXT } from "../about-text";
 import { MERGED_PRS_URL, PROJECT_BOARD_URL, SITE_REPO_URL } from "@/lib/site";
@@ -24,72 +21,35 @@ vi.mock("next/navigation", () => ({
   },
 }));
 
-const post = (n: number): Post => ({
-  slug: `post-${n}`,
-  title: `Post ${n}`,
-  date: "2026-11-15T10:00:00Z",
-  tags: ["a"],
-  summary: `Summary ${n}.`,
-  html: "",
-});
-
 const headings = (level: number) => screen.getAllByRole("heading", { level }).map((h) => h.textContent);
 /** next/link applies the trailingSlash setting only in the build; the built HTML is checked in e2e. */
 const slashed = (href: string | null) => href?.replace(/\/?$/, "/");
 
 describe("home", () => {
   it("has the intro (placeholder-marked) and no 'under construction' line", () => {
-    const { container } = render(<HomeView posts={[]} />);
+    const { container } = render(<HomeView />);
     expect(screen.queryByText(/under construction/i)).toBeNull();
     const intro = screen.getByRole("region", { name: "Intro" });
     expect(intro.querySelector("[data-placeholder]")).not.toBeNull();
     expect(intro).toHaveTextContent("Alberta, Canada");
-    expect(container.querySelectorAll("[data-placeholder]").length).toBeGreaterThanOrEqual(2);
+    expect(container.querySelectorAll("[data-placeholder]")).toHaveLength(1);
   });
 
-  it("has Focus, Featured repos and Latest posts below the first screen", () => {
-    render(<HomeView posts={[]} />);
-    expect(headings(2)).toEqual(["Focus", "Featured repos", "Latest posts"]);
-  });
-
-  it("Featured repos has the same cards as Projects, each linking to its page", () => {
-    render(<HomeView posts={[]} />);
-    const featured = screen.getByRole("region", { name: "Featured repos" });
-    const links = within(featured)
-      .getAllByRole("link")
-      .map((l) => slashed(l.getAttribute("href")));
-    expect(links.filter((h) => h?.startsWith("/projects/") && h !== "/projects/")).toEqual(
-      PROJECTS.map((p) => `/projects/${p.slug}/`),
-    );
-  });
-
-  it("with no posts: 'No posts yet' and a link to /blog/", () => {
-    render(<HomeView posts={[]} />);
-    const latest = screen.getByRole("region", { name: "Latest posts" });
-    expect(latest).toHaveTextContent("No posts yet.");
-    expect(slashed(within(latest).getByRole("link", { name: "Go to the blog" }).getAttribute("href"))).toBe("/blog/");
-  });
-
-  it("with posts: up to three, in the order given, each linked", () => {
-    render(<HomeView posts={[1, 2, 3, 4].map(post)} />);
-    const latest = screen.getByRole("region", { name: "Latest posts" });
-    expect(latest).not.toHaveTextContent("No posts yet");
-    expect(
-      within(latest)
-        .getAllByRole("heading", { level: 3 })
-        .map((h) => h.textContent),
-    ).toEqual(["Post 1", "Post 2", "Post 3"]);
-    expect(slashed(within(latest).getByRole("link", { name: "Post 1" }).getAttribute("href"))).toBe("/blog/post-1/");
+  it("is its first screen only: no heading but the name, and no Focus, Featured repos or Latest posts", () => {
+    const { container } = render(<HomeView />);
+    expect(screen.getAllByRole("heading").map((h) => h.tagName)).toEqual(["H1"]);
+    expect(screen.queryAllByRole("heading", { level: 2 })).toEqual([]);
+    expect(container.querySelector("article")).toBeNull();
+    expect(container.textContent).not.toMatch(/Focus|Featured repos|Latest posts|All projects|All posts/);
   });
 });
 
 describe("About", () => {
-  it("has its four sections, indexable metadata, and the two profile links", () => {
-    render(<AboutPage />);
+  it("has its three sections, indexable metadata, and no links section", () => {
+    const { container } = render(<AboutPage />);
     expect(screen.getByRole("heading", { level: 1, name: "About" })).toBeInTheDocument();
-    expect(headings(2)).toEqual(["Background", "What I am learning", "How I work", "Links"]);
-    expect(screen.getByRole("link", { name: "GitHub" })).toHaveAttribute("href", GITHUB_OWNER_URL);
-    expect(screen.getByRole("link", { name: "LinkedIn" })).toHaveAttribute("href", LINKEDIN_URL);
+    expect(headings(2)).toEqual(["Background", "What I am learning", "How I work"]);
+    expect(container.querySelector("a")).toBeNull();
     expect(aboutMeta.robots).toBeUndefined();
     expect(aboutMeta.title).toBe("About");
   });

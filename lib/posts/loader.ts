@@ -2,7 +2,7 @@ import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { parse as parseYaml, type YAMLParseError } from "yaml";
 import type { z } from "zod";
-import { findRawHtml, renderMarkdown } from "./markdown";
+import { findRawHtml, ImageError, renderMarkdown } from "./markdown";
 import { frontMatterSchema, RESERVED_SLUGS, SLUG_PATTERN, type FrontMatter } from "./schema";
 
 export type Post = FrontMatter & {
@@ -21,6 +21,14 @@ export class PostError extends Error {
 
 const CONTENT_DIR = "content/posts";
 const FIXTURE_DIR = "tests/fixtures/posts";
+/** Pictures of the real posts: public/blog/<slug>/, served as /blog/<slug>/<file>. The fixture's are never in public/. */
+const IMAGES_DIR = "public/blog";
+const FIXTURE_IMAGES_DIR = "tests/fixtures/post-images";
+
+/** The folder (relative to the project root) with the pictures of post `slug`, which sits in the posts folder `dir`. */
+export function imageDirFor(dir: string, slug: string): string {
+  return `${dir === FIXTURE_DIR ? FIXTURE_IMAGES_DIR : IMAGES_DIR}/${slug}`;
+}
 
 /** Splits the `---` block from the body. `bodyLine` is the 1-based line of the file where the body starts. */
 export function splitFrontMatter(file: string, raw: string): { yaml: string; body: string; bodyLine: number } {
@@ -44,7 +52,13 @@ function yamlProblem(error: YAMLParseError): string {
 }
 
 /** Parses and validates one post file; `file` is only used in messages. Throws with the file and the field named. */
-export async function parsePost(file: string, slug: string, raw: string): Promise<Post> {
+export async function parsePost(
+  file: string,
+  slug: string,
+  raw: string,
+  imageDir = imageDirFor(CONTENT_DIR, slug),
+  root = process.cwd(),
+): Promise<Post> {
   if (!SLUG_PATTERN.test(slug) || RESERVED_SLUGS.includes(slug)) {
     throw new PostError(
       file,
@@ -81,7 +95,15 @@ export async function parsePost(file: string, slug: string, raw: string): Promis
     throw new PostError(file, "body", `line ${bodyLine + rawHtml[0] - 1}: raw HTML is not allowed, use Markdown`);
   }
 
-  return { ...parsed.data, slug, html: await renderMarkdown(body) };
+  try {
+    const images = { slug, dir: resolve(root, imageDir), label: `${imageDir}/` };
+    return { ...parsed.data, slug, html: await renderMarkdown(body, images) };
+  } catch (error) {
+    if (error instanceof ImageError) {
+      throw new PostError(file, "body", `line ${bodyLine + error.line - 1}: ${error.message}`);
+    }
+    throw error;
+  }
 }
 
 /** Newest first; the slug breaks a tie so the order never changes between builds. */
@@ -101,7 +123,8 @@ export async function loadPostsFrom(dirs: string[], root = process.cwd()): Promi
       .filter((n) => n.endsWith(".md"))
       .sort()) {
       const file = relative(root, join(abs, name)).split("\\").join("/");
-      const post = await parsePost(file, name.slice(0, -3), readFileSync(join(abs, name), "utf8"));
+      const slug = name.slice(0, -3);
+      const post = await parsePost(file, slug, readFileSync(join(abs, name), "utf8"), imageDirFor(dir, slug), root);
       const earlier = posts.get(post.slug);
       if (earlier) {
         throw new PostError(file, "file name", `the slug "${post.slug}" is already used by ${earlier.file}`);

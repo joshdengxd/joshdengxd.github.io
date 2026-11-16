@@ -113,3 +113,25 @@ describe("WCAG 2.2 AA contrast, every text and surface pair of both themes", () 
     expect(p.ratio).toBeGreaterThanOrEqual(required);
   });
 });
+
+describe("the picture plate (--color-plate)", () => {
+  const dark = themeColours(css, "dark");
+  const light = themeColours(css, "light");
+
+  it("is a #rrggbb colour in both themes, and the same light colour in both", () => {
+    expect(dark["--color-plate"]).toMatch(/^#[0-9a-f]{6}$/i);
+    expect(light["--color-plate"]).toBe(dark["--color-plate"]);
+  });
+
+  it("is the light theme's ground, so a light picture sits on it as on the page", () => {
+    expect(dark["--color-plate"]).toBe(light["--color-ground"]);
+  });
+
+  it("stands out from the dark ground by at least 3:1, so the edge of the picture is visible", () => {
+    expect(contrast(dark["--color-plate"], dark["--color-ground"])).toBeGreaterThanOrEqual(AA_LARGE);
+  });
+
+  it("carries the light theme's ink at AA for normal text, as a broken picture's alt text would", () => {
+    expect(contrast(light["--color-ink"], dark["--color-plate"])).toBeGreaterThanOrEqual(AA_NORMAL);
+  });
+});
