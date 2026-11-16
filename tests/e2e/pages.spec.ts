@@ -135,12 +135,13 @@ test.describe("home", () => {
       expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(
         0,
       );
-      const box = (sel: string) =>
-        page.evaluate((s) => {
-          const r = document.querySelector(s)!.getBoundingClientRect();
+      // Read both boxes in one frame: hydration replaces expanded fallback navigation.
+      const [name, intro] = await page.evaluate(() =>
+        ["h1", "section[aria-label=Intro]"].map((selector) => {
+          const r = document.querySelector(selector)!.getBoundingClientRect();
           return { top: r.top, bottom: r.bottom };
-        }, sel);
-      const [name, intro] = [await box("h1"), await box("section[aria-label=Intro]")];
+        }),
+      );
       expect(intro.top, "the intro is under the name").toBeGreaterThanOrEqual(name.bottom - 1);
       await expect(page.getByRole("contentinfo")).toHaveCount(0);
     });

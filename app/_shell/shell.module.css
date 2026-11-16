@@ -40,12 +40,11 @@
   gap: 0.25em;
 }
 
-.menu {
-  margin-inline-start: auto;
-}
-
 .menuButton {
-  list-style: none;
+  font: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
   cursor: pointer;
   font-weight: var(--weight-strong);
   color: var(--color-ink);
@@ -53,11 +52,7 @@
   margin-inline-end: calc(-1 * var(--space-3));
 }
 
-.menuButton::-webkit-details-marker {
-  display: none;
-}
-
-.menu[open] .menuButton {
+.menuButton[aria-expanded="true"] {
   color: var(--color-accent);
 }
 
@@ -76,9 +71,13 @@
   overflow-y: auto;
 }
 
-/* Closed, the sheet is not laid out at all (some engines still measure the contents of a closed <details>). */
-.menu:not([open]) .sheet,
+/* Server/no-JS navigation stays in normal flow until the disclosure is usable. */
 .wide {
+  display: grid;
+  gap: var(--space-5);
+  padding: var(--space-2) var(--margin-page) var(--space-6);
+}
+.shell[data-enhanced] .wide {
   display: none;
 }
 
@@ -205,11 +204,14 @@
     justify-content: flex-end;
   }
 
-  .menu {
+  .menu,
+  .menuButton {
     display: none;
   }
 
-  .wide {
+  .wide,
+  .shell[data-enhanced] .wide {
+    padding: 0;
     display: flex;
     flex-direction: column;
     align-items: stretch;

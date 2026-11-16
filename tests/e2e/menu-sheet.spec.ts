@@ -6,9 +6,10 @@ const DELAY = 2500;
 
 test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
 
-const menuButton = (page: Page) => page.locator("summary", { hasText: "Menu" });
-const sheet = (page: Page) => page.locator("details");
-const sheetLink = (page: Page, name: string) => page.locator("details nav a", { hasText: name });
+const menuButton = (page: Page) => page.locator("button[aria-controls]");
+
+const sheetLink = (page: Page, name: string) =>
+  page.getByRole("navigation", { name: "Main" }).filter({ visible: true }).getByRole("link", { name, exact: true });
 const slowNavigation = (page: Page) =>
   page.route(/\.txt(\?.*)?$/, async (route) => {
     await new Promise((resolve) => setTimeout(resolve, DELAY));
@@ -16,16 +17,21 @@ const slowNavigation = (page: Page) =>
       // the page may already be gone when the delayed request resumes
     });
   });
-const expectOpen = (page: Page, open: boolean) => expect(sheet(page)).toHaveJSProperty("open", open);
+const expectOpen = (page: Page, open: boolean) =>
+  expect(menuButton(page)).toHaveAttribute("aria-expanded", String(open));
 /** The state right now, without waiting: used right after a tap, while the slow navigation is still on its way. */
-const isOpen = (page: Page) => page.evaluate(() => document.querySelector("details")!.open);
+const isOpen = (page: Page) =>
+  page.evaluate(() => document.querySelector("button[aria-controls]")!.getAttribute("aria-expanded") === "true");
 /** Records every open/close of the sheet, to prove each tap toggled it exactly once. */
 const recordToggles = (page: Page) =>
   page.evaluate(() => {
     const w = window as unknown as { toggles: boolean[] };
     w.toggles = [];
-    const d = document.querySelector("details")!;
-    d.addEventListener("toggle", () => w.toggles.push(d.open));
+    const d = document.querySelector("button[aria-controls]")!;
+    new MutationObserver(() => w.toggles.push(d.getAttribute("aria-expanded") === "true")).observe(d, {
+      attributes: true,
+      attributeFilter: ["aria-expanded"],
+    });
   });
 const toggles = (page: Page) => page.evaluate(() => (window as unknown as { toggles: boolean[] }).toggles);
 
@@ -124,19 +130,125 @@ test.describe("Menu sheet, other ways to close it", () => {
   });
 });
 
+for (const width of [320, 390]) {
+  for (const path of ["/", "/about/", "/how-this-site-is-built/"]) {
+    test(`repeated disclosure visibly dismisses at ${width}px on ${path}`, async ({ page }, info) => {
+      await page.setViewportSize({ width, height: 844 });
+      await page.goto(path, { waitUntil: "networkidle" });
+      const button = menuButton(page);
+      const panel = page.locator(`[id="${await button.getAttribute("aria-controls")}"]`);
+      const capture = (name: string) => page.screenshot({ path: info.outputPath(`${name}.png`) });
+      await expectOpen(page, false);
+      await capture("before");
+      for (let cycle = 0; cycle < 2; cycle++) {
+        await button.tap({ position: { x: 16, y: 19 } });
+        await page.waitForTimeout(460);
+        await expectOpen(page, true);
+        await expect(panel.getByRole("navigation")).toBeVisible();
+        if (cycle === 0) {
+          await capture("open");
+        }
+        await button.tap({ position: { x: 20, y: 23 } });
+        await page.waitForTimeout(530);
+        await expectOpen(page, false);
+        await expect(panel).toBeHidden();
+        await expect(panel.locator("*")).toHaveCount(0);
+        if (cycle === 0) {
+          const closed = await capture("closed");
+          await page.waitForTimeout(810);
+          expect(await capture("settled")).toEqual(closed);
+        }
+        await expect(page).toHaveURL(path);
+      }
+      // A tap on the underlying focusable main must reach it after dismissal.
+      const underlying = page.getByRole("main");
+      await underlying.tap({ position: { x: 18, y: 16 } });
+      await expect(underlying).toBeFocused();
+      await page.evaluate(() => window.scrollBy(0, 180));
+      await page.waitForTimeout(470);
+      await page.evaluate(() => window.scrollBy(0, -180));
+      await page.waitForTimeout(620);
+      await button.tap();
+      await expectOpen(page, true);
+      await page.setViewportSize({ width: 1100, height: 844 });
+      await expect(button).toBeHidden();
+      await expectOpen(page, false);
+      await expect(panel.locator("*")).toHaveCount(0);
+      await expect(page.getByRole("navigation", { name: "Main" })).toBeVisible();
+      await page.setViewportSize({ width, height: 844 });
+      await expectOpen(page, false);
+      await button.tap();
+      await expectOpen(page, true);
+    });
+  }
+}
+
+test("Space, short-screen scrolling and theme survive content removal", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 230 });
+  await page.goto("/about/");
+  await menuButton(page).focus();
+  await page.keyboard.press("Space");
+  await expectOpen(page, true);
+  const theme = page.getByRole("button", { name: "Switch to light theme" });
+  await theme.scrollIntoViewIfNeeded();
+  await expect(theme).toBeInViewport();
+  await theme.tap();
+  await page.keyboard.press("Escape");
+  await expect(menuButton(page)).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("button", { name: "Switch to dark theme" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await page.reload();
+  await menuButton(page).tap();
+  await expect(page.getByRole("button", { name: "Switch to dark theme" })).toBeVisible();
+});
+
+test("a late navigation cannot close a reopened panel", async ({ page }) => {
+  await start(page, "/");
+  await menuButton(page).tap();
+  await sheetLink(page, "About").tap();
+  expect(await isOpen(page)).toBe(false);
+  await menuButton(page).tap();
+  await expect(page).toHaveURL("/about/", { timeout: DELAY * 3 });
+  await expectOpen(page, true);
+});
+
+test("navigation remains usable while enhancement scripts are delayed", async ({ page }) => {
+  let resume!: () => void;
+  const scripts = new Promise<void>((resolve) => {
+    resume = resolve;
+  });
+  await page.route("**/*.js", async (route) => {
+    await scripts;
+    await route.continue();
+  });
+  await page.goto("/about/", { waitUntil: "commit" });
+  try {
+    await expect(menuButton(page)).toHaveCount(0);
+    const nav = page.getByRole("navigation", { name: "Main" });
+    await expect(nav).toHaveCount(1);
+    await expect(nav.getByRole("link", { name: "Projects", exact: true })).toHaveAttribute("href", "/projects/");
+    const position = await nav.evaluate((el) => getComputedStyle(el.parentElement!).position);
+    expect(position).toBe("static");
+  } finally {
+    resume();
+  }
+  await expectOpen(page, false);
+  await expect(page.getByRole("navigation", { name: "Main" })).toHaveCount(0);
+  await menuButton(page).tap();
+  await expect(page.getByRole("navigation", { name: "Main" })).toHaveCount(1);
+});
+
 test.describe("Menu sheet without JavaScript", () => {
   test.use({ javaScriptEnabled: false });
 
-  test("the Menu opens and its links are full page loads", async ({ page }) => {
+  test("expanded normal-flow navigation works with full page loads", async ({ page }) => {
     await page.goto("/");
-    await menuButton(page).tap();
-    await expectOpen(page, true);
+    await expect(menuButton(page)).toHaveCount(0);
+    await expect(page.getByRole("navigation", { name: "Main" })).toHaveCount(1);
     await sheetLink(page, "Projects").tap();
     await expect(page).toHaveURL("/projects/");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-    await expectOpen(page, false);
-    await menuButton(page).tap();
-    await expectOpen(page, true);
     await sheetLink(page, "About").tap();
     await expect(page).toHaveURL("/about/");
   });

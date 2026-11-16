@@ -74,9 +74,11 @@ for (const js of [true, false]) {
         scrolls.add(await page.evaluate(() => document.documentElement.scrollHeight > window.innerHeight));
         const closed = await boxes(page, {
           wordmark: page.getByRole("link", { name: HOME_LABEL }),
-          menu: page.getByText("Menu", { exact: true }),
+          ...(js ? { menu: page.getByText("Menu", { exact: true }) } : {}),
         });
-        await page.getByText("Menu", { exact: true }).click();
+        if (js) {
+          await page.getByText("Menu", { exact: true }).click();
+        }
         const open = await boxes(page, {
           About: page
             .getByRole("navigation", { name: "Main" })

@@ -221,7 +221,7 @@ test.describe("keyboard", () => {
     await page.keyboard.press("Tab"); // wordmark
     await expect(page.getByRole("link", { name: HOME_LABEL })).toBeFocused();
     await page.keyboard.press("Tab");
-    const menu = page.locator("summary", { hasText: "Menu" });
+    const menu = page.getByRole("button", { name: "Menu", exact: true });
     await expect(menu).toBeFocused();
     await page.keyboard.press("Enter");
     await page.keyboard.press("Tab");
@@ -239,7 +239,7 @@ test.describe("phone", () => {
         await page.goto(path);
         const overflow = () => page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
         expect(await overflow(), `${path} closed`).toBeLessThanOrEqual(0);
-        await page.locator("summary", { hasText: "Menu" }).click();
+        await page.getByRole("button", { name: "Menu", exact: true }).click();
         const sheetNav = page.getByRole("navigation", { name: "Main" }).filter({ visible: true });
         await expect(sheetNav, path).toBeVisible();
         expect(await overflow(), `${path} open`).toBeLessThanOrEqual(0);
@@ -302,12 +302,11 @@ test.describe("phone, web font not loaded", () => {
 test.describe("without JavaScript, on a phone", () => {
   test.use({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
 
-  test("every page is readable and the Menu sheet opens", async ({ page }) => {
+  test("every page is readable with expanded navigation", async ({ page }) => {
     for (const path of PAGES) {
       await page.goto(path);
       await expect(page.getByRole("heading", { level: 1 }), path).toBeVisible();
-      await expect(page.getByRole("navigation", { name: "Main" }).filter({ visible: true })).toHaveCount(0);
-      await page.locator("summary", { hasText: "Menu" }).click();
+      await expect(page.getByRole("button", { name: "Menu", exact: true })).toHaveCount(0);
       const sheet = page.getByRole("navigation", { name: "Main" }).filter({ visible: true });
       await expect(sheet, path).toBeVisible();
       for (const { label } of NAV) {
