@@ -1,3 +1,4 @@
+import { ExternalLink } from "../_components/external-link";
 import { PageLayout, Section } from "../_components/page-layout";
 import pageStyles from "../_components/page.module.css";
 import { Placeholder } from "../_components/placeholder";
@@ -85,9 +86,9 @@ export default function Page() {
         <ul className={pageStyles.rows}>
           {RECORD.map(({ name, href, text }) => (
             <li key={href} className={pageStyles.row}>
-              <a className={`${pageStyles.link} ${pageStyles.linkStart}`} href={href} rel="noreferrer">
+              <ExternalLink className={`${pageStyles.link} ${pageStyles.linkStart}`} href={href}>
                 {name}
-              </a>
+              </ExternalLink>
               <span className={pageStyles.rowText}>{text}</span>
             </li>
           ))}

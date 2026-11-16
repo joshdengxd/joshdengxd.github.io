@@ -207,8 +207,8 @@ test.describe("keyboard", () => {
       "Light theme",
       "Matt Pocock", // the two names in the About text (ticket #35)
       "Lauren Tan",
-      "GitHub",
-      "LinkedIn",
+      "GitHub (opens in a new tab)",
+      "LinkedIn (opens in a new tab)",
     ]);
 
     // The toggle works from the keyboard.

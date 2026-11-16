@@ -1,3 +1,4 @@
+import { ExternalLink } from "../_components/external-link";
 import { GITHUB_OWNER_URL } from "@/lib/site";
 import { LINKEDIN_URL } from "./links";
 import styles from "./shell.module.css";
@@ -6,14 +7,14 @@ export function ProfileLinks({ className }: { className?: string }) {
   return (
     <ul className={className ? `${styles.profiles} ${className}` : styles.profiles}>
       <li>
-        <a href={GITHUB_OWNER_URL} rel="me">
+        <ExternalLink href={GITHUB_OWNER_URL} rel="me">
           GitHub
-        </a>
+        </ExternalLink>
       </li>
       <li>
-        <a href={LINKEDIN_URL} rel="me">
+        <ExternalLink href={LINKEDIN_URL} rel="me">
           LinkedIn
-        </a>
+        </ExternalLink>
       </li>
     </ul>
   );
