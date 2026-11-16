@@ -1,3 +1,4 @@
+import { ExternalLink } from "../_components/external-link";
 import { PageLayout, Section } from "../_components/page-layout";
 import pageStyles from "../_components/page.module.css";
 import { pageMetadata } from "@/lib/metadata";
@@ -46,14 +47,8 @@ export default function Page() {
         </p>
         <p className={pageStyles.prose}>
           I mostly use Claude Code. Many of my ideas and workflows come from{" "}
-          <a href="https://www.aihero.dev/" rel="noreferrer">
-            Matt Pocock
-          </a>{" "}
-          and{" "}
-          <a href="https://x.com/poteto" rel="noreferrer">
-            Lauren Tan
-          </a>
-          , along with many other people.
+          <ExternalLink href="https://www.aihero.dev/">Matt Pocock</ExternalLink> and{" "}
+          <ExternalLink href="https://x.com/poteto">Lauren Tan</ExternalLink>, along with many other people.
         </p>
       </Section>
       <Section title="How I work">

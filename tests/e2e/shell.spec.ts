@@ -205,8 +205,8 @@ test.describe("keyboard", () => {
       HOME_LABEL,
       ...NAV.map((n) => n.label),
       "Light theme",
-      "Matt Pocock", // the two names in the About text (ticket #35)
-      "Lauren Tan",
+      "Matt Pocock (opens in a new tab)", // the two names in the About text (ticket #35)
+      "Lauren Tan (opens in a new tab)",
       "GitHub (opens in a new tab)",
       "LinkedIn (opens in a new tab)",
     ]);

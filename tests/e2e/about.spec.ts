@@ -1,11 +1,16 @@
 // The About page text (tickets #34, #35, #36): each section shows the owner's approved text word for word and no
-// placeholder, with JavaScript on and off; the two names in "What I am learning" are plain, focusable links.
+// placeholder, with JavaScript on and off; the two names in "What I am learning" are focusable links that open in a new tab.
 import { expect, test, type Page } from "@playwright/test";
 import { ABOUT_LINKS, ABOUT_TEXT } from "../about-text";
 
+/** The accessible name of an external link: its text, then the hidden note (ticket #44). */
+const named = (name: string) => new RegExp(`^${name}\\s*\\(opens in a new tab\\)$`);
+
 async function paragraphs(page: Page, title: string) {
   const section = page.getByRole("region", { name: title });
-  return (await section.locator("p").allTextContents()).map((t) => t.replace(/\s+/g, " ").trim());
+  return (await section.locator("p").allTextContents()).map((t) =>
+    t.replace(/\s+/g, " ").replaceAll(" (opens in a new tab)", "").trim(),
+  );
 }
 
 async function expectText(page: Page) {
@@ -34,8 +39,9 @@ test("the two names link to their own pages, inside the paragraph", async ({ pag
   const section = page.getByRole("region", { name: "What I am learning" });
   await expect(section.getByRole("link")).toHaveCount(ABOUT_LINKS.length);
   for (const { name, href } of ABOUT_LINKS) {
-    const link = section.getByRole("link", { name, exact: true });
+    const link = section.getByRole("link", { name: named(name) });
     await expect(link).toHaveAttribute("href", href);
+    await expect(link).toHaveAttribute("target", "_blank");
     expect(await link.evaluate((a) => [a.closest("p") !== null, getComputedStyle(a).display])).toEqual([
       true,
       "inline",
@@ -46,8 +52,8 @@ test("the two names link to their own pages, inside the paragraph", async ({ pag
 test("the links take focus in order, show the focus ring, and read at 4.5:1 in both themes", async ({ page }) => {
   await page.goto("/about/");
   const section = page.getByRole("region", { name: "What I am learning" });
-  const first = section.getByRole("link", { name: ABOUT_LINKS[0].name, exact: true });
-  const second = section.getByRole("link", { name: ABOUT_LINKS[1].name, exact: true });
+  const first = section.getByRole("link", { name: named(ABOUT_LINKS[0].name) });
+  const second = section.getByRole("link", { name: named(ABOUT_LINKS[1].name) });
   await page.keyboard.press("Tab"); // enter the page's tab order, then walk to the first link
   await first.focus();
   await expect(first).toBeFocused();

@@ -164,7 +164,10 @@ for (const javaScriptEnabled of [true, false]) {
         "How I work",
       ]);
       await expect(page.getByRole("heading", { name: "Links" })).toHaveCount(0);
-      await expect(page.locator("main a")).toHaveText(["Matt Pocock", "Lauren Tan"]);
+      await expect(page.locator("main a")).toHaveText([
+        "Matt Pocock (opens in a new tab)",
+        "Lauren Tan (opens in a new tab)",
+      ]);
       const footer = page.getByRole("contentinfo");
       await expect(footer.getByRole("link", { name: "GitHub" })).toBeVisible();
       await expect(footer.getByRole("link", { name: "LinkedIn" })).toBeVisible();
