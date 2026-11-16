@@ -11,6 +11,7 @@ import { createHighlighter } from "shiki";
 import { createCssVariablesTheme } from "shiki/core";
 import { createJavaScriptRegexEngine } from "shiki/engine/javascript";
 import { unified } from "unified";
+import { NEW_TAB_NOTE } from "../external-links";
 import { SITE_ORIGIN } from "../site";
 
 type MdNode = { type: string; children?: MdNode[]; position?: { start: { line: number } } };
@@ -210,8 +211,6 @@ const rehypePictures = () => (tree: object, file: { data: object }) => {
 // writes by hand (a raw `target` never gets here). Every `a` with an absolute http(s) href to another origin opens in a
 // new tab and says so in its accessible name, the same markup as the ExternalLink component. Same-origin and relative
 // links are left alone.
-const NEW_TAB_NOTE = " (opens in a new tab)";
-
 function isExternalHref(href: unknown): boolean {
   if (typeof href !== "string" || !/^https?:\/\//i.test(href)) {
     return false;

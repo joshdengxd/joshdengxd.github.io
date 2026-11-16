@@ -1,7 +1,5 @@
 import type { ReactNode } from "react";
-
-/** The words added to every link that opens another site in a new tab; the Markdown pipeline uses the same text. */
-export const NEW_TAB_NOTE = " (opens in a new tab)";
+import { NEW_TAB_NOTE } from "@/lib/external-links";
 
 type Props = {
   href: string;
