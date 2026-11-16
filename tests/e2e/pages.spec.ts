@@ -105,7 +105,7 @@ test.describe("projects", () => {
 });
 
 test.describe("home", () => {
-  test("the D5 first screen and the footer line, nothing between or after", async ({ page }) => {
+  test("the D5 first screen and navigation utilities, nothing between or after", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     const problems = watch(page);
     await page.goto("/");
@@ -124,13 +124,17 @@ test.describe("home", () => {
     }
     await expect(page.locator("main article")).toHaveCount(0);
     await expect(page.locator("main a")).toHaveCount(0);
-    await expect(page.getByRole("contentinfo").getByRole("link", { name: "GitHub" })).toBeVisible();
-    await expect(page.getByRole("contentinfo").getByRole("link", { name: "LinkedIn" })).toBeVisible();
+    await expect(
+      page.getByRole("banner").getByRole("link", { name: "GitHub" }).filter({ visible: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("banner").getByRole("link", { name: "LinkedIn" }).filter({ visible: true }),
+    ).toBeVisible();
     expect(problems).toEqual([]);
   });
 
   for (const width of [320, 390, 1440]) {
-    test(`the home page at ${width}px: no horizontal overflow; the name, then the intro under it, then the footer line`, async ({
+    test(`the home page at ${width}px: no horizontal overflow; the name, then the intro under it, then navigation utilities`, async ({
       page,
     }) => {
       await page.setViewportSize({ width, height: width > 500 ? 900 : 844 });
@@ -143,9 +147,9 @@ test.describe("home", () => {
           const r = document.querySelector(s)!.getBoundingClientRect();
           return { top: r.top, bottom: r.bottom };
         }, sel);
-      const [name, intro, footer] = [await box("h1"), await box("section[aria-label=Intro]"), await box("footer")];
+      const [name, intro] = [await box("h1"), await box("section[aria-label=Intro]")];
       expect(intro.top, "the intro is under the name").toBeGreaterThanOrEqual(name.bottom - 1);
-      expect(footer.top, "the footer line follows").toBeGreaterThanOrEqual(intro.bottom - 1);
+      await expect(page.getByRole("contentinfo")).toHaveCount(0);
     });
   }
 });
@@ -154,16 +158,19 @@ for (const javaScriptEnabled of [true, false]) {
   test.describe(`JavaScript ${javaScriptEnabled ? "on" : "off"}: home and About after the removals`, () => {
     test.use({ javaScriptEnabled });
 
-    test("/ has only its first screen and the footer, no Focus, Featured repos or Latest posts", async ({ page }) => {
+    test("/ has only its first screen and navigation utilities, no Focus, Featured repos or Latest posts", async ({
+      page,
+    }) => {
       await page.goto("/");
       await expect(page.getByRole("heading")).toHaveCount(1);
       await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Josh\s*Deng/);
       await expect(page.getByRole("heading", { level: 2 })).toHaveCount(0);
       await expect(page.locator("main article, main ol")).toHaveCount(0);
       await expect(page.locator("main a")).toHaveCount(0);
-      const footer = page.getByRole("contentinfo");
-      await expect(footer.getByRole("link", { name: "GitHub" })).toBeVisible();
-      await expect(footer.getByRole("link", { name: "LinkedIn" })).toBeVisible();
+      await expect(page.getByRole("contentinfo")).toHaveCount(0);
+      const footer = page.getByRole("banner");
+      await expect(footer.getByRole("link", { name: "GitHub" }).filter({ visible: true })).toBeVisible();
+      await expect(footer.getByRole("link", { name: "LinkedIn" }).filter({ visible: true })).toBeVisible();
     });
 
     test("/ shows the written intro word for word, with no Placeholder label", async ({ page }) => {
@@ -175,7 +182,7 @@ for (const javaScriptEnabled of [true, false]) {
       await expect(page.getByText("Placeholder:")).toHaveCount(0);
     });
 
-    test("/about/ has no Links section and no GitHub or LinkedIn link in its main content (only the two names in the text); the footer links stay", async ({
+    test("/about/ has no Links section and no GitHub or LinkedIn link in its main content (only the two names in the text); navigation profile links stay", async ({
       page,
     }) => {
       await page.goto("/about/");
@@ -189,9 +196,10 @@ for (const javaScriptEnabled of [true, false]) {
         "Matt Pocock (opens in a new tab)",
         "Lauren Tan (opens in a new tab)",
       ]);
-      const footer = page.getByRole("contentinfo");
-      await expect(footer.getByRole("link", { name: "GitHub" })).toBeVisible();
-      await expect(footer.getByRole("link", { name: "LinkedIn" })).toBeVisible();
+      await expect(page.getByRole("contentinfo")).toHaveCount(0);
+      const footer = page.getByRole("banner");
+      await expect(footer.getByRole("link", { name: "GitHub" }).filter({ visible: true })).toBeVisible();
+      await expect(footer.getByRole("link", { name: "LinkedIn" }).filter({ visible: true })).toBeVisible();
     });
   });
 }

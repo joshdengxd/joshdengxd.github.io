@@ -95,7 +95,10 @@ test.describe("in the browser", () => {
     test(`${name} opens in a new tab and the page stays where it is`, async ({ page }) => {
       await page.goto("/about/");
       const url = page.url();
-      const link = page.getByRole("link", { name: named(name) }).first();
+      const link = page
+        .getByRole("link", { name: named(name) })
+        .filter({ visible: true })
+        .first();
       const [popup] = await Promise.all([page.waitForEvent("popup"), link.click()]);
       await popup.waitForLoadState();
       expect(popup.url()).toMatch(name === "GitHub" ? /github\.com/ : /linkedin\.com/);
@@ -127,7 +130,10 @@ test.describe("with JavaScript off", () => {
   test("the note is in the accessible name of the profile links", async ({ page }) => {
     await page.goto("/");
     for (const name of ["GitHub", "LinkedIn"]) {
-      const link = page.getByRole("link", { name: named(name) }).first();
+      const link = page
+        .getByRole("link", { name: named(name) })
+        .filter({ visible: true })
+        .first();
       await expect(link).toHaveAttribute("target", "_blank");
       await expect(link).toHaveText(named(name));
     }

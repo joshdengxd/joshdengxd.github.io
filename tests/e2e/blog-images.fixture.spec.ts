@@ -51,7 +51,7 @@ for (const theme of ["Dark", "Light"] as const) {
   test(`${theme} theme: the picture sits on the light plate, and the caption is readable`, async ({ page }) => {
     await page.goto(POST);
     if (theme === "Light") {
-      await page.getByRole("button", { name: "Light theme" }).click();
+      await page.getByRole("button", { name: /Switch to (light|dark) theme/ }).click();
     }
     await expect(page.locator("html")).toHaveAttribute("data-theme", theme.toLowerCase());
     await picture(page).scrollIntoViewIfNeeded();

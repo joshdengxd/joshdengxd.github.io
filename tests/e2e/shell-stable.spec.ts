@@ -41,6 +41,8 @@ for (const js of [true, false]) {
           const now = await boxes(page, {
             panel: page.getByRole("banner"),
             wordmark: page.getByRole("link", { name: HOME_LABEL }),
+            github: page.getByRole("link", { name: /^GitHub/ }).filter({ visible: true }),
+            linkedin: page.getByRole("link", { name: /^LinkedIn/ }).filter({ visible: true }),
             // the theme toggle needs JavaScript
             ...(js ? { toggle: page.getByRole("button", { name: /theme/i }).filter({ visible: true }).first() } : {}),
             ...Object.fromEntries(

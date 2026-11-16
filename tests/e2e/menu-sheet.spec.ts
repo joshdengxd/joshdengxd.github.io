@@ -93,7 +93,10 @@ test.describe("Menu sheet, other ways to close it", () => {
   test("a tap outside the sheet closes it; a tap inside it (the theme toggle) does not", async ({ page }) => {
     await start(page, "/about/");
     await menuButton(page).tap();
-    await page.getByRole("button", { name: "Light theme" }).filter({ visible: true }).tap();
+    await page
+      .getByRole("button", { name: /Switch to (light|dark) theme/ })
+      .filter({ visible: true })
+      .tap();
     await expectOpen(page, true);
     await page.touchscreen.tap(195, 800); // empty page area below the sheet
     await expectOpen(page, false);

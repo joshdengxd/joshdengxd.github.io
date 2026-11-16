@@ -66,13 +66,13 @@ test.describe("without JavaScript", () => {
   test("the page is dark and there is no toggle", async ({ page }) => {
     await page.goto("/design/");
     expect(await bodyBackground(page)).toBe(DARK_GROUND);
-    await expect(page.getByRole("button", { name: "Light theme" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /Switch to (light|dark) theme/ })).toHaveCount(0);
   });
 });
 
 test("the toggle on /design/ switches to light, is remembered, and switches back", async ({ page }) => {
   await page.goto("/design/");
-  const toggle = page.getByRole("button", { name: "Light theme" });
+  const toggle = page.getByRole("button", { name: /Switch to (light|dark) theme/ });
   await expect(toggle).toHaveAttribute("aria-pressed", "false");
   await toggle.click();
   await expect(toggle).toHaveAttribute("aria-pressed", "true");
@@ -85,7 +85,7 @@ test("the toggle on /design/ switches to light, is remembered, and switches back
   expect(await bodyBackground(page)).toBe(LIGHT_GROUND);
 
   await page.goto("/design/");
-  await page.getByRole("button", { name: "Light theme" }).click();
+  await page.getByRole("button", { name: /Switch to (light|dark) theme/ }).click();
   expect(await theme(page)).toBe("dark");
   await page.reload();
   expect(await theme(page)).toBe("dark");
@@ -97,7 +97,7 @@ test("computed styles on /design/ equal the token file, in both themes", async (
 
   for (const t of ["dark", "light"] as Theme[]) {
     if ((await theme(page)) !== t) {
-      await page.getByRole("button", { name: "Light theme" }).click();
+      await page.getByRole("button", { name: /Switch to (light|dark) theme/ }).click();
     }
     expect(await theme(page)).toBe(t);
     expect(await mismatches(page, themeColours(css, t))).toEqual([]);
@@ -177,7 +177,7 @@ test("the code colours on /design/ equal the token file, in both themes", async 
   await page.goto("/design/");
   for (const t of ["dark", "light"] as Theme[]) {
     if ((await theme(page)) !== t) {
-      await page.getByRole("button", { name: "Light theme" }).click();
+      await page.getByRole("button", { name: /Switch to (light|dark) theme/ }).click();
     }
     expect(await theme(page)).toBe(t);
     const colours = codeColours(css, t);

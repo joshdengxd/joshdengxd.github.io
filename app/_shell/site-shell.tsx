@@ -13,7 +13,7 @@ import { ThemeToggle } from "./theme-toggle";
  * The D5 shell around every page. Wide screens: the panel on the right is the header (navigation, toggle).
  * Phones: one top row with the wordmark and a "Menu" sheet (<details>, so it opens without JavaScript).
  * The panel is the same on every page, home included (ticket #33): the wordmark first, then the links. On home the wordmark
- * is the one home link (current page) and the big name in the page is a plain heading. The footer line is on every page.
+ * is the one home link (current page) and the big name in the page is a plain heading. Secondary controls live in navigation utilities.
  */
 export function SiteShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -74,22 +74,24 @@ export function SiteShell({ children }: { children: ReactNode }) {
               }}
             >
               <NavLinks />
-              <ThemeToggle />
+              <div className={styles.utilities}>
+                <ThemeToggle />
+                <ProfileLinks />
+              </div>
             </div>
           </details>
         </div>
         <div className={styles.wide}>
           <NavLinks />
-          <ThemeToggle />
+          <div className={styles.utilities}>
+            <ThemeToggle />
+            <ProfileLinks />
+          </div>
         </div>
       </header>
       <main id="main" tabIndex={-1} className={styles.main}>
         {children}
       </main>
-      <footer className={styles.footer}>
-        <p>Xindong Deng (Josh)</p>
-        <ProfileLinks />
-      </footer>
     </div>
   );
 }

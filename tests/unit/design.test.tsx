@@ -34,7 +34,7 @@ describe("/design/ specimen", () => {
 
   it("has no toggle of its own (the toggle is in the shell)", async () => {
     render(await DesignPage());
-    expect(screen.queryByRole("button", { name: "Light theme" })).toBeNull();
+    expect(screen.queryByRole("button", { name: /Switch to (light|dark) theme/ })).toBeNull();
   });
 });
 

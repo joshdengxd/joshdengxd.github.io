@@ -143,7 +143,7 @@ test.describe("a post", () => {
       await page.goto(POST);
       for (const theme of ["dark", "light"] as const) {
         if ((await page.evaluate(() => document.documentElement.getAttribute("data-theme"))) !== theme) {
-          await page.getByRole("button", { name: "Light theme" }).click();
+          await page.getByRole("button", { name: /Switch to (light|dark) theme/ }).click();
         }
         await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
         const c = codeColours(codeTokens, theme);
@@ -163,7 +163,7 @@ test.describe("a post", () => {
       await page.goto(POST);
       for (const theme of ["dark", "light"] as const) {
         if ((await page.evaluate(() => document.documentElement.getAttribute("data-theme"))) !== theme) {
-          await page.getByRole("button", { name: "Light theme" }).click();
+          await page.getByRole("button", { name: /Switch to (light|dark) theme/ }).click();
         }
         await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
         const c = codeColours(codeTokens, theme);
