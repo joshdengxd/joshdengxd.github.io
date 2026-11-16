@@ -37,10 +37,18 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         </p>
       </Section>
       <Section title="What it does">
-        <Placeholder>What this project does, in a few plain paragraphs, comes here.</Placeholder>
+        {project.whatItDoes ? (
+          project.whatItDoes.map((text) => <p key={text}>{text}</p>)
+        ) : (
+          <Placeholder>What this project does, in a few plain paragraphs, comes here.</Placeholder>
+        )}
       </Section>
       <Section title="Why it exists">
-        <Placeholder>The problem it came from and what I learned building it comes here.</Placeholder>
+        {project.whyItExists ? (
+          project.whyItExists.map((text) => <p key={text}>{text}</p>)
+        ) : (
+          <Placeholder>The problem it came from and what I learned building it comes here.</Placeholder>
+        )}
       </Section>
       <p>
         <Link className={pageStyles.link} href="/projects/">

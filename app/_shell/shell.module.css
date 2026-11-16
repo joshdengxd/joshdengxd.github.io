@@ -124,6 +124,7 @@
   flex-direction: column;
 }
 
+/* Phones: home's first screen fills the window. On wide screens the panel is the same on every page. */
 .shell[data-home] .main {
   flex: 1;
 }
@@ -197,37 +198,5 @@
   .footer {
     grid-column: 1;
     grid-row: 2;
-  }
-
-  /* Home keeps the D5 composition: navigation at the top of the panel, the first screen fills the rest (the name on
-     the left, the intro at the foot of the panel column). Rows: navigation, rest of the first screen, the sections
-     on the ground, the footer line. */
-  .shell[data-home] {
-    grid-template-rows: auto 1fr auto auto;
-  }
-
-  .shell[data-home] .panel {
-    grid-row: 1;
-    position: relative;
-    z-index: 1;
-    height: auto;
-    padding-bottom: 0;
-  }
-
-  .shell[data-home] .bar {
-    display: none;
-  }
-
-  .shell[data-home] .main {
-    grid-column: 1 / -1;
-    grid-row: 1 / 4;
-    display: grid;
-    grid-template-columns: subgrid;
-    grid-template-rows: subgrid;
-  }
-
-  .shell[data-home] .footer {
-    grid-column: 1 / -1;
-    grid-row: 4;
   }
 }

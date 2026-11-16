@@ -1,6 +1,5 @@
-/* Direction D5 on the home page: the first screen has the name on the left and the panel column (one step lighter)
-   on the right, carrying the navigation at the top (from the shell) and the intro with the profile links at the
-   foot. Nothing follows it but the footer. */
+/* Direction D5 on the home page: the first screen is the name and the intro with the profile links; the navigation
+   panel is the shell's, the same as on every page. Nothing follows it but the footer. */
 .name {
   /* the first screen is one viewport high: the name fills it from the foot */
   min-height: 55svh;
@@ -10,9 +9,8 @@
   padding: var(--margin-page);
 }
 
-.nameLink {
+.nameText {
   display: block;
-  text-decoration: none;
 }
 
 .panel {
@@ -28,15 +26,17 @@
   font-size: var(--step-lead);
 }
 
+/* Wide screens: the panel (from the shell) is the same on every page, so the first screen is one column: the intro at
+   the top, the name filling the rest from the foot. */
 @media (min-width: 64rem) {
   .name {
-    grid-column: 1;
-    grid-row: 1 / 3;
-    min-height: 100svh;
+    min-height: calc(100svh - 14rem);
   }
 
   .panel {
-    grid-column: 2;
-    grid-row: 2;
+    order: -1;
+    background: none;
+    max-width: var(--measure);
+    padding-bottom: 0;
   }
 }

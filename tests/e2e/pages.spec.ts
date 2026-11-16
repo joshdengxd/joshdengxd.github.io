@@ -76,11 +76,29 @@ test.describe("projects", () => {
       await expect(page.getByRole("link", { name: `${project.name} on GitHub` })).toHaveAttribute("href", repo);
       await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", project.summary);
       await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
-      await expect(page.locator("[data-placeholder]").first()).toBeVisible();
+      const written = (project.whatItDoes ? 1 : 0) + (project.whyItExists ? 1 : 0);
+      await expect(page.locator("[data-placeholder]")).toHaveCount(2 - written);
+      for (const text of [...(project.whatItDoes ?? []), ...(project.whyItExists ?? [])]) {
+        await expect(page.getByText(text, { exact: true })).toBeVisible();
+      }
       expect(await (await request.get("/sitemap.xml")).text()).toContain(`/projects/${slug}/</loc>`);
       expect(problems).toEqual([]);
     });
   }
+
+  test("the written project texts show with JavaScript off", async ({ browser, baseURL }) => {
+    const context = await browser.newContext({ javaScriptEnabled: false, baseURL });
+    const page = await context.newPage();
+    for (const slug of ["josh-shared-skills", "this-site"]) {
+      await page.goto(`/projects/${slug}/`);
+      const project = PROJECTS.find((p) => p.slug === slug)!;
+      await expect(page.locator("[data-placeholder]")).toHaveCount(0);
+      for (const text of [...(project.whatItDoes ?? []), ...(project.whyItExists ?? [])]) {
+        await expect(page.getByText(text, { exact: true })).toBeVisible();
+      }
+    }
+    await context.close();
+  });
 
   test("an unknown project is the 404 page", async ({ page }) => {
     expect((await page.goto("/projects/no-such-project/"))?.status()).toBe(404);
@@ -114,7 +132,7 @@ test.describe("home", () => {
   }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/");
-    expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBe(0);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(0);
     const order = await page.evaluate(() => {
       const top = (sel: string) => document.querySelector(sel)!.getBoundingClientRect().top;
       return [top("h1"), top("section[aria-label=Intro]"), top("footer")];
@@ -156,7 +174,7 @@ for (const javaScriptEnabled of [true, false]) {
 
 test.describe("placeholders", () => {
   test("each one shows the label 'Placeholder:' and has data-placeholder, on every v1 page", async ({ page }) => {
-    for (const path of ["/", "/projects/this-site/", "/how-this-site-is-built/"]) {
+    for (const path of ["/", "/projects/job-search-skills/", "/how-this-site-is-built/"]) {
       await page.goto(path);
       const marked = page.locator("[data-placeholder]");
       expect(await marked.count(), path).toBeGreaterThan(0);
