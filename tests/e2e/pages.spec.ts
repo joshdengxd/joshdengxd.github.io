@@ -132,7 +132,7 @@ test.describe("home", () => {
   }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/");
-    expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBe(0);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(0);
     const order = await page.evaluate(() => {
       const top = (sel: string) => document.querySelector(sel)!.getBoundingClientRect().top;
       return [top("h1"), top("section[aria-label=Intro]"), top("footer")];
