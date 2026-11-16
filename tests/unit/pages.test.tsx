@@ -74,11 +74,15 @@ describe("a project page", () => {
     expect(projectParams()).toEqual(PROJECTS.map((p) => ({ slug: p.slug })));
   });
 
-  it.each(PROJECTS)("$slug links its GitHub repo and has placeholder sections and its own metadata", async (p) => {
+  it.each(PROJECTS)("$slug links its GitHub repo and has its text or placeholders and its own metadata", async (p) => {
     const { container } = render(await ProjectPage({ params: Promise.resolve({ slug: p.slug }) }));
     expect(screen.getByRole("heading", { level: 1, name: p.name })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: `${p.name} on GitHub` })).toHaveAttribute("href", p.repoUrl);
-    expect(container.querySelectorAll("[data-placeholder]").length).toBeGreaterThanOrEqual(1);
+    const written = (p.whatItDoes ? 1 : 0) + (p.whyItExists ? 1 : 0);
+    expect(container.querySelectorAll("[data-placeholder]")).toHaveLength(2 - written);
+    for (const text of [...(p.whatItDoes ?? []), ...(p.whyItExists ?? [])]) {
+      expect(screen.getByText(text)).toBeInTheDocument();
+    }
     const meta = await projectMeta({ params: Promise.resolve({ slug: p.slug }) });
     expect(meta.title).toBe(p.name);
     expect(meta.description).toBe(p.summary);

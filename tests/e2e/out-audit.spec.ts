@@ -203,8 +203,12 @@ test.describe("placeholders", () => {
     expect(total).toBeGreaterThan(5);
   });
 
-  test("the v1 pages each have at least one placeholder", () => {
-    for (const path of ["/", "/about/", ...PROJECTS.map((p) => `/projects/${p.slug}/`)]) {
+  test("the v1 pages without written text each have at least one placeholder", () => {
+    for (const path of [
+      "/",
+      "/about/",
+      ...PROJECTS.filter((p) => !p.whatItDoes || !p.whyItExists).map((p) => `/projects/${p.slug}/`),
+    ]) {
       expect(pages.find((p) => p.path === path)?.html, path).toContain("data-placeholder");
     }
   });
