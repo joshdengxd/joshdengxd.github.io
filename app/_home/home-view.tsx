@@ -3,7 +3,7 @@ import styles from "./home.module.css";
 
 const second = { "--reveal-index": 1 } as CSSProperties;
 
-/** The home page: the D5 first screen (name and panel) and the footer, nothing else. */
+/** The home page: the D5 first screen (name and intro panel). Profile links live in navigation utilities; no content footer. */
 export function HomeView() {
   return (
     <>
