@@ -7,15 +7,14 @@ import { HomeView } from "@/app/_home/home-view";
 const Home = () => <HomeView />;
 
 describe("home page and 404", () => {
-  it("home shows the name as its heading, revealed line by line, as the current home mark", () => {
+  it("home shows the name as a plain heading (not a link), revealed line by line", () => {
     render(<Home />);
-    const h1 = screen.getByRole("heading", { level: 1, name: HOME_LABEL });
-    const mark = within(h1).getByRole("link", { name: HOME_LABEL });
-    expect(mark).toHaveAttribute("href", "/");
-    expect(mark).toHaveAttribute("aria-current", "page");
+    const h1 = screen.getByRole("heading", { level: 1, name: "Josh Deng" });
+    expect(within(h1).queryByRole("link")).toBeNull();
     expect(h1.querySelectorAll(".reveal-mask > .reveal-line")).toHaveLength(2);
     expect(h1.querySelector(".name-first")).toHaveTextContent("Josh");
     expect(h1.querySelector(".name-last")).toHaveTextContent("Deng");
+    expect(screen.queryByRole("link", { name: HOME_LABEL })).toBeNull(); // the home link is the shell's wordmark
   });
 
   it("home does not link to the design specimen", () => {

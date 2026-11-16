@@ -240,11 +240,11 @@ test.describe("phone", () => {
       for (const path of PAGES) {
         await page.goto(path);
         const overflow = () => page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-        expect(await overflow(), `${path} closed`).toBe(0);
+        expect(await overflow(), `${path} closed`).toBeLessThanOrEqual(0);
         await page.locator("summary", { hasText: "Menu" }).click();
         const sheetNav = page.getByRole("navigation", { name: "Main" }).filter({ visible: true });
         await expect(sheetNav, path).toBeVisible();
-        expect(await overflow(), `${path} open`).toBe(0);
+        expect(await overflow(), `${path} open`).toBeLessThanOrEqual(0);
 
         const small = await page.evaluate(() =>
           [...document.querySelectorAll<HTMLElement>("header a, header button, header summary, footer a, main a")]

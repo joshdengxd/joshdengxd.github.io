@@ -59,14 +59,17 @@ describe("shell", () => {
     expect(screen.getByRole("main")).toHaveAttribute("id", "main");
   });
 
-  it("on home: no small wordmark, no section marked, and the same footer line as the other pages", () => {
+  it("on home: the wordmark is the one home link and the current page, no section marked, the same footer line", () => {
     nav.pathname = "/";
     render(<SiteShell>page</SiteShell>);
-    expect(screen.queryByRole("link", { name: HOME_LABEL })).toBeNull();
+    const wordmark = screen.getByRole("link", { name: HOME_LABEL });
+    expect(wordmark).toHaveAttribute("href", "/");
+    expect(wordmark).toHaveAttribute("aria-current", "page");
     const footer = screen.getByRole("contentinfo");
     expect(within(footer).getByRole("link", { name: "GitHub" })).toHaveAttribute("href", GITHUB_OWNER_URL);
     expect(within(footer).getByRole("link", { name: "LinkedIn" })).toHaveAttribute("href", LINKEDIN_URL);
-    expect(document.querySelectorAll('[aria-current="page"]')).toHaveLength(0);
+    expect(document.querySelectorAll('[aria-current="page"]')).toHaveLength(1);
+    expect(screen.getAllByRole("link", { name: HOME_LABEL })).toHaveLength(1);
   });
 
   it("the phone menu is a details sheet labelled Menu", () => {

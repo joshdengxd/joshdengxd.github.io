@@ -28,6 +28,12 @@
   size-adjust: 62%;
 }
 
+/* Reserve the scrollbar space, so a short page and a long one have the same layout width and the navigation panel
+   never moves sideways between pages (ticket #33). */
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   margin: 0;
   background: var(--color-ground);

@@ -217,6 +217,6 @@ test("the name rises from below on load", async ({ page }) => {
     .locator(".reveal-line")
     .evaluateAll((els) => els.map((e) => getComputedStyle(e).animationName));
   expect(names.every((n) => n !== "none")).toBe(true);
-  await expect(page.getByRole("heading", { level: 1, name: "Josh Deng, home" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Josh Deng" })).toBeVisible();
   await expect(page.locator("h1")).toHaveText(/Josh\s*Deng/);
 });
