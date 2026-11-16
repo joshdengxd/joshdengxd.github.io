@@ -206,7 +206,6 @@ test.describe("placeholders", () => {
 
   test("the v1 pages without written text each have at least one placeholder", () => {
     for (const path of [
-      "/",
       ...PROJECTS.filter((p) => !p.whatItDoes || !p.whyItExists).map((p) => `/projects/${p.slug}/`),
     ]) {
       expect(pages.find((p) => p.path === path)?.html, path).toContain("data-placeholder");

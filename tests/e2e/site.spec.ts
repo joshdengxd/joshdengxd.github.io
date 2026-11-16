@@ -1,11 +1,11 @@
 import { expect, test } from "@playwright/test";
 
-test("home shows its placeholder intro and the build commit", async ({ page }) => {
+test("home shows its written intro and the build commit", async ({ page }) => {
   const errors: string[] = [];
   page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
   const res = await page.goto("/");
   expect(res?.status()).toBe(200);
-  await expect(page.getByRole("region", { name: "Intro" }).locator("[data-placeholder]")).toBeVisible();
+  await expect(page.getByRole("region", { name: "Intro" })).toContainText("an AI-native builder, in Alberta, Canada.");
   await expect(page.locator('meta[name="commit"]')).toHaveAttribute("content", /^[0-9a-f]{40}$/);
   expect(errors).toEqual([]);
 });
