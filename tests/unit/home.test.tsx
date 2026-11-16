@@ -1,7 +1,5 @@
-import { opensInNewTab } from "./new-tab-name";
 import { render, screen, within } from "@testing-library/react";
-import { HOME_LABEL, LINKEDIN_URL } from "@/app/_shell/links";
-import { GITHUB_OWNER_URL } from "@/lib/site";
+import { HOME_LABEL } from "@/app/_shell/links";
 import NotFound, { metadata as notFoundMetadata } from "@/app/not-found";
 import { HomeView } from "@/app/_home/home-view";
 
@@ -23,10 +21,10 @@ describe("home page and 404", () => {
     expect(container.querySelector('a[href^="/design"]')).toBeNull();
   });
 
-  it("home has the GitHub and LinkedIn links", () => {
-    render(<Home />);
-    expect(screen.getByRole("link", { name: opensInNewTab("GitHub") })).toHaveAttribute("href", GITHUB_OWNER_URL);
-    expect(screen.getByRole("link", { name: opensInNewTab("LinkedIn") })).toHaveAttribute("href", LINKEDIN_URL);
+  it("home has no links of its own: the GitHub and LinkedIn links are the footer's", () => {
+    const { container } = render(<Home />);
+    expect(screen.queryAllByRole("link")).toHaveLength(0);
+    expect(container.querySelector("a")).toBeNull();
   });
 
   it("404 has a title and links back home", () => {

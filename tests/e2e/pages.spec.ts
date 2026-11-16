@@ -124,6 +124,7 @@ test.describe("home", () => {
       await expect(page.getByRole("region", { name })).toHaveCount(0);
     }
     await expect(page.locator("main article")).toHaveCount(0);
+    await expect(page.locator("main a")).toHaveCount(0);
     await expect(page.getByRole("contentinfo").getByRole("link", { name: "GitHub" })).toBeVisible();
     await expect(page.getByRole("contentinfo").getByRole("link", { name: "LinkedIn" })).toBeVisible();
     expect(problems).toEqual([]);
@@ -143,15 +144,9 @@ test.describe("home", () => {
           const r = document.querySelector(s)!.getBoundingClientRect();
           return { top: r.top, bottom: r.bottom };
         }, sel);
-      const [name, intro, links, footer] = [
-        await box("h1"),
-        await box("section[aria-label=Intro]"),
-        await box("main a[href*='github.com']"),
-        await box("footer"),
-      ];
+      const [name, intro, footer] = [await box("h1"), await box("section[aria-label=Intro]"), await box("footer")];
       expect(intro.top, "the intro is under the name").toBeGreaterThanOrEqual(name.bottom - 1);
-      expect(links.top, "the profile links are under the intro").toBeGreaterThanOrEqual(intro.bottom - 1);
-      expect(footer.top, "the footer line follows").toBeGreaterThanOrEqual(links.bottom - 1);
+      expect(footer.top, "the footer line follows").toBeGreaterThanOrEqual(intro.bottom - 1);
     });
   }
 });
@@ -166,7 +161,10 @@ for (const javaScriptEnabled of [true, false]) {
       await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Josh\s*Deng/);
       await expect(page.getByRole("heading", { level: 2 })).toHaveCount(0);
       await expect(page.locator("main article, main ol")).toHaveCount(0);
-      await expect(page.getByRole("contentinfo").getByRole("link", { name: "GitHub" })).toBeVisible();
+      await expect(page.locator("main a")).toHaveCount(0);
+      const footer = page.getByRole("contentinfo");
+      await expect(footer.getByRole("link", { name: "GitHub" })).toBeVisible();
+      await expect(footer.getByRole("link", { name: "LinkedIn" })).toBeVisible();
     });
 
     test("/ shows the written intro word for word, with no Placeholder label", async ({ page }) => {
