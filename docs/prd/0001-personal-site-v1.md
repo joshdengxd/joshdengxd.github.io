@@ -15,6 +15,8 @@ A personal website that introduces me, shares how I think about agent-assisted s
 ## Positioning
 Software developer by background (since 2018), now training myself to be an **AI-native builder**. I like building useful things that help people.
 
+> Amended 2026-11-15: the positioning reads "an AI-native builder", no longer "training to be one".
+
 Tone: show the work and the thinking.
 
 ## Goals
