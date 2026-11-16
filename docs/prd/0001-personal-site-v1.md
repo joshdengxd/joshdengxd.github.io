@@ -94,3 +94,7 @@ Quality gates (Lighthouse and automated accessibility checks in CI) and a full r
 
 ## Done when
 All six tickets are merged, the live site meets the requirements for the pages that exist, and each ticket's issue shows its refinement comment and a PR with verification evidence.
+
+## Amendment — 2026-11-16: navigation utilities (#68)
+
+This decision supersedes the footer placement from #45. Home has no content footer; the repeated footer identity is removed. Profile links live in the navigation utility row: theme icon left, GitHub and LinkedIn right, at the bottom of the desktop panel. On phones the row sits below primary links inside the existing expandable Menu and hides when it closes. Theme icons describe the destination and include matching accessible names and hover/focus tooltips. Existing theme persistence, no-JavaScript navigation, safe external links and Home first-screen composition remain.

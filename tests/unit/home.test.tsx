@@ -21,7 +21,7 @@ describe("home page and 404", () => {
     expect(container.querySelector('a[href^="/design"]')).toBeNull();
   });
 
-  it("home has no links of its own: the GitHub and LinkedIn links are the footer's", () => {
+  it("home has no links of its own: the GitHub and LinkedIn links are the navigation panel's", () => {
     const { container } = render(<Home />);
     expect(screen.queryAllByRole("link")).toHaveLength(0);
     expect(container.querySelector("a")).toBeNull();

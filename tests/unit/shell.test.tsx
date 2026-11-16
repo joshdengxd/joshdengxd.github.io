@@ -34,7 +34,7 @@ describe("shell", () => {
     document.documentElement.setAttribute("data-theme", "dark");
   });
 
-  it("on an inner page: wordmark home, the four sections with the current one marked, footer links", () => {
+  it("on an inner page: wordmark home, the four sections with the current one marked, navigation profile links", () => {
     nav.pathname = "/blog/";
     render(<SiteShell>page</SiteShell>);
     const wordmark = screen.getByRole("link", { name: HOME_LABEL });
@@ -54,27 +54,35 @@ describe("shell", () => {
       ]);
     }
 
-    const footer = screen.getByRole("contentinfo");
-    expect(within(footer).getByRole("link", { name: opensInNewTab("GitHub") })).toHaveAttribute(
+    expect(screen.queryByRole("contentinfo")).toBeNull();
+    const footer = screen.getByRole("banner");
+    expect(within(footer).getAllByRole("link", { name: opensInNewTab("GitHub") })[0]).toHaveAttribute(
       "href",
       GITHUB_OWNER_URL,
     );
-    expect(within(footer).getByRole("link", { name: opensInNewTab("LinkedIn") })).toHaveAttribute("href", LINKEDIN_URL);
+    expect(within(footer).getAllByRole("link", { name: opensInNewTab("LinkedIn") })[0]).toHaveAttribute(
+      "href",
+      LINKEDIN_URL,
+    );
     expect(screen.getByRole("main")).toHaveAttribute("id", "main");
   });
 
-  it("on home: the wordmark is the one home link and the current page, no section marked, the same footer line", () => {
+  it("on home: the wordmark is the one home link and the current page, no section marked, the same navigation utilities", () => {
     nav.pathname = "/";
     render(<SiteShell>page</SiteShell>);
     const wordmark = screen.getByRole("link", { name: HOME_LABEL });
     expect(wordmark).toHaveAttribute("href", "/");
     expect(wordmark).toHaveAttribute("aria-current", "page");
-    const footer = screen.getByRole("contentinfo");
-    expect(within(footer).getByRole("link", { name: opensInNewTab("GitHub") })).toHaveAttribute(
+    expect(screen.queryByRole("contentinfo")).toBeNull();
+    const footer = screen.getByRole("banner");
+    expect(within(footer).getAllByRole("link", { name: opensInNewTab("GitHub") })[0]).toHaveAttribute(
       "href",
       GITHUB_OWNER_URL,
     );
-    expect(within(footer).getByRole("link", { name: opensInNewTab("LinkedIn") })).toHaveAttribute("href", LINKEDIN_URL);
+    expect(within(footer).getAllByRole("link", { name: opensInNewTab("LinkedIn") })[0]).toHaveAttribute(
+      "href",
+      LINKEDIN_URL,
+    );
     expect(document.querySelectorAll('[aria-current="page"]')).toHaveLength(1);
     expect(screen.getAllByRole("link", { name: HOME_LABEL })).toHaveLength(1);
   });
@@ -107,7 +115,7 @@ describe("shell", () => {
 
     it("stays open when something else in it is clicked, or when the path changes by itself", () => {
       const { details, rerender } = openSheet();
-      fireEvent.click(within(details).getByRole("button", { name: "Light theme" }));
+      fireEvent.click(within(details).getByRole("button", { name: /Switch to (light|dark) theme/ }));
       expect(details.open).toBe(true);
       nav.pathname = "/projects/";
       rerender(<SiteShell>page</SiteShell>);
@@ -141,7 +149,7 @@ describe("shell", () => {
 
   it("the toggle switches to light and remembers it, and back", async () => {
     render(<ThemeToggle />);
-    const toggle = screen.getByRole("button", { name: "Light theme" });
+    const toggle = screen.getByRole("button", { name: /Switch to (light|dark) theme/ });
     expect(toggle).toHaveAttribute("aria-pressed", "false");
     fireEvent.click(toggle);
     expect(document.documentElement.getAttribute("data-theme")).toBe("light");

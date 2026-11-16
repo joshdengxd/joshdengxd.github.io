@@ -72,6 +72,8 @@
   display: grid;
   justify-items: start;
   gap: var(--space-5);
+  max-height: calc(100svh - 3.75rem);
+  overflow-y: auto;
 }
 
 /* Closed, the sheet is not laid out at all (some engines still measure the contents of a closed <details>). */
@@ -103,22 +105,49 @@
   color: var(--color-accent);
 }
 
+.utilities {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 2.75rem;
+}
 .toggle {
+  position: relative;
+  min-width: 2.75rem;
+  flex-shrink: 0;
+  justify-content: center;
   font: inherit;
-  font-weight: var(--weight-strong);
   color: var(--color-ink);
-  background: var(--color-ground);
+  background: transparent;
   border: 0;
   border-radius: var(--radius-none);
-  padding: var(--space-2) var(--space-5);
+  padding: 0;
   cursor: pointer;
 }
-
-.toggle[aria-pressed="true"] {
+.toggle:hover {
   color: var(--color-accent);
 }
+.tooltip {
+  position: absolute;
+  bottom: calc(100% + var(--space-2));
+  left: 0;
+  width: max-content;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-ground);
+  color: var(--color-ink);
+  font-size: var(--step-small);
+  pointer-events: none;
+  visibility: hidden;
+  z-index: 3;
+}
+.toggle:hover .tooltip,
+.toggle:focus-visible .tooltip {
+  visibility: visible;
+}
 
-/* On phones the home page's first screen fills the screen (the name at the foot); other pages run on into the footer line. */
+/* On phones the home page's first screen fills the screen (the name at the foot); other pages run with their content. */
 .main {
   display: flex;
   flex-direction: column;
@@ -134,13 +163,9 @@
   outline: none;
 }
 
-.footer {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  column-gap: var(--space-5);
-  padding: var(--space-7) var(--margin-page) var(--space-4);
-  color: var(--color-muted);
+.profiles a {
+  min-width: 2.75rem;
+  justify-content: center;
 }
 
 .profiles {
@@ -148,15 +173,15 @@
   margin: 0;
   padding: 0;
   display: flex;
-  flex-wrap: wrap;
-  column-gap: var(--space-5);
+  gap: var(--space-3);
+  margin-inline-start: auto;
 }
 
 @media (min-width: 64rem) {
   .shell {
     display: grid;
     grid-template-columns: minmax(0, 1fr) var(--width-panel);
-    grid-template-rows: 1fr auto;
+    grid-template-rows: 1fr;
   }
 
   /* The panel stays at the right while the page scrolls, in its own column, so it never covers content. */
@@ -167,6 +192,7 @@
     top: 0;
     align-self: start;
     height: 100svh;
+    overflow-y: auto;
     padding: var(--margin-page);
     display: flex;
     flex-direction: column;
@@ -184,9 +210,11 @@
   }
 
   .wide {
-    display: grid;
-    justify-items: end;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
     text-align: right;
+    flex: 1;
     gap: var(--space-6);
   }
 
@@ -195,8 +223,7 @@
     grid-row: 1;
   }
 
-  .footer {
-    grid-column: 1;
-    grid-row: 2;
+  .wide .utilities {
+    margin-top: auto;
   }
 }

@@ -104,7 +104,7 @@ test.describe("theme", () => {
     page,
   }) => {
     await page.goto("/about/");
-    const toggle = page.getByRole("button", { name: "Light theme" });
+    const toggle = page.getByRole("button", { name: /Switch to (light|dark) theme/ });
     await expect(toggle).toHaveAttribute("aria-pressed", "false");
     await toggle.click();
     await expect(toggle).toHaveAttribute("aria-pressed", "true");
@@ -118,10 +118,13 @@ test.describe("theme", () => {
       await page.goto(path);
       expect(await firstFrameTheme(page), path).toBe("light");
       expect(await bodyBackground(page), path).toBe(LIGHT_GROUND);
-      await expect(page.getByRole("button", { name: "Light theme" }), path).toHaveAttribute("aria-pressed", "true");
+      await expect(page.getByRole("button", { name: /Switch to (light|dark) theme/ }), path).toHaveAttribute(
+        "aria-pressed",
+        "true",
+      );
     }
 
-    await page.getByRole("button", { name: "Light theme" }).click();
+    await page.getByRole("button", { name: /Switch to (light|dark) theme/ }).click();
     await page.goto("/blog/");
     expect(await theme(page)).toBe("dark");
   });
@@ -154,7 +157,7 @@ test.describe("navigation", () => {
     await expect(page).toHaveTitle("Page not found · Xindong Deng (Josh)");
     await expect(page.getByRole("heading", { level: 1, name: "Page not found" })).toBeVisible();
     await expect(page.getByRole("navigation", { name: "Main" }).filter({ visible: true })).toBeVisible();
-    await expect(page.getByRole("contentinfo")).toBeVisible();
+    await expect(page.getByRole("contentinfo")).toHaveCount(0);
     await page.getByRole("link", { name: "Back to the home page" }).click();
     await expect(page).toHaveURL("/");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Josh\s*Deng/);
@@ -178,7 +181,7 @@ test.describe("keyboard", () => {
     page,
   }) => {
     await page.goto("/about/");
-    await page.getByRole("button", { name: "Light theme" }).waitFor();
+    await page.getByRole("button", { name: /Switch to (light|dark) theme/ }).waitFor();
     const order: string[] = [];
     for (let i = 0; i < 14; i++) {
       await page.keyboard.press("Tab");
@@ -199,20 +202,20 @@ test.describe("keyboard", () => {
       order.push(info.name);
       expect(info.ring, `focus ring on ${info.name}`).toBe(true);
     }
-    // The About text links (its two names) come before the footer links.
+    // Utilities follow navigation; page content follows the panel.
     expect(order).toEqual([
       "Skip to content",
       HOME_LABEL,
       ...NAV.map((n) => n.label),
-      "Light theme",
-      "Matt Pocock (opens in a new tab)", // the two names in the About text (ticket #35)
-      "Lauren Tan (opens in a new tab)",
+      "Switch to light theme",
       "GitHub (opens in a new tab)",
       "LinkedIn (opens in a new tab)",
+      "Matt Pocock (opens in a new tab)",
+      "Lauren Tan (opens in a new tab)",
     ]);
 
     // The toggle works from the keyboard.
-    await page.getByRole("button", { name: "Light theme" }).focus();
+    await page.getByRole("button", { name: /Switch to (light|dark) theme/ }).focus();
     await page.keyboard.press("Enter");
     expect(await theme(page)).toBe("light");
     await page.keyboard.press("Space");
@@ -319,7 +322,7 @@ test.describe("without JavaScript, on a phone", () => {
         await expect(sheet.getByRole("link", { name: label })).toBeVisible();
       }
       // No toggle without JavaScript: it could not work.
-      await expect(page.getByRole("button", { name: "Light theme" })).toHaveCount(0);
+      await expect(page.getByRole("button", { name: /Switch to (light|dark) theme/ })).toHaveCount(0);
     }
   });
 });
