@@ -19,7 +19,7 @@ export default function Page() {
         </p>
         <p className={pageStyles.prose}>
           So I studied Computing Science at the University of Alberta. In my third year, in 2015, six of us, all
-          friends, helped a local startup, Yardley, get started.
+          friends, helped a local startup called SnowTapp get started. It later became Yardly and was acquired in 2022.
         </p>
         <p className={pageStyles.prose}>
           After university I worked at Origami Accounting, then at Alberta Motor Association, the College of Registered
