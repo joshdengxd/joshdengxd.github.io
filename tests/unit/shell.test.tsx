@@ -29,6 +29,12 @@ describe("current page", () => {
 });
 
 describe("shell", () => {
+  beforeEach(() => {
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn(() => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() })),
+    );
+  });
   afterEach(() => {
     localStorage.clear();
     document.documentElement.setAttribute("data-theme", "dark");
@@ -41,9 +47,9 @@ describe("shell", () => {
     expect(wordmark).toHaveAttribute("href", "/");
     expect(wordmark).not.toHaveAttribute("aria-current");
 
-    // Two navigations in the DOM: the phone sheet and the wide panel; CSS shows one at a time.
+    // Closed compact contents are unmounted; only the shared wide/fallback navigation remains.
     const navs = screen.getAllByRole("navigation", { name: "Main" });
-    expect(navs).toHaveLength(2);
+    expect(navs).toHaveLength(1);
     for (const n of navs) {
       const links = within(n).getAllByRole("link");
       // next/link applies the trailingSlash setting only in the build; the built HTML is checked in e2e.
@@ -87,48 +93,57 @@ describe("shell", () => {
     expect(screen.getAllByRole("link", { name: HOME_LABEL })).toHaveLength(1);
   });
 
-  it("the phone menu is a details sheet labelled Menu", () => {
-    nav.pathname = "/about/";
+  it("uses a button and stable independent empty panel when closed", () => {
     const { container } = render(<SiteShell>page</SiteShell>);
-    const details = container.querySelector("details")!;
-    expect(details.querySelector("summary")).toHaveTextContent("Menu");
-    expect(within(details).getByRole("navigation", { name: "Main" })).toBeInTheDocument();
+    const button = screen.getByRole("button", { name: "Menu" });
+    const panel = document.getElementById(button.getAttribute("aria-controls")!)!;
+    expect(container.querySelector("details")).toBeNull();
+    expect(button).toHaveAttribute("aria-expanded", "false");
+    expect(panel).toHaveAttribute("hidden");
+    expect(panel).toBeEmptyDOMElement();
+    fireEvent.click(button);
+    expect(button).toHaveAttribute("aria-expanded", "true");
+    expect(within(panel).getByRole("navigation", { name: "Main" })).toBeInTheDocument();
+    fireEvent.click(button);
+    expect(document.getElementById(panel.id)).toBe(panel);
+    expect(panel).toBeEmptyDOMElement();
   });
 
   describe("the Menu sheet closes by what the visitor does, not by the path", () => {
     const openSheet = () => {
       nav.pathname = "/about/";
       const view = render(<SiteShell>page</SiteShell>);
-      const details = view.container.querySelector("details")!;
-      details.open = true;
+      const button = screen.getByRole("button", { name: "Menu" });
+      const details = document.getElementById(button.getAttribute("aria-controls")!)!;
+      fireEvent.click(button);
       return { ...view, details };
     };
 
     it("closes when a link in it is clicked, also the link of the current page", () => {
       const { details } = openSheet();
       fireEvent.click(within(details).getByRole("link", { name: "About" }));
-      expect(details.open).toBe(false);
-      details.open = true;
+      expect(details).toHaveAttribute("hidden");
+      fireEvent.click(screen.getByRole("button", { name: "Menu" }));
       fireEvent.click(within(details).getByRole("link", { name: "Blog" }));
-      expect(details.open).toBe(false);
+      expect(details).toHaveAttribute("hidden");
     });
 
     it("stays open when something else in it is clicked, or when the path changes by itself", () => {
       const { details, rerender } = openSheet();
       fireEvent.click(within(details).getByRole("button", { name: /Switch to (light|dark) theme/ }));
-      expect(details.open).toBe(true);
+      expect(details).not.toHaveAttribute("hidden");
       nav.pathname = "/projects/";
       rerender(<SiteShell>page</SiteShell>);
-      expect(details.open).toBe(true);
+      expect(details).not.toHaveAttribute("hidden");
     });
 
     it("closes on Escape and returns focus to the Menu button; Escape does nothing when it is closed", () => {
       const { details } = openSheet();
       fireEvent.keyDown(document, { key: "Enter" });
-      expect(details.open).toBe(true);
+      expect(details).not.toHaveAttribute("hidden");
       fireEvent.keyDown(document, { key: "Escape" });
-      expect(details.open).toBe(false);
-      expect(details.querySelector("summary")).toHaveFocus();
+      expect(details).toHaveAttribute("hidden");
+      expect(screen.getByRole("button", { name: "Menu" })).toHaveFocus();
       (document.activeElement as HTMLElement).blur();
       fireEvent.keyDown(document, { key: "Escape" });
       expect(document.activeElement).toBe(document.body);
@@ -137,13 +152,13 @@ describe("shell", () => {
     it("closes on a click outside it", () => {
       const { details } = openSheet();
       fireEvent.click(screen.getByRole("main"));
-      expect(details.open).toBe(false);
+      expect(details).toHaveAttribute("hidden");
     });
 
     it("closes on back and forward (popstate)", () => {
       const { details } = openSheet();
       fireEvent(window, new PopStateEvent("popstate"));
-      expect(details.open).toBe(false);
+      expect(details).toHaveAttribute("hidden");
     });
   });
 

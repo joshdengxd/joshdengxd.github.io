@@ -40,7 +40,7 @@ for (const viewport of [
     await expect(page.locator("footer")).toHaveCount(0);
     if (phone) {
       await toggle.click();
-      await expect(page.locator("details")).toHaveAttribute("open", "");
+      await expect(page.getByRole("button", { name: "Menu", exact: true })).toHaveAttribute("aria-expanded", "true");
       await page.getByText("Menu", { exact: true }).click();
       await expect(page.getByRole("link", { name: /^GitHub/ })).toHaveCount(0);
     }
@@ -70,12 +70,11 @@ test("destination icons and matching tooltips on hover and keyboard focus in bot
 });
 
 for (const width of [320, 390]) {
-  test(`no JavaScript ${width}px: profiles remain usable inside Menu only`, async ({ browser, baseURL }) => {
+  test(`no JavaScript ${width}px: profiles remain usable in expanded navigation`, async ({ browser, baseURL }) => {
     const context = await browser.newContext({ baseURL, javaScriptEnabled: false, viewport: { width, height: 568 } });
     const page = await context.newPage();
     await page.goto("/");
-    await expect(page.getByRole("link", { name: /^GitHub/ })).toHaveCount(0);
-    await page.getByText("Menu", { exact: true }).click();
+    await expect(page.getByRole("link", { name: /^GitHub/ })).toHaveCount(1);
     await expect(page.getByRole("button")).toHaveCount(0);
     for (const name of ["GitHub", "LinkedIn"]) {
       const link = page.getByRole("link", { name: new RegExp(`^${name} \\(opens in a new tab\\)$`) });
