@@ -82,11 +82,14 @@ Two surfaces and five text roles. Text roles appear at any size and need WCAG 2.
 |---|---|---|---|
 | `--color-ground` | page ground | `#1e2c23` | `#f3f0e6` |
 | `--color-panel` | the panel, one step lighter | `#2a3b2f` | `#dfe5d6` |
+| `--color-plate` | behind a picture in a post; the same light colour in both themes (not a text surface) | `#f3f0e6` | `#f3f0e6` |
 | `--color-ink` | running text | `#c2d2b8` | `#2c4a35` |
 | `--color-muted` | secondary notes | `#98a694` | `#57645a` |
 | `--color-accent` | links, current page, focus | `#c49a5a` | `#855a21` |
 | `--color-name-first` | JOSH | `#c49a5a` | `#a8742f` |
 | `--color-name-last` | DENG | `#a9bd9d` | `#3f6447` |
+
+The plate is not a surface for text roles, so it has its own checks in `tests/unit/tokens.test.ts`: the same `#rrggbb` in both themes, equal to the light ground, 3:1 or more against the dark ground (the edge of the picture is visible), and the light theme's ink on it at 4.5:1 (a broken picture's alt text).
 
 Contrast (text on ground / on panel):
 

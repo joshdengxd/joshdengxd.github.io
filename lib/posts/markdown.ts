@@ -1,4 +1,7 @@
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import rehypeShikiFromHighlighter from "@shikijs/rehype/core";
+import { imageSize } from "image-size";
 import rehypeSanitize, { defaultSchema, type Options } from "rehype-sanitize";
 import rehypeStringify from "rehype-stringify";
 import remarkGfm from "remark-gfm";
@@ -70,8 +73,141 @@ export const HIGHLIGHT_LANGUAGES = [
 // Every colour comes from the variables in design-language/tokens.css, so the theme switch needs nothing extra.
 const CODE_THEME = createCssVariablesTheme({ name: "css-variables", variablePrefix: "--shiki-", fontStyle: true });
 
-type HastNode = { tagName?: string; properties?: Record<string, unknown>; children?: HastNode[] };
-type Processor = { process(markdown: string): Promise<{ toString(): string }> };
+type HastNode = {
+  type?: string;
+  value?: string;
+  tagName?: string;
+  properties?: Record<string, unknown>;
+  children?: HastNode[];
+  position?: { start: { line: number } };
+};
+
+// Pictures in posts (ticket #41). A step after rehype-sanitize, like Shiki, so sanitizing is unchanged. A post names a
+// picture by file name only, `![alt text](diagram.svg "Caption")`; the file lives in the post's image folder
+// (public/blog/<slug>/) and the page serves it as /blog/<slug>/<file>. The step turns the sanitized <img> into a
+// <figure> with the file's real size on the <img> (width and height), so the page reserves the space before the file
+// loads. Anything else fails the build with the line: a remote URL, a path, a data URL, a missing file, another format,
+// empty alt text, or a picture that is not alone in its paragraph. Without an image context (the /design/ sample)
+// pictures are dropped.
+export const IMAGE_FORMATS = ["svg", "png", "jpg", "jpeg", "webp"] as const;
+const IMAGE_FILE_NAME = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
+
+/** Where a post's pictures are: `dir` is read from disk, `label` is shown in messages, `slug` gives the URL. */
+export type ImageContext = { slug: string; dir: string; label: string };
+
+/** A picture that cannot be built; `line` is the 1-based line in the Markdown. */
+export class ImageError extends Error {
+  constructor(
+    readonly line: number,
+    message: string,
+  ) {
+    super(message);
+    this.name = "ImageError";
+  }
+}
+
+const isElement = (node: HastNode, tag: string) => node.type === "element" && node.tagName === tag;
+
+function figureFor(img: HastNode, ctx: ImageContext): HastNode {
+  const line = img.position?.start.line ?? 1;
+  const { alt, src, title } = img.properties ?? {};
+  if (typeof alt !== "string" || alt.trim() === "") {
+    throw new ImageError(line, "a picture needs alt text: ![what the picture shows](file.svg)");
+  }
+  if (typeof src !== "string" || src === "") {
+    throw new ImageError(line, `a picture must be the name of a file in ${ctx.label}, not a URL or a data URL`);
+  }
+  if (!IMAGE_FILE_NAME.test(src)) {
+    throw new ImageError(line, `the picture "${src}" must be only a file name in ${ctx.label}, not a URL or a path`);
+  }
+  const extension = src.slice(src.lastIndexOf(".") + 1).toLowerCase();
+  if (!src.includes(".") || !(IMAGE_FORMATS as readonly string[]).includes(extension)) {
+    throw new ImageError(line, `the picture "${src}" must be ${IMAGE_FORMATS.join(", ")}`);
+  }
+  // An exact name match, so a name that works on Windows (case-insensitive) cannot 404 on the host (case-sensitive).
+  const path = join(ctx.dir, src);
+  if (!existsSync(ctx.dir) || !readdirSync(ctx.dir).includes(src)) {
+    throw new ImageError(line, `the picture "${src}" is not in ${ctx.label}`);
+  }
+  let size: { width: number; height: number };
+  try {
+    const { width: w, height: h, orientation } = imageSize(readFileSync(path));
+    // A JPEG whose EXIF orientation is 5-8 is shown turned a quarter: the box is the other way round.
+    const [width, height] = orientation !== undefined && orientation >= 5 ? [h, w] : [w, h];
+    if (!Number.isFinite(width) || !Number.isFinite(height) || width < 1 || height < 1) {
+      throw new Error("no size");
+    }
+    size = { width, height };
+  } catch {
+    throw new ImageError(line, `the size of the picture "${src}" cannot be read (is the file valid?)`);
+  }
+  const caption = typeof title === "string" ? title.trim() : "";
+  const plate: HastNode = {
+    type: "element",
+    tagName: "div",
+    properties: {},
+    children: [
+      {
+        type: "element",
+        tagName: "img",
+        properties: {
+          src: `/blog/${ctx.slug}/${src}`,
+          alt,
+          width: size.width,
+          height: size.height,
+          loading: "lazy",
+          decoding: "async",
+        },
+        children: [],
+      },
+    ],
+  };
+  const figcaption: HastNode[] = caption
+    ? [{ type: "element", tagName: "figcaption", properties: {}, children: [{ type: "text", value: caption }] }]
+    : [];
+  return { type: "element", tagName: "figure", properties: {}, children: [plate, ...figcaption] };
+}
+
+const rehypePictures = () => (tree: object, file: { data: object }) => {
+  const ctx = (file.data as { images?: ImageContext }).images;
+  const walk = (node: HastNode, top: boolean) => {
+    const children = node.children;
+    if (!children) {
+      return;
+    }
+    for (let i = 0; i < children.length; i++) {
+      const child = children[i];
+      const content = isElement(child, "p") ? child.children?.filter((c) => c.type !== "text" || c.value?.trim()) : [];
+      const alone = content?.length === 1 && isElement(content[0], "img") ? content[0] : undefined;
+      if (alone) {
+        if (ctx && !top) {
+          throw new ImageError(
+            alone.position?.start.line ?? 1,
+            "a picture must stand at the top level, not in a list or a quote",
+          );
+        }
+        if (ctx) {
+          children[i] = figureFor(alone, ctx);
+        } else {
+          children.splice(i--, 1);
+        }
+      } else if (isElement(child, "img")) {
+        if (!ctx) {
+          children.splice(i--, 1);
+          continue;
+        }
+        throw new ImageError(child.position?.start.line ?? 1, "a picture must stand alone in its own paragraph");
+      } else {
+        walk(child, false);
+      }
+    }
+  };
+  walk(tree as HastNode, true);
+};
+
+type Processor = {
+  process(input: { value: string; data: { images?: ImageContext } }): Promise<{ toString(): string }>;
+};
 let processor: Promise<Processor> | undefined;
 
 async function buildProcessor(): Promise<Processor> {
@@ -104,6 +240,7 @@ async function buildProcessor(): Promise<Processor> {
     .use(remarkGfm)
     .use(remarkRehype)
     .use(rehypeSanitize, schema)
+    .use(rehypePictures)
     .use(dropUnknownLanguages)
     .use(rehypeShikiFromHighlighter, highlighter, {
       theme: "css-variables",
@@ -113,8 +250,11 @@ async function buildProcessor(): Promise<Processor> {
     .use(rehypeStringify);
 }
 
-/** Markdown to sanitized, highlighted HTML. Never outputs raw HTML from the source or a javascript: link. */
-export async function renderMarkdown(markdown: string): Promise<string> {
+/**
+ * Markdown to sanitized, highlighted HTML. Never outputs raw HTML from the source or a javascript: link. `images` says
+ * where the post's pictures are; without it pictures are dropped. Throws ImageError for a picture that cannot be built.
+ */
+export async function renderMarkdown(markdown: string, images?: ImageContext): Promise<string> {
   processor ??= buildProcessor();
-  return String(await (await processor).process(markdown));
+  return String(await (await processor).process({ value: markdown, data: { images } }));
 }
