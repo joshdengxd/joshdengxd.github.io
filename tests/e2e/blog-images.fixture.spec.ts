@@ -1,6 +1,7 @@
 // Pictures in posts (ticket #41). Runs on the fixture build: the post "blog-engine-fixture" ends with a picture,
 // tests/fixtures/post-images/blog-engine-fixture/diagram.svg (600 x 300, light), with alt text and a caption.
 import { expect, test, type Page } from "@playwright/test";
+import { watch } from "./watch";
 
 const POST = "/blog/blog-engine-fixture/";
 const ALT = "A diagram of three boxes, One, Two and Three, joined by arrows";
@@ -9,15 +10,6 @@ const PLATE = "rgb(239, 238, 234)"; // --color-plate, the same in both themes
 
 const figure = (page: Page) => page.locator("figure");
 const picture = (page: Page) => page.getByRole("img", { name: ALT });
-
-/** Failed responses (404 and up), console errors and uncaught errors. */
-function watch(page: Page) {
-  const problems: string[] = [];
-  page.on("response", (r) => r.status() >= 400 && problems.push(`${r.status()} ${r.url()}`));
-  page.on("console", (m) => m.type() === "error" && problems.push(`console: ${m.text()}`));
-  page.on("pageerror", (e) => problems.push(`pageerror: ${e.message}`));
-  return problems;
-}
 
 test("the picture renders as a figure with its alt text and caption, loaded from the post's folder", async ({
   page,
@@ -36,8 +28,8 @@ test("the picture renders as a figure with its alt text and caption, loaded from
   expect(problems).toEqual([]);
 });
 
-test("the same picture, caption and plate without JavaScript", async ({ browser }) => {
-  const context = await browser.newContext({ javaScriptEnabled: false, baseURL: "http://localhost:4173" });
+test("the same picture, caption and plate without JavaScript", async ({ browser, baseURL }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false, baseURL });
   const page = await context.newPage();
   await page.goto(POST);
   await picture(page).scrollIntoViewIfNeeded();

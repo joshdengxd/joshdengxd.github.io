@@ -3,7 +3,8 @@
 // "blog-engine-fixture-early" (2026-11-16T00:30:00Z, tag engine-check).
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
+import { watch } from "./watch";
 import { codeColours } from "../../lib/tokens";
 
 const LATE = "time[datetime='2026-11-15T23:30:00Z']"; // 23:30 UTC
@@ -17,15 +18,6 @@ const rgb = (hex: string) => {
   const n = parseInt(hex.slice(1), 16);
   return `rgb(${n >> 16}, ${(n >> 8) & 255}, ${n & 255})`;
 };
-
-/** Failed responses (404 and up), console errors and uncaught errors. */
-function watch(page: Page) {
-  const problems: string[] = [];
-  page.on("response", (r) => r.status() >= 400 && problems.push(`${r.status()} ${r.url()}`));
-  page.on("console", (m) => m.type() === "error" && problems.push(`console: ${m.text()}`));
-  page.on("pageerror", (e) => problems.push(`pageerror: ${e.message}`));
-  return problems;
-}
 
 test.describe("the list", () => {
   test("shows the posts newest first, each with date, summary and tag links, and has no feed link", async ({
