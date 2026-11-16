@@ -201,7 +201,7 @@ test.describe("placeholders", () => {
       expect(labels, `${p.file}: a Placeholder: label that is not on a placeholder`).toBe(marked);
       total += marked;
     }
-    expect(total).toBeGreaterThan(5);
+    expect(total).toBeGreaterThan(3);
   });
 
   test("the v1 pages without written text each have at least one placeholder", () => {

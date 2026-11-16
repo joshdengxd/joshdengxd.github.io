@@ -94,6 +94,9 @@ test("no horizontal overflow at 320 and 390 px", async ({ page }) => {
   for (const width of [320, 390]) {
     await page.setViewportSize({ width, height: 800 });
     await page.goto("/about/");
-    expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth), `${width}`).toBe(0);
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth),
+      `${width}`,
+    ).toBeLessThanOrEqual(0);
   }
 });
