@@ -123,8 +123,11 @@ describe("the picture plate (--color-plate)", () => {
     expect(light["--color-plate"]).toBe(dark["--color-plate"]);
   });
 
-  it("is the light theme's ground, so a light picture sits on it as on the page", () => {
-    expect(dark["--color-plate"]).toBe(light["--color-ground"]);
+  it("is a low-chroma stone within a hair of the light theme's ground (not a yellow cream: the taste inspector warns on large cream areas)", () => {
+    expect(contrast(dark["--color-plate"], light["--color-ground"])).toBeLessThan(1.1);
+    const n = parseInt(dark["--color-plate"].slice(1), 16);
+    const [r, g, b] = [n >> 16, (n >> 8) & 255, n & 255];
+    expect(Math.max(r, g, b) - Math.min(r, g, b)).toBeLessThanOrEqual(6);
   });
 
   it("stands out from the dark ground by at least 3:1, so the edge of the picture is visible", () => {

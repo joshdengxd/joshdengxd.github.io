@@ -36,7 +36,11 @@ test.describe("the list", () => {
     await expect(page.getByRole("heading", { level: 1, name: "Blog" })).toBeVisible();
     await expect(page.getByText("No posts yet.")).toHaveCount(0);
     const titles = page.getByRole("heading", { level: 2 });
-    await expect(titles).toHaveText(["Second fixture post, just after midnight UTC", TITLE]);
+    await expect(titles).toHaveText([
+      "Second fixture post, just after midnight UTC",
+      TITLE,
+      "How do I trust my agents more?",
+    ]);
     await expect(page.getByText("A test post 30 minutes after midnight UTC")).toBeVisible();
     await expect(page.locator(LATE)).toBeVisible();
     await expect(page.getByRole("link", { name: "markdown" })).toHaveAttribute("href", "/blog/tags/markdown/");

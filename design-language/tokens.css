@@ -18,7 +18,7 @@
   color-scheme: dark;
   --color-ground: #1e2c23;
   --color-panel: #2a3b2f;
-  --color-plate: #f3f0e6; /* behind a picture in a post: light in both themes */
+  --color-plate: #efeeea; /* behind a picture in a post: light in both themes */
   --color-ink: #c2d2b8;
   --color-muted: #98a694;
   --color-accent: #c49a5a;
@@ -46,7 +46,7 @@
   color-scheme: light;
   --color-ground: #f3f0e6;
   --color-panel: #dfe5d6;
-  --color-plate: #f3f0e6;
+  --color-plate: #efeeea;
   --color-ink: #2c4a35;
   --color-muted: #57645a;
   --color-accent: #855a21;
@@ -107,7 +107,7 @@
   --space-8: 4rem;
   --space-9: 6rem;
   --space-10: 8rem;
-  --margin-page: clamp(1rem, 0.5rem + 2vw, 2rem);
+  --margin-page: clamp(1.0625rem, 0.5625rem + 2vw, 2rem);
   --width-panel: 21.25rem;
 
   /* Radius: square corners; the full round is kept for a control that must read as a toggle. */

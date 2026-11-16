@@ -260,6 +260,9 @@ test.describe("personal details", () => {
       ...PROJECTS.map((p) => p.repoUrl),
       PROJECT_BOARD_URL,
       MERGED_PRS_URL,
+      // The two links in the first post (the talk it answers and its speaker).
+      "https://www.youtube.com/watch?v=O_zcc6Xl12g",
+      "https://x.com/poteto",
     ];
     for (const p of pages) {
       for (const href of [...p.html.replace(/<script[\s\S]*?<\/script>/g, "").matchAll(/<a [^>]*href="([^"]+)"/g)].map(
