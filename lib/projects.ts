@@ -7,10 +7,10 @@ export type Project = {
   repoUrl: string;
   /** One line, plain words. */
   summary: string;
-  /** Paragraphs for the "What it does" section; without them the page shows a placeholder. */
-  whatItDoes?: readonly string[];
-  /** Paragraphs for the "Why it exists" section; without them the page shows a placeholder. */
-  whyItExists?: readonly string[];
+  /** Paragraphs for the "What it does" section. */
+  whatItDoes: readonly string[];
+  /** Paragraphs for the "Why it exists" section. */
+  whyItExists: readonly string[];
 };
 
 export const PROJECTS: readonly Project[] = [
@@ -34,6 +34,13 @@ export const PROJECTS: readonly Project[] = [
     repoUrl: repoUrl("job-search-skills"),
     summary:
       "Agent skills for an evidence-based job search: posting checks, tailoring from verified facts, independent audits.",
+    whatItDoes: [
+      "A set of agent skills for an evidence-based job search. They check a posting against your hard requirements first, tailor a resume from one verified master resume (they can reorder and trim it, never add to it), and have fresh agents audit the result. A scheduled scan watches public job boards and tells you only about strong fits.",
+      "The producer never grades its own work: every quality gate runs in a new agent or a script. Nothing is submitted automatically. You press submit.",
+    ],
+    whyItExists: [
+      "A job search is full of tedious work: reading postings, tailoring a resume, filling in a hundred forms. I built these skills to automate that part, with checks so that nothing untrue is claimed. Then the time goes to the part that needs a person: talking to people. I share them so friends who are looking for work can use them too.",
+    ],
   },
   {
     slug: "this-site",
