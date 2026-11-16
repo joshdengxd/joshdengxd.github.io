@@ -1,3 +1,4 @@
+import { opensInNewTab } from "./new-tab-name";
 import { render, screen, within } from "@testing-library/react";
 import { HomeView } from "@/app/_home/home-view";
 import AboutPage, { metadata as aboutMeta } from "@/app/about/page";
@@ -77,7 +78,7 @@ describe("a project page", () => {
   it.each(PROJECTS)("$slug links its GitHub repo and has its text or placeholders and its own metadata", async (p) => {
     const { container } = render(await ProjectPage({ params: Promise.resolve({ slug: p.slug }) }));
     expect(screen.getByRole("heading", { level: 1, name: p.name })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: `${p.name} on GitHub` })).toHaveAttribute("href", p.repoUrl);
+    expect(screen.getByRole("link", { name: opensInNewTab(`${p.name} on GitHub`) })).toHaveAttribute("href", p.repoUrl);
     const written = (p.whatItDoes ? 1 : 0) + (p.whyItExists ? 1 : 0);
     expect(container.querySelectorAll("[data-placeholder]")).toHaveLength(2 - written);
     for (const text of [...(p.whatItDoes ?? []), ...(p.whyItExists ?? [])]) {
@@ -119,9 +120,15 @@ describe("How this site is built", () => {
 
   it("links the board, the merged pull requests and the repository", () => {
     render(<HowPage />);
-    expect(screen.getByRole("link", { name: "Project board" })).toHaveAttribute("href", PROJECT_BOARD_URL);
-    expect(screen.getByRole("link", { name: "Merged pull requests" })).toHaveAttribute("href", MERGED_PRS_URL);
-    expect(screen.getByRole("link", { name: "Repository" })).toHaveAttribute("href", SITE_REPO_URL);
+    expect(screen.getByRole("link", { name: opensInNewTab("Project board") })).toHaveAttribute(
+      "href",
+      PROJECT_BOARD_URL,
+    );
+    expect(screen.getByRole("link", { name: opensInNewTab("Merged pull requests") })).toHaveAttribute(
+      "href",
+      MERGED_PRS_URL,
+    );
+    expect(screen.getByRole("link", { name: opensInNewTab("Repository") })).toHaveAttribute("href", SITE_REPO_URL);
   });
 
   it("What it is made of has 3 to 5 lines and no version or PR numbers", () => {

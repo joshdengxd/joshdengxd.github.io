@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ExternalLink } from "../../_components/external-link";
 import { Placeholder } from "../../_components/placeholder";
 import { PageLayout, Section } from "../../_components/page-layout";
 import pageStyles from "../../_components/page.module.css";
@@ -31,9 +32,9 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     <PageLayout title={project.name} lead={project.summary} longTitle>
       <Section title="Repository">
         <p>
-          <a className={pageStyles.link} href={project.repoUrl} rel="noreferrer">
+          <ExternalLink className={pageStyles.link} href={project.repoUrl}>
             {project.name} on GitHub
-          </a>
+          </ExternalLink>
         </p>
       </Section>
       <Section title="What it does">

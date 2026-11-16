@@ -44,3 +44,6 @@ summary: One or two sentences (1-300 characters).
 - `tests/fixtures/posts/` holds two test posts (one with code blocks in several languages, one with an unknown and one with no language, and a GFM table; the second sits 30 minutes after midnight UTC for the time-zone tests). They load only when `BLOG_FIXTURES=1`.
 - `npm run e2e` builds with the flag through `scripts/run-e2e.mjs fixture` (which calls `scripts/build-fixture.mjs`, Windows-safe). The default build never reads them; `npm run e2e:default` tests that build.
 - `npm run check:fixture` fails when a fixture slug or title is anywhere in `out/`; CI runs it after the default build and `deploy.yml` runs it before upload.
+
+## Links to other sites in posts
+`rehypeExternalLinks` in `lib/posts/markdown.ts` runs after `rehype-sanitize`: every `a` with an absolute `http(s)` href to another origin than the site's gets `target="_blank"`, `rel="noopener noreferrer"` and a trailing `<span class="visually-hidden"> (opens in a new tab)</span>`. Same-origin and relative links are unchanged. A hand-written `target` or `rel` never survives (raw HTML is refused and sanitize strips them). Nothing is needed in a post file. The rule is the same as `ExternalLink` (see `pages.md`).
