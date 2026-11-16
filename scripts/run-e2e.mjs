@@ -3,13 +3,15 @@
 //   node scripts/run-e2e.mjs fixture   (default) build with the blog test fixture (BLOG_FIXTURES=1): *.fixture.spec.ts
 //   node scripts/run-e2e.mjs default   the deployed build, no fixture; also runs the fixture guard: *.default.spec.ts
 //   add --webkit (npm run e2e:webkit) to also run menu-sheet.spec.ts in WebKit; local only, CI runs Chromium only.
+//   add --all (npm run e2e:all / e2e:default:all) to run every spec in Chromium and WebKit locally.
 //   Needs `npx playwright install webkit` once; this script installs nothing.
 // Specs without either word in their name run on both builds. Extra arguments go to `playwright test`.
 import { spawnSync } from "node:child_process";
 
 const args = process.argv.slice(2);
-const webkit = args.includes("--webkit");
-const [build = "fixture", ...extra] = args.filter((a) => a !== "--webkit");
+const quickWebkit = args.includes("--webkit") ? "1" : "";
+const webkit = args.includes("--all") ? "all" : quickWebkit;
+const [build = "fixture", ...extra] = args.filter((a) => a !== "--webkit" && a !== "--all");
 if (build !== "fixture" && build !== "default") {
   console.error(`run-e2e: unknown build "${build}" (use fixture or default)`);
   process.exit(1);
@@ -28,4 +30,4 @@ if (build === "fixture") {
   run("npm run build");
   run("npm run check:fixture");
 }
-run(["npx playwright test", ...extra].join(" "), { E2E_BUILD: build, ...(webkit ? { E2E_WEBKIT: "1" } : {}) });
+run(["npx playwright test", ...extra].join(" "), { E2E_BUILD: build, E2E_WEBKIT: webkit });

@@ -39,7 +39,7 @@ Two modes. Anything agents, code or tests can verify is verified that way in bot
 - Max fix rounds: 3
 
 ## Commands
-Node 26 (`.nvmrc`). Install: `npm ci`; once per machine for e2e: `npx playwright install chromium`; optional, for `npm run e2e:webkit` (local and verification only, not CI, to keep CI cost low): `npx playwright install webkit`.
+Node 26 (`.nvmrc`). Install: `npm ci`; once per machine for e2e: `npx playwright install chromium`; optional, for `npm run e2e:all`, `npm run e2e:default:all` and `npm run e2e:webkit` (local and verification only, not CI, to keep CI cost low): `npx playwright install webkit`.
 - Build: `npm run build` (static export to `out/`)
 - Dev: `npm run dev` (dev server, http://localhost:3000; routing and 404 differ from Pages)
 - Lint: `npm run lint`
@@ -48,6 +48,7 @@ Node 26 (`.nvmrc`). Install: `npm ci`; once per machine for e2e: `npx playwright
 - Type check: `npm run typecheck`
 - Unit: `npm test` (Vitest, `tests/unit/`)
 - e2e: `npm run e2e` (builds with the blog test fixture, `BLOG_FIXTURES=1`, through `scripts/run-e2e.mjs fixture`; serves `out/` on port 4173, runs Playwright Chromium, `tests/e2e/`; CI runs this only, and only for a manual run or a Dependabot PR). It leaves a fixture build in `out/`: never deploy or upload it. `npm run e2e:default` does the same on the default build (no fixture, then `check:fixture`). Specs named `*.fixture.spec.ts` run only on the fixture build, `*.default.spec.ts` only on the default one, all others on both. `npm run e2e:webkit` (fixture build, `E2E_WEBKIT=1`) also runs `menu-sheet.spec.ts` in WebKit, the iPhone Safari engine; local and verification only, not in CI.
+- Full local e2e: `npm run e2e:all` builds the fixture and runs every applicable spec in Chromium and WebKit; `npm run e2e:default:all` does the same for the default build and runs the fixture guard. WebKit is local and opt-in only; CI runs Chromium only, including manual and Dependabot runs. `npm run e2e:webkit` remains the quick Menu sheet check.
 - Fixture guard: `npm run check:fixture` (fails if the blog fixture's slug or title is anywhere in `out/`; run after the default `npm run build`)
 - Run: `npm run build && npm run serve` (serves `out/` on http://localhost:3000, as Pages does; this is what verifiers check)
 - CI: `.github/workflows/checks.yml`, one job `checks`, on every PR and by hand (`workflow_dispatch`). Every run: lint, format check, type check, unit, default build + fixture guard. The Playwright install, e2e on the fixture build and e2e on the default build run only for a manual run or a Dependabot PR (`github.event.pull_request.user.login == 'dependabot[bot]'`); for an ordinary PR the local e2e run is the verification (see CI rules). `deploy.yml` runs the same guard after its build.
