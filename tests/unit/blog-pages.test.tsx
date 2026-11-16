@@ -20,11 +20,15 @@ const post = (over: Partial<Post> = {}): Post => ({
   ...over,
 });
 
-describe("/blog/ with no posts (the deployed state)", () => {
-  it("says there are no posts yet, opens with the weekly line, and is indexable", async () => {
+describe("/blog/ with the first post (the deployed state)", () => {
+  it("lists the first post, opens with the weekly line, and is indexable", async () => {
     render(await BlogPage());
     expect(screen.getByRole("heading", { level: 1, name: "Blog" })).toBeInTheDocument();
-    expect(screen.getByText("No posts yet.")).toBeInTheDocument();
+    expect(screen.queryByText("No posts yet.")).toBeNull();
+    expect(screen.getByRole("link", { name: "How do I trust my agents more?" })).toHaveAttribute(
+      "href",
+      expect.stringMatching(/^\/blog\/how-do-i-trust-my-agents-more\/?$/),
+    );
     expect(
       screen.getByText("My learning notes on building software with agents, posted weekly. Newest first."),
     ).toBeInTheDocument();
@@ -34,14 +38,18 @@ describe("/blog/ with no posts (the deployed state)", () => {
     expect(blogMeta.description).toBe("My weekly learning notes on building software with agents.");
   });
 
-  it("generates one hidden _none page per dynamic route, so the static export has something to build", async () => {
-    expect(await slugParams()).toEqual([{ slug: "_none" }]);
-    expect(await tagParams()).toEqual([{ tag: "_none" }]);
+  it("generates the post page and one page per tag, with no hidden _none page", async () => {
+    expect(await slugParams()).toEqual([{ slug: "how-do-i-trust-my-agents-more" }]);
+    expect((await tagParams()).map((p) => p.tag).sort()).toEqual(["agents", "learning", "verification"]);
   });
 
-  it("keeps the hidden _none pages out of the sitemap", async () => {
-    const urls = (await sitemap()).map((e) => e.url).join("\n");
+  it("lists the post and its tag pages in the sitemap", async () => {
+    const urls = (await sitemap()).map((e) => e.url).join(" ");
     expect(urls).not.toContain("_none");
+    expect(urls).toContain("/blog/how-do-i-trust-my-agents-more");
+    for (const tag of ["agents", "learning", "verification"]) {
+      expect(urls).toContain(`/blog/tags/${tag}`);
+    }
   });
 });
 
