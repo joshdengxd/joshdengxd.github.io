@@ -50,7 +50,9 @@ test("the picture fits the column without overflow or layout shift from 320 to 1
     const box = await img.boundingBox();
     expect(box!.width, `width at ${width}`).toBeLessThanOrEqual(width);
     expect(
-      await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth),
+      await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.getBoundingClientRect().width,
+      ),
       `overflow at ${width}`,
     ).toBe(0);
   }
@@ -97,7 +99,7 @@ test("on a tablet the picture plate runs to the page margin on both sides (the p
   const box = await plate.boundingBox();
   expect(box).not.toBeNull();
   const left = box!.x;
-  const viewportWidth = await page.evaluate(() => document.documentElement.clientWidth);
+  const viewportWidth = await page.evaluate(() => document.documentElement.getBoundingClientRect().width);
   const right = viewportWidth - (box!.x + box!.width);
   expect(Math.abs(left - right)).toBeLessThanOrEqual(2);
   expect(left).toBeLessThan(40);
