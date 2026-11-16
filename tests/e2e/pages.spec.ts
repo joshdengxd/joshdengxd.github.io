@@ -70,7 +70,7 @@ test.describe("projects", () => {
       await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", project.summary);
       await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
       await expect(page.locator("[data-placeholder]")).toHaveCount(0);
-      for (const text of [...project.whatItDoes, ...project.whyItExists]) {
+      for (const text of [...project.whatItDoes, ...project.howItWorks, ...project.whyItExists]) {
         await expect(page.getByText(text, { exact: true })).toBeVisible();
       }
       expect(await (await request.get("/sitemap.xml")).text()).toContain(`/projects/${slug}/</loc>`);
@@ -85,12 +85,65 @@ test.describe("projects", () => {
       await page.goto(`/projects/${slug}/`);
       const project = PROJECTS.find((p) => p.slug === slug)!;
       await expect(page.locator("[data-placeholder]")).toHaveCount(0);
-      for (const text of [...project.whatItDoes, ...project.whyItExists]) {
+      for (const text of [...project.whatItDoes, ...project.howItWorks, ...project.whyItExists]) {
         await expect(page.getByText(text, { exact: true })).toBeVisible();
       }
     }
     await context.close();
   });
+
+  for (const javaScriptEnabled of [true, false]) {
+    for (const theme of ["dark", "light"]) {
+      for (const width of [320, 390, 1440]) {
+        test(`project explanations: ${width}px, ${theme}, JavaScript ${javaScriptEnabled}`, async ({
+          browser,
+          baseURL,
+        }) => {
+          const context = await browser.newContext({ baseURL, javaScriptEnabled, viewport: { width, height: 900 } });
+          if (javaScriptEnabled && theme === "light") {
+            await context.addInitScript(() => localStorage.setItem("theme", "light"));
+          }
+          const page = await context.newPage();
+          const problems = watch(page);
+          for (const project of PROJECTS) {
+            await page.goto(`/projects/${project.slug}/`);
+            // Without JS the default is dark; CSS still needs to work when the light theme is present.
+            if (!javaScriptEnabled && theme === "light") {
+              await page.locator("html").evaluate((html) => html.setAttribute("data-theme", "light"));
+            }
+            const how = page.getByRole("region", { name: "How it works" });
+            await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+            await expect(how).toBeVisible();
+            for (const text of project.howItWorks) {
+              await expect(how.getByText(text, { exact: true })).toBeVisible();
+            }
+            for (const { label, href } of project.guideLinks) {
+              await expect(how.getByRole("link", { name: label })).toHaveAttribute("href", href);
+            }
+            expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+            if (project.diagram) {
+              const image = how.getByRole("img", { name: project.diagram.alt });
+              await expect(image).toBeVisible();
+              await expect(image).toHaveAttribute("src", project.diagram.src);
+              expect(await image.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
+              const fullSize = how.getByRole("link", { name: "Open full-size diagram" });
+              await expect(fullSize).toHaveAttribute("href", project.diagram.src);
+              await fullSize.focus();
+              await expect(fullSize).toBeFocused();
+              const asset = await context.request.get(project.diagram.src);
+              expect(asset.status()).toBe(200);
+              expect(asset.headers()["content-type"]).toContain("image/svg+xml");
+              await fullSize.press("Enter");
+              await expect(page).toHaveURL(project.diagram.src);
+              await page.goBack();
+            }
+          }
+          expect(problems).toEqual([]);
+          await context.close();
+        });
+      }
+    }
+  }
 
   test("an unknown project is the 404 page", async ({ page }) => {
     expect((await page.goto("/projects/no-such-project/"))?.status()).toBe(404);

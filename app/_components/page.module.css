@@ -131,3 +131,20 @@
   font-weight: var(--weight-strong);
   margin-bottom: var(--space-3);
 }
+
+/* Project prose stays readable; wide source diagrams can use the available page width. */
+.projectText {
+  max-width: var(--measure);
+}
+
+.diagram {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.diagramImage {
+  display: block;
+  width: 100%;
+  height: auto;
+}

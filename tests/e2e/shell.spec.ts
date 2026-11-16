@@ -339,6 +339,10 @@ test.describe("personal details", () => {
       "https://github.com/joshdengxd/josh-shared-skills",
       "https://github.com/joshdengxd/job-search-skills",
       "https://github.com/joshdengxd/joshdengxd.github.io",
+      // Approved project-page guides (#79–#81); keep the privacy allowlist explicit.
+      "https://github.com/joshdengxd/josh-shared-skills/blob/main/README.md",
+      "https://github.com/joshdengxd/job-search-skills/blob/main/README.md",
+      "https://github.com/joshdengxd/joshdengxd.github.io/blob/main/docs/context/INDEX.md",
       ...ABOUT_LINKS.map((l) => l.href), // Matt Pocock and Lauren Tan, in About (ticket #35)
       PROJECT_BOARD_URL,
       MERGED_PRS_URL,
