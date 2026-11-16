@@ -72,11 +72,6 @@
   max-width: var(--measure);
 }
 
-.listItem {
-  display: grid;
-  gap: var(--space-1);
-}
-
 /* Name and text side by side from a tablet up, so a list uses the width of the page instead of one narrow column. */
 .rows {
   list-style: none;
@@ -109,15 +104,6 @@
   overflow-wrap: anywhere;
 }
 
-.links {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  column-gap: var(--space-5);
-}
-
 /* Touch targets: every link in the pages is at least 44px high and wide. */
 .link {
   min-height: 2.75rem;
@@ -141,9 +127,4 @@
 .groupTitle {
   font-weight: var(--weight-strong);
   margin-bottom: var(--space-3);
-}
-
-.small {
-  font-size: var(--step-small);
-  color: var(--color-muted);
 }

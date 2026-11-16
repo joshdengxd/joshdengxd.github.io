@@ -198,14 +198,12 @@ test.describe("keyboard", () => {
       order.push(info.name);
       expect(info.ring, `focus ring on ${info.name}`).toBe(true);
     }
-    // The About page's own Links section comes before the footer line.
+    // The About page has no links of its own: after the toggle come the footer links.
     expect(order).toEqual([
       "Skip to content",
       HOME_LABEL,
       ...NAV.map((n) => n.label),
       "Light theme",
-      "GitHub",
-      "LinkedIn",
       "GitHub",
       "LinkedIn",
     ]);
