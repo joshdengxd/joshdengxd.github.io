@@ -11,6 +11,7 @@ import ProjectPage, {
 import robots from "@/app/robots";
 import sitemap from "@/app/sitemap";
 import { PROJECTS } from "@/lib/projects";
+import { ABOUT_LINKS, ABOUT_TEXT } from "../about-text";
 import { MERGED_PRS_URL, PROJECT_BOARD_URL, SITE_REPO_URL } from "@/lib/site";
 import { SKILLS } from "@/lib/skills";
 
@@ -51,9 +52,35 @@ describe("About", () => {
     const { container } = render(<AboutPage />);
     expect(screen.getByRole("heading", { level: 1, name: "About" })).toBeInTheDocument();
     expect(headings(2)).toEqual(["Background", "What I am learning", "How I work"]);
-    expect(container.querySelector("a")).toBeNull();
+    expect(Array.from(container.querySelectorAll("a"), (a) => a.textContent)).toEqual([
+      "Matt Pocock (opens in a new tab)",
+      "Lauren Tan (opens in a new tab)",
+    ]);
     expect(aboutMeta.robots).toBeUndefined();
     expect(aboutMeta.title).toBe("About");
+  });
+});
+
+describe("About text", () => {
+  it.each(Object.entries(ABOUT_TEXT))(
+    "%s shows the approved text word for word and no placeholder",
+    (title, expected) => {
+      const { container } = render(<AboutPage />);
+      const section = screen.getByRole("region", { name: title });
+      expect(
+        Array.from(section.querySelectorAll("p"), (p) => p.textContent?.replaceAll(" (opens in a new tab)", "")),
+      ).toEqual(expected);
+      expect(container.querySelector("[data-placeholder]")).toBeNull();
+    },
+  );
+
+  it("links the two names to their own pages", () => {
+    render(<AboutPage />);
+    for (const { name, href } of ABOUT_LINKS) {
+      const link = screen.getByRole("link", { name: opensInNewTab(name) });
+      expect(link).toHaveAttribute("href", href);
+      expect(link).toHaveAttribute("rel", "noopener noreferrer");
+    }
   });
 });
 

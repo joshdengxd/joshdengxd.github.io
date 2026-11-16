@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { PROJECTS } from "../../lib/projects";
+import { ABOUT_LINKS } from "../about-text";
 import { MERGED_PRS_URL, PROJECT_BOARD_URL } from "../../lib/site";
 
 const HOME_LABEL = "Josh Deng, home";
@@ -179,7 +180,7 @@ test.describe("keyboard", () => {
     await page.goto("/about/");
     await page.getByRole("button", { name: "Light theme" }).waitFor();
     const order: string[] = [];
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < 14; i++) {
       await page.keyboard.press("Tab");
       const info = await page.evaluate(() => {
         const el = document.activeElement as HTMLElement | null;
@@ -198,12 +199,14 @@ test.describe("keyboard", () => {
       order.push(info.name);
       expect(info.ring, `focus ring on ${info.name}`).toBe(true);
     }
-    // The About page has no links of its own: after the toggle come the footer links.
+    // The About text links (its two names) come before the footer links.
     expect(order).toEqual([
       "Skip to content",
       HOME_LABEL,
       ...NAV.map((n) => n.label),
       "Light theme",
+      "Matt Pocock (opens in a new tab)", // the two names in the About text (ticket #35)
+      "Lauren Tan (opens in a new tab)",
       "GitHub (opens in a new tab)",
       "LinkedIn (opens in a new tab)",
     ]);
@@ -249,6 +252,18 @@ test.describe("phone", () => {
         const small = await page.evaluate(() =>
           [...document.querySelectorAll<HTMLElement>("header a, header button, header summary, footer a, main a")]
             .filter((el) => el.offsetParent !== null || getComputedStyle(el).position === "fixed")
+            // WCAG 2.2 target size, inline exception: a link is exempt only when it is displayed inline and sits in a
+            // sentence, i.e. its paragraph still has a letter or digit once the text of ALL links in it is removed.
+            // Every other link (blocks, inline-blocks, flex, a paragraph of only links) must be 44px.
+            .filter((el) => {
+              const block = el.closest("p");
+              if (!el.matches("main a") || !block || getComputedStyle(el).display !== "inline") {
+                return true;
+              }
+              const copy = block.cloneNode(true) as HTMLElement;
+              copy.querySelectorAll("a").forEach((a) => a.remove());
+              return !/[\p{L}\p{N}]/u.test(copy.textContent ?? "");
+            })
             .map((el) => ({ name: el.textContent?.trim(), r: el.getBoundingClientRect() }))
             .filter(({ r }) => r.width > 0 && (r.width < 44 || r.height < 44))
             .map(({ name, r }) => `${name} ${Math.round(r.width)}x${Math.round(r.height)}`),
@@ -310,7 +325,7 @@ test.describe("without JavaScript, on a phone", () => {
 });
 
 test.describe("personal details", () => {
-  test("the shell shows no contact detail, and outside links go only to GitHub, LinkedIn, the public repos, the project board and the merged pull requests", async ({
+  test("the shell shows no contact detail, and outside links go only to GitHub, LinkedIn, the public repos, the two people About names, the project board and the merged pull requests", async ({
     page,
   }) => {
     const outside = new Set<string>();
@@ -330,6 +345,7 @@ test.describe("personal details", () => {
       "https://github.com/joshdengxd/josh-shared-skills",
       "https://github.com/joshdengxd/job-search-skills",
       "https://github.com/joshdengxd/joshdengxd.github.io",
+      ...ABOUT_LINKS.map((l) => l.href), // Matt Pocock and Lauren Tan, in About (ticket #35)
       PROJECT_BOARD_URL,
       MERGED_PRS_URL,
     ];

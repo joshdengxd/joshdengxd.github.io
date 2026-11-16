@@ -5,6 +5,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { expect, test } from "@playwright/test";
 import { PROJECTS } from "../../lib/projects";
+import { ABOUT_LINKS } from "../about-text";
 import { MERGED_PRS_URL, PROJECT_BOARD_URL } from "../../lib/site";
 
 const OUT = join(process.cwd(), "out");
@@ -204,7 +205,7 @@ test.describe("placeholders", () => {
   });
 
   test("the v1 pages without written text each have at least one placeholder", () => {
-    for (const path of ["/about/"]) {
+    for (const path of ["/how-this-site-is-built/"]) {
       expect(pages.find((p) => p.path === path)?.html, path).toContain("data-placeholder");
     }
   });
@@ -249,15 +250,20 @@ test.describe("personal details", () => {
     const home = pages.find((p) => p.path === "/")!;
     expect(home.text).toContain("Alberta, Canada");
     for (const p of pages) {
-      expect(p.text.replace(/Alberta, Canada/g, ""), p.file).not.toMatch(/Alberta|Canada/);
+      // The Background text names the university and two employers with Alberta in their names (ticket #34).
+      const rest = p.text
+        .replace(/Alberta, Canada/g, "")
+        .replace(/University of Alberta|Alberta Motor Association|College of Registered Nurses of Alberta/g, "");
+      expect(rest, p.file).not.toMatch(/Alberta|Canada/);
     }
   });
 
-  test("outside links go only to the GitHub and LinkedIn profiles, the three public repos, the project board and the merged pull requests", () => {
+  test("outside links go only to the GitHub and LinkedIn profiles, the three public repos, the two people About names, the project board and the merged pull requests", () => {
     const allowed = [
       "https://github.com/joshdengxd",
       "https://www.linkedin.com/in/josh-deng-edm",
       ...PROJECTS.map((p) => p.repoUrl),
+      ...ABOUT_LINKS.map((l) => l.href), // Matt Pocock and Lauren Tan, in About (ticket #35)
       PROJECT_BOARD_URL,
       MERGED_PRS_URL,
       // The two links in the first post (the talk it answers and its speaker).

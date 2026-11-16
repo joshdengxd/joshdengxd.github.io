@@ -63,6 +63,13 @@
   max-width: var(--measure);
 }
 
+/* The About paragraphs: a reading measure of 75ch, a little wider than the other pages' 65ch. At 768px the column is then
+   as wide as the page (721px), so the two margins match (a 65ch column leaves 111px on the right, 23px on the left: the
+   inspector's off-centre rule). Above that the column keeps 75ch at every width. */
+.prose {
+  max-width: 75ch;
+}
+
 .list {
   list-style: none;
   margin: 0;

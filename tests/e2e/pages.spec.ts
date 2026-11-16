@@ -175,7 +175,7 @@ for (const javaScriptEnabled of [true, false]) {
       await expect(page.getByText("Placeholder:")).toHaveCount(0);
     });
 
-    test("/about/ has no Links section and no GitHub or LinkedIn link in its main content; the footer links stay", async ({
+    test("/about/ has no Links section and no GitHub or LinkedIn link in its main content (only the two names in the text); the footer links stay", async ({
       page,
     }) => {
       await page.goto("/about/");
@@ -185,7 +185,10 @@ for (const javaScriptEnabled of [true, false]) {
         "How I work",
       ]);
       await expect(page.getByRole("heading", { name: "Links" })).toHaveCount(0);
-      await expect(page.locator("main a")).toHaveCount(0);
+      await expect(page.locator("main a")).toHaveText([
+        "Matt Pocock (opens in a new tab)",
+        "Lauren Tan (opens in a new tab)",
+      ]);
       const footer = page.getByRole("contentinfo");
       await expect(footer.getByRole("link", { name: "GitHub" })).toBeVisible();
       await expect(footer.getByRole("link", { name: "LinkedIn" })).toBeVisible();
@@ -195,7 +198,7 @@ for (const javaScriptEnabled of [true, false]) {
 
 test.describe("placeholders", () => {
   test("each one shows the label 'Placeholder:' and has data-placeholder, on every v1 page", async ({ page }) => {
-    for (const path of ["/about/", "/how-this-site-is-built/"]) {
+    for (const path of ["/how-this-site-is-built/"]) {
       await page.goto(path);
       const marked = page.locator("[data-placeholder]");
       expect(await marked.count(), path).toBeGreaterThan(0);
