@@ -204,8 +204,8 @@ test.describe("keyboard", () => {
       HOME_LABEL,
       ...NAV.map((n) => n.label),
       "Light theme",
-      "GitHub",
-      "LinkedIn",
+      "GitHub (opens in a new tab)",
+      "LinkedIn (opens in a new tab)",
     ]);
 
     // The toggle works from the keyboard.

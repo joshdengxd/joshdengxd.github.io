@@ -9,7 +9,9 @@ describe("the Markdown pipeline", () => {
     );
     expect(html).toContain("<h2>Title</h2>");
     expect(html).toContain("<em>emphasis</em>");
-    expect(html).toContain('<a href="https://example.com/">link</a>');
+    expect(html).toContain(
+      '<a href="https://example.com/" target="_blank" rel="noopener noreferrer">link<span class="visually-hidden"> (opens in a new tab)</span></a>',
+    );
     expect(html).toContain('<pre class="shiki css-variables"');
     expect(html).toContain('<code><span class="line">');
     expect(html).toContain("<table>");
@@ -228,5 +230,36 @@ describe("findRawHtml", () => {
 
   it("ignores code and autolinks", () => {
     expect(findRawHtml("`<b>`\n\n```\n<div>\n```\n\n<https://example.com>")).toEqual([]);
+  });
+
+  describe("links to other sites (ticket #44)", () => {
+    const NOTE = '<span class="visually-hidden"> (opens in a new tab)</span>';
+    const attrs = 'target="_blank" rel="noopener noreferrer"';
+
+    it("opens only external links in a new tab, with the hidden note", async () => {
+      const html = await renderMarkdown(
+        "[ext](https://example.com/x) [plain](http://example.org) [own](https://joshdengxd.github.io/blog/) [rel](/blog/) [hash](#top) [sub](https://www.joshdengxd.github.io/)",
+      );
+      expect(html).toContain(`<a href="https://example.com/x" ${attrs}>ext${NOTE}</a>`);
+      expect(html).toContain(`<a href="http://example.org" ${attrs}>plain${NOTE}</a>`);
+      expect(html).toContain(`<a href="https://www.joshdengxd.github.io/" ${attrs}>sub${NOTE}</a>`);
+      expect(html).toContain('<a href="https://joshdengxd.github.io/blog/">own</a>');
+      expect(html).toContain('<a href="/blog/">rel</a>');
+      expect(html).toContain('<a href="#top">hash</a>');
+      expect(html.match(/target=/g)).toHaveLength(3);
+    });
+
+    it("keeps the link text for autolinks and links with formatting", async () => {
+      const html = await renderMarkdown("<https://example.com/a> and [**bold** text](https://example.com/b)");
+      expect(html).toContain(`>https://example.com/a${NOTE}</a>`);
+      expect(html).toContain(`<strong>bold</strong> text${NOTE}</a>`);
+    });
+
+    it("still drops a hand-written raw <a target> and fails the raw HTML check", async () => {
+      const raw = '<a href="https://evil.example/" target="_self" rel="opener">x</a>';
+      const html = await renderMarkdown(raw);
+      expect(html).not.toMatch(/<a|target|opener|evil/);
+      expect(findRawHtml(raw).length).toBeGreaterThan(0);
+    });
   });
 });

@@ -11,6 +11,7 @@ import { createHighlighter } from "shiki";
 import { createCssVariablesTheme } from "shiki/core";
 import { createJavaScriptRegexEngine } from "shiki/engine/javascript";
 import { unified } from "unified";
+import { SITE_ORIGIN } from "../site";
 
 type MdNode = { type: string; children?: MdNode[]; position?: { start: { line: number } } };
 
@@ -205,6 +206,43 @@ const rehypePictures = () => (tree: object, file: { data: object }) => {
   walk(tree as HastNode, true);
 };
 
+// Links to other sites (ticket #44). A step after rehype-sanitize, so the sanitize rules still strip whatever an author
+// writes by hand (a raw `target` never gets here). Every `a` with an absolute http(s) href to another origin opens in a
+// new tab and says so in its accessible name, the same markup as the ExternalLink component. Same-origin and relative
+// links are left alone.
+const NEW_TAB_NOTE = " (opens in a new tab)";
+
+function isExternalHref(href: unknown): boolean {
+  if (typeof href !== "string" || !/^https?:\/\//i.test(href)) {
+    return false;
+  }
+  try {
+    return new URL(href).origin !== SITE_ORIGIN;
+  } catch {
+    return false;
+  }
+}
+
+const rehypeExternalLinks = () => (tree: object) => {
+  const walk = (node: HastNode) => {
+    if (isElement(node, "a") && isExternalHref(node.properties?.href)) {
+      node.properties = { ...node.properties, target: "_blank", rel: ["noopener", "noreferrer"] };
+      node.children = [
+        ...(node.children ?? []),
+        {
+          type: "element",
+          tagName: "span",
+          properties: { className: ["visually-hidden"] },
+          children: [{ type: "text", value: NEW_TAB_NOTE }],
+        },
+      ];
+      return;
+    }
+    node.children?.forEach(walk);
+  };
+  walk(tree as HastNode);
+};
+
 type Processor = {
   process(input: { value: string; data: { images?: ImageContext } }): Promise<{ toString(): string }>;
 };
@@ -240,6 +278,7 @@ async function buildProcessor(): Promise<Processor> {
     .use(remarkGfm)
     .use(remarkRehype)
     .use(rehypeSanitize, schema)
+    .use(rehypeExternalLinks)
     .use(rehypePictures)
     .use(dropUnknownLanguages)
     .use(rehypeShikiFromHighlighter, highlighter, {
