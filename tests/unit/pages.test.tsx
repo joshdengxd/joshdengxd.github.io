@@ -109,8 +109,21 @@ describe("a project page", () => {
     expect(screen.getByRole("heading", { level: 1, name: p.name })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: opensInNewTab(`${p.name} on GitHub`) })).toHaveAttribute("href", p.repoUrl);
     expect(container.querySelectorAll("[data-placeholder]")).toHaveLength(0);
-    for (const text of [...p.whatItDoes, ...p.whyItExists]) {
+    for (const text of [...p.whatItDoes, ...p.howItWorks, ...p.whyItExists]) {
       expect(screen.getByText(text)).toBeInTheDocument();
+    }
+    expect(headings(2)).toEqual(["Repository", "What it does", "How it works", "Why it exists"]);
+    const how = screen.getByRole("region", { name: "How it works" });
+    for (const { label, href } of p.guideLinks) {
+      const link = within(how).getByRole("link", { name: href.startsWith("/") ? label : opensInNewTab(label) });
+      expect(href.startsWith("/") ? slashed(link.getAttribute("href")) : link.getAttribute("href")).toBe(href);
+    }
+    if (p.diagram) {
+      expect(within(how).getByRole("img", { name: p.diagram.alt })).toHaveAttribute("src", p.diagram.src);
+      expect(within(how).getByRole("link", { name: "Open full-size diagram" })).toHaveAttribute("href", p.diagram.src);
+      expect(how).toHaveTextContent(p.diagram.caption);
+    } else {
+      expect(within(how).queryByRole("img")).toBeNull();
     }
     const meta = await projectMeta({ params: Promise.resolve({ slug: p.slug }) });
     expect(meta.title).toBe(p.name);
@@ -123,8 +136,7 @@ describe("a project page", () => {
     const what = screen.getByRole("heading", { level: 2, name: "What it does" }).parentElement!;
     const why = screen.getByRole("heading", { level: 2, name: "Why it exists" }).parentElement!;
     expect(Array.from(what.querySelectorAll("p")).map((p) => p.textContent)).toEqual([
-      "A set of agent skills for an evidence-based job search. They check a posting against your hard requirements first, tailor a resume from one verified master resume (they can reorder and trim it, never add to it), and have fresh agents audit the result. A scheduled scan watches public job boards and tells you only about strong fits.",
-      "The producer never grades its own work: every quality gate runs in a new agent or a script. Nothing is submitted automatically. You press submit.",
+      "A set of agent skills for an evidence-based job search. They screen postings, tailor resumes from verified facts and independently audit the result. Nothing is submitted automatically. You press submit.",
     ]);
     expect(Array.from(why.querySelectorAll("p")).map((p) => p.textContent)).toEqual([
       "A job search is full of tedious work: reading postings, tailoring a resume, filling in a hundred forms. I built these skills to automate that part, with checks so that nothing untrue is claimed. Then the time goes to the part that needs a person: talking to people. I share them so friends who are looking for work can use them too.",

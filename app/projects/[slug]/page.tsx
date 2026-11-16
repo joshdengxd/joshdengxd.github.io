@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ExternalLink } from "../../_components/external-link";
 import { PageLayout, Section } from "../../_components/page-layout";
@@ -38,12 +39,56 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
       </Section>
       <Section title="What it does">
         {project.whatItDoes.map((text) => (
-          <p key={text}>{text}</p>
+          <p className={pageStyles.projectText} key={text}>
+            {text}
+          </p>
         ))}
+      </Section>
+      <Section title="How it works">
+        {project.diagram && (
+          <figure className={pageStyles.diagram}>
+            <Image
+              className={pageStyles.diagramImage}
+              src={project.diagram.src}
+              width={project.diagram.width}
+              height={project.diagram.height}
+              alt={project.diagram.alt}
+            />
+            <figcaption className={pageStyles.projectText}>
+              {project.diagram.caption}{" "}
+              <a className={pageStyles.link} href={project.diagram.src}>
+                Open full-size diagram
+              </a>
+              .
+            </figcaption>
+          </figure>
+        )}
+        {project.howItWorks.map((text) => (
+          <p className={pageStyles.projectText} key={text}>
+            {text}
+          </p>
+        ))}
+        <ul className={pageStyles.list}>
+          {project.guideLinks.map(({ label, href }) => (
+            <li key={href}>
+              {href.startsWith("/") ? (
+                <Link className={pageStyles.link} href={href}>
+                  {label}
+                </Link>
+              ) : (
+                <ExternalLink className={pageStyles.link} href={href}>
+                  {label}
+                </ExternalLink>
+              )}
+            </li>
+          ))}
+        </ul>
       </Section>
       <Section title="Why it exists">
         {project.whyItExists.map((text) => (
-          <p key={text}>{text}</p>
+          <p className={pageStyles.projectText} key={text}>
+            {text}
+          </p>
         ))}
       </Section>
       <p>

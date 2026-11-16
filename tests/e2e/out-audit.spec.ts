@@ -226,22 +226,31 @@ test.describe("personal details", () => {
   test("no page shows a city, email, phone number, job-search status or photo", () => {
     for (const p of pages) {
       for (const [what, pattern] of FORBIDDEN) {
-        // The one picture the site allows is a post's own <figure> (ticket #41), checked in the next test.
+        // Figures may hold a post's own image or one of the two approved project diagrams, checked below.
         // One sentence on the job-search-skills page (ticket #47) says "friends who are looking for work": it is about the
         // reader's friends, not the owner, so that exact phrase is not scanned. Any other use still fails.
         const text = p.text.replace(/friends who are looking for work/g, "friends who need it");
-        const where = what === "a photo" ? p.html.replace(/<figure>[\s\S]*?<\/figure>/g, "") : text;
+        const where = what === "a photo" ? p.html.replace(/<figure(?:\s[^>]*)?>[\s\S]*?<\/figure>/g, "") : text;
         expect(pattern.test(where), `${p.file} shows ${what}`).toBe(false);
       }
     }
   });
 
-  test("a picture appears only inside a post's figure, from that post's own folder", () => {
+  test("pictures belong to their post, except the two approved project workflow diagrams", () => {
+    const diagrams = new Map([
+      ["/projects/josh-shared-skills/", "/projects/josh-shared-skills/cycle.svg"],
+      ["/projects/job-search-skills/", "/projects/job-search-skills/pipeline.svg"],
+    ]);
     for (const p of pages) {
       for (const [tag] of p.html.matchAll(/<img\s[^>]*>/gi)) {
-        expect(p.path, `${p.file} has a picture outside a post`).toMatch(/^\/blog\/[a-z0-9-]+\/$/);
         const src = /\ssrc="([^"]*)"/.exec(tag)?.[1];
-        expect(src, `${p.file}: ${tag}`).toContain(`${p.path}`);
+        const diagram = diagrams.get(p.path);
+        if (diagram) {
+          expect(src, `${p.file}: ${tag}`).toBe(diagram);
+        } else {
+          expect(p.path, `${p.file} has a picture outside a post`).toMatch(/^\/blog\/[a-z0-9-]+\/$/);
+          expect(src, `${p.file}: ${tag}`).toContain(`${p.path}`);
+        }
       }
     }
   });
@@ -263,6 +272,10 @@ test.describe("personal details", () => {
       "https://github.com/joshdengxd",
       "https://www.linkedin.com/in/josh-deng-edm",
       ...PROJECTS.map((p) => p.repoUrl),
+      // Approved project-page guides (#79–#81); keep the privacy allowlist explicit.
+      "https://github.com/joshdengxd/josh-shared-skills/blob/main/README.md",
+      "https://github.com/joshdengxd/job-search-skills/blob/main/README.md",
+      "https://github.com/joshdengxd/joshdengxd.github.io/blob/main/docs/context/INDEX.md",
       ...ABOUT_LINKS.map((l) => l.href), // Matt Pocock and Lauren Tan, in About (ticket #35)
       PROJECT_BOARD_URL,
       MERGED_PRS_URL,

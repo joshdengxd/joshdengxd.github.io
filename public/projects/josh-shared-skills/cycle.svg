@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 780" width="1280" height="780" role="img" aria-label="Delivery cycle: refine, build and evaluate, run at scale, ship, investigate with data, foundations">
+<defs><filter id="sh" x="-5%" y="-10%" width="110%" height="130%"><feDropShadow dx="0" dy="1.5" stdDeviation="2.5" flood-color="#1f2328" flood-opacity="0.08"/></filter><marker id="m_refine" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#E36209"/></marker><marker id="m_build" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#1F6FEB"/></marker><marker id="m_scale" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#0E8A8A"/></marker><marker id="m_ship" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#6B4FBB"/></marker><marker id="m_data" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#2EA44F"/></marker><marker id="m_base" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#57606a"/></marker><marker id="m_n" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#8c959f"/></marker></defs>
+<rect x="0.5" y="0.5" width="1279" height="779" rx="18" fill="#FFFFFF" stroke="#D0D7DE"/>
+<text x="32" y="46" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="22" font-weight="700" fill="#1f2328" text-anchor="start">Delivery cycle</text>
+<text x="32" y="70" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="13" fill="#57606a" text-anchor="start">From a vague ticket to a production release. Independent agents, code and tests verify the work; a person takes the irreversible steps.</text>
+<rect x="32" y="96" width="250" height="340" rx="14" fill="#FFF8F2" stroke="#E36209" stroke-opacity="0.35"/>
+<circle cx="56" cy="122" r="11" fill="#E36209"/>
+<text x="56" y="126.5" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">1</text>
+<text x="75" y="126.5" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" font-weight="700" fill="#E36209" text-anchor="start" letter-spacing="1.1">REFINE</text>
+<rect x="52" y="150" width="210" height="32" rx="16.0" fill="#fff" stroke="#E36209" stroke-dasharray="4 3"/>
+<text x="157.0" y="170.5" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#57606a" text-anchor="middle">Epic or feature</text>
+<path d="M157.0 183 V194" fill="none" stroke="#E36209" stroke-width="1.6" stroke-linejoin="round" marker-end="url(#m_refine)"/>
+<rect x="52" y="196" width="210" height="32" rx="16.0" fill="#fff" stroke="#E36209" stroke-dasharray="4 3"/>
+<text x="157.0" y="216.5" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#57606a" text-anchor="middle">Spec: agent drafts, you approve</text>
+<path d="M157.0 229 V240" fill="none" stroke="#E36209" stroke-width="1.6" stroke-linejoin="round" marker-end="url(#m_refine)"/>
+<rect x="52" y="242" width="210" height="32" rx="9" fill="#fff" stroke="#E36209" stroke-opacity="0.5" filter="url(#sh)"/>
+<rect x="53" y="251" width="4" height="14" rx="2" fill="#E36209"/>
+<text x="68" y="263.0" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="14" font-weight="700" fill="#1f2328" text-anchor="start">create-ticket</text>
+<path d="M157.0 275 V286" fill="none" stroke="#E36209" stroke-width="1.6" stroke-linejoin="round" marker-end="url(#m_refine)"/>
+<rect x="52" y="288" width="210" height="62" rx="9" fill="#fff" stroke="#E36209" stroke-opacity="0.5" filter="url(#sh)"/>
+<rect x="53" y="297" width="4" height="44" rx="2" fill="#E36209"/>
+<text x="68" y="310" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="14" font-weight="700" fill="#1f2328" text-anchor="start">refine-ticket</text>
+<text x="68" y="327" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#57606a" text-anchor="start">Spec + acceptance criteria</text>
+<text x="68" y="342" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#57606a" text-anchor="start">You approve the summary</text>
+<text x="157.0" y="418" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="11" fill="#57606a" text-anchor="middle">dashed: process step, no skill yet</text>
+<rect x="318" y="96" width="440" height="340" rx="14" fill="#F4F8FF" stroke="#1F6FEB" stroke-opacity="0.35"/>
+<circle cx="342" cy="122" r="11" fill="#1F6FEB"/>
+<text x="342" y="126.5" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">2</text>
+<text x="361" y="126.5" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" font-weight="700" fill="#1F6FEB" text-anchor="start" letter-spacing="1.1">BUILD, EVALUATE, IMPROVE</text>
+<rect x="338" y="150" width="380" height="58" rx="9" fill="#fff" stroke="#1F6FEB" stroke-opacity="0.5" filter="url(#sh)"/>
+<rect x="339" y="159" width="4" height="40" rx="2" fill="#1F6FEB"/>
+<text x="354" y="172" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="14" font-weight="700" fill="#1f2328" text-anchor="start">implement-and-verify-ticket</text>
+<text x="354" y="189" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#57606a" text-anchor="start">Checks + e2e green; fresh agent checks each criterion</text>
+<rect x="338" y="228" width="380" height="58" rx="9" fill="#fff" stroke="#1F6FEB" stroke-opacity="0.5" filter="url(#sh)"/>
+<rect x="339" y="237" width="4" height="40" rx="2" fill="#1F6FEB"/>
+<text x="354" y="250" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="14" font-weight="700" fill="#1f2328" text-anchor="start">verify-against-criteria</text>
+<text x="354" y="267" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#57606a" text-anchor="start">Follow-up: read-only code review, with evidence</text>
+<path d="M528.0 209 V226" fill="none" stroke="#1F6FEB" stroke-width="1.6" stroke-linejoin="round" marker-end="url(#m_build)"/>
+<rect x="338" y="306" width="380" height="58" rx="9" fill="#fff" stroke="#1F6FEB" stroke-opacity="0.5" filter="url(#sh)"/>
+<rect x="339" y="315" width="4" height="40" rx="2" fill="#1F6FEB"/>
+<text x="354" y="328" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="14" font-weight="700" fill="#1f2328" text-anchor="start">live-env-local-test</text>
+<text x="354" y="345" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#57606a" text-anchor="start">Follow-up: real environment, local build</text>
+<path d="M528.0 287 V304" fill="none" stroke="#1F6FEB" stroke-width="1.6" stroke-linejoin="round" marker-end="url(#m_build)"/>
+<path d="M718 257 H730 V179 H720" fill="none" stroke="#1F6FEB" stroke-width="1.6" stroke-dasharray="5 4" stroke-linejoin="round" marker-end="url(#m_build)"/>
+<text x="538.0" y="400" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="11.5" fill="#1F6FEB" text-anchor="middle">Not passing: findings go back to the implementer,</text>
+<text x="538.0" y="416" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="11.5" fill="#1F6FEB" text-anchor="middle">and every round gets a new verifier.</text>
+<path d="M262 319 H300 V179 H336" fill="none" stroke="#E36209" stroke-width="1.6" stroke-linejoin="round" marker-end="url(#m_refine)"/>
+<rect x="794" y="96" width="454" height="340" rx="14" fill="#F8F5FF" stroke="#6B4FBB" stroke-opacity="0.35"/>
+<circle cx="818" cy="122" r="11" fill="#6B4FBB"/>
+<text x="818" y="126.5" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">4</text>
+<text x="837" y="126.5" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" font-weight="700" fill="#6B4FBB" text-anchor="start" letter-spacing="1.1">SHIP</text>
+<rect x="814" y="150" width="414" height="62" rx="9" fill="#fff" stroke="#6B4FBB" stroke-opacity="0.5" filter="url(#sh)"/>
+<rect x="815" y="159" width="4" height="44" rx="2" fill="#6B4FBB"/>
+<text x="830" y="172" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="14" font-weight="700" fill="#1f2328" text-anchor="start">Before merge: private environment</text>
+<text x="830" y="189" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#57606a" text-anchor="start">Branch build in a short-lived Kubernetes pod</text>
+<text x="830" y="204" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#57606a" text-anchor="start">run-e2e-automation, plus manual QA by people</text>
+<rect x="814" y="226" width="414" height="34" rx="17.0" fill="#6B4FBB" filter="url(#sh)"/>
+<text x="1021.0" y="248.0" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.5" font-weight="700" fill="#fff" text-anchor="middle">On land request: merge, deploy, re-check</text>
+<path d="M1021.0 213 V224" fill="none" stroke="#6B4FBB" stroke-width="1.6" stroke-linejoin="round" marker-end="url(#m_ship)"/>
+<rect x="814" y="272" width="199.0" height="58" rx="9" fill="#fff" stroke="#6B4FBB" stroke-opacity="0.5" filter="url(#sh)"/>
+<rect x="815" y="281" width="4" height="40" rx="2" fill="#6B4FBB"/>
+<text x="830" y="294" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="14" font-weight="700" fill="#1f2328" text-anchor="start">deploy-to-staging</text>
+<text x="830" y="311" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#57606a" text-anchor="start">Explicit tag, GitOps sync</text>
+<rect x="1029.0" y="272" width="199.0" height="58" rx="9" fill="#fff" stroke="#6B4FBB" stroke-opacity="0.5" filter="url(#sh)"/>
+<rect x="1030.0" y="281" width="4" height="40" rx="2" fill="#6B4FBB"/>
+<text x="1045.0" y="294" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="14" font-weight="700" fill="#1f2328" text-anchor="start">run-e2e-automation</text>
+<text x="1045.0" y="311" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#57606a" text-anchor="start">Suite again on staging</text>
+<path d="M1021.0 261 V268 H913.5 V270" fill="none" stroke="#6B4FBB" stroke-width="1.6" stroke-linejoin="round" marker-end="url(#m_ship)"/>
+<path d="M1013.0 301 H1027.0" fill="none" stroke="#6B4FBB" stroke-width="1.6" stroke-linejoin="round" marker-end="url(#m_ship)"/>
+<rect x="814" y="342" width="414" height="50" rx="9" fill="#fff" stroke="#6B4FBB" stroke-opacity="0.5" filter="url(#sh)"/>
+<rect x="815" y="351" width="4" height="32" rx="2" fill="#6B4FBB"/>
+<text x="830" y="364" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="14" font-weight="700" fill="#1f2328" text-anchor="start">prod-release-gate</text>
+<text x="830" y="381" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#57606a" text-anchor="start">Stop after each step; canary go / no-go</text>
+<path d="M1128.5 331 V340" fill="none" stroke="#6B4FBB" stroke-width="1.6" stroke-linejoin="round" marker-end="url(#m_ship)"/>
+<text x="1021.0" y="418" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="11" fill="#57606a" text-anchor="middle">Only a clean run is released. People perform every production action.</text>
+<path d="M718 335 H776 V181 H812" fill="none" stroke="#1F6FEB" stroke-width="1.6" stroke-linejoin="round" marker-end="url(#m_build)"/>
+<text x="724" y="328" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#1F6FEB" text-anchor="start">pass</text>
+<rect x="318" y="458" width="440" height="88" rx="14" fill="#F0FAFA" stroke="#0E8A8A" stroke-opacity="0.35"/>
+<circle cx="342" cy="484" r="11" fill="#0E8A8A"/>
+<text x="342" y="488.5" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">3</text>
+<text x="361" y="488.5" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" font-weight="700" fill="#0E8A8A" text-anchor="start" letter-spacing="1.1">RUN IT AT SCALE</text>
+<text x="338" y="514" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="14" font-weight="700" fill="#1f2328" text-anchor="start">drain-refined</text>
+<text x="338" y="532" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#57606a" text-anchor="start">Unattended: each group runs box 2, then land-ticket.</text>
+<path d="M538.0 456 V439" fill="none" stroke="#0E8A8A" stroke-width="1.6" stroke-dasharray="5 4" stroke-linejoin="round" marker-end="url(#m_scale)"/>
+<rect x="32" y="568" width="1216" height="78" rx="14" fill="#F2FBF4" stroke="#2EA44F" stroke-opacity="0.35"/>
+<circle cx="56" cy="594" r="11" fill="#2EA44F"/>
+<text x="56" y="598.5" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">5</text>
+<text x="75" y="598.5" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" font-weight="700" fill="#2EA44F" text-anchor="start" letter-spacing="1.1">INVESTIGATE WITH DATA</text>
+<rect x="52" y="608" width="150" height="30" rx="9" fill="#fff" stroke="#2EA44F" stroke-opacity="0.5" filter="url(#sh)"/>
+<rect x="53" y="617" width="4" height="12" rx="2" fill="#2EA44F"/>
+<text x="68" y="628.0" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="14" font-weight="700" fill="#1f2328" text-anchor="start">log-analysis</text>
+<text x="222" y="628" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12.5" fill="#57606a" text-anchor="start">debug  ·  size a change  ·  check an assumption  ·  evidence for specs  ·  baseline  ·  release watch  ·  A/B tests</text>
+<path d="M157.0 566 V439" fill="none" stroke="#2EA44F" stroke-width="1.6" stroke-dasharray="5 4" stroke-linejoin="round" marker-end="url(#m_data)"/>
+<text x="165.0" y="486" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#2EA44F" text-anchor="start">evidence for</text>
+<text x="165.0" y="500" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#2EA44F" text-anchor="start">specs and design</text>
+<path d="M914 566 V439" fill="none" stroke="#2EA44F" stroke-width="1.6" stroke-dasharray="5 4" stroke-linejoin="round" marker-end="url(#m_data)"/>
+<text x="922" y="486" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#2EA44F" text-anchor="start">canary checks</text>
+<text x="922" y="500" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#2EA44F" text-anchor="start">and debugging</text>
+<path d="M1094 439 V566" fill="none" stroke="#2EA44F" stroke-width="1.6" stroke-dasharray="5 4" stroke-linejoin="round" marker-end="url(#m_data)"/>
+<text x="1102" y="486" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#2EA44F" text-anchor="start">release watch</text>
+<text x="1102" y="500" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#2EA44F" text-anchor="start">and A/B results</text>
+<rect x="32" y="668" width="1216" height="78" rx="14" fill="#F6F8FA" stroke="#57606a" stroke-opacity="0.35"/>
+<circle cx="56" cy="694" r="11" fill="#57606a"/>
+<text x="56" y="698.5" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">6</text>
+<text x="75" y="698.5" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" font-weight="700" fill="#57606a" text-anchor="start" letter-spacing="1.1">FOUNDATIONS</text>
+<rect x="52" y="708" width="120" height="30" rx="9" fill="#fff" stroke="#57606a" stroke-opacity="0.5" filter="url(#sh)"/>
+<rect x="53" y="717" width="4" height="12" rx="2" fill="#57606a"/>
+<text x="68" y="728.0" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="14" font-weight="700" fill="#1f2328" text-anchor="start">wrap-up</text>
+<rect x="186" y="708" width="250" height="30" rx="9" fill="#fff" stroke="#57606a" stroke-opacity="0.5" filter="url(#sh)"/>
+<rect x="187" y="717" width="4" height="12" rx="2" fill="#57606a"/>
+<text x="202" y="728.0" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="14" font-weight="700" fill="#1f2328" text-anchor="start">agent-context-template</text>
+<text x="456" y="728" font-family="Inter,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12.5" fill="#57606a" text-anchor="start">Every session ends by saving what worked as memory; every repo starts with the right rules.</text>
+</svg>

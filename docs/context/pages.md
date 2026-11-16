@@ -32,3 +32,16 @@ Only what PRD-0001 allows: name "Xindong Deng (Josh)", "Alberta, Canada", past e
 Every link to another site (an absolute `http(s)` address whose origin is not the site's) opens in a new tab: `target="_blank"`, `rel="noopener noreferrer"` (profile links add `me`) and a visually hidden " (opens in a new tab)" at the end of the link (`.visually-hidden` in `app/globals.css`), so it is in the accessible name and works without JavaScript. Write such links with `ExternalLink` (`app/_components/external-link.tsx`); links inside the site use `Link` and get no `target`. Links in Markdown posts get the same markup from `lib/posts/markdown.ts` (see `blog.md`). `tests/e2e/external-links.spec.ts` parses every HTML file in `out/` (both builds) and fails on an external `a` without the attributes or the note, so any new external link must use the component or the pipeline.
 
 The content footer is removed (#68). On phones the enhanced Menu button controls an independent panel; closed panel contents are unmounted. Before hydration and without JavaScript, navigation remains expanded in normal flow. The expanded panel contains the utility row beneath primary links, with a gap; closing Menu hides all utilities. The sheet and desktop panel scroll at short heights. The theme button shows its destination (sun for light, moon for dark), with an accessible action name and matching hover/focus tooltip. It is absent without JavaScript; profile links remain usable.
+
+## Project explanations (#79–#81)
+
+`lib/projects.ts` stores each project's What it does, How it works and Why it exists paragraphs, guide links and optional diagram metadata. The shared project page renders these at build time; summaries, slugs and metadata are independent of the longer explanation. Internal guide links use Link; external guides use ExternalLink.
+
+The two README diagrams are unchanged, checked-in SVGs, served locally without runtime GitHub requests. Each has intrinsic dimensions, responsive sizing, descriptive alt text, a caption and a same-tab full-size link that works without JavaScript. The original light background is part of each SVG and remains in both site themes. The shared skills diagram describes the broader toolkit, including optional staging and production tools; it is not this site's deployment architecture.
+
+| Local asset | Upstream source | Git blob SHA |
+|---|---|---|
+| `public/projects/josh-shared-skills/cycle.svg` | [shared skills delivery cycle](https://github.com/joshdengxd/josh-shared-skills/blob/main/assets/cycle.svg) | `0834829af75e544e17c17e43ea1879bc66e305fe` |
+| `public/projects/job-search-skills/pipeline.svg` | [job-search pipeline](https://github.com/joshdengxd/job-search-skills/blob/main/assets/pipeline.svg) | `dda5f275a0f51c95c6160208018462f5d7de10c3` |
+
+Update these assets deliberately from their upstream sources; there is no automatic synchronization. `tests/e2e/pages.spec.ts` covers How it works text, guide links, locally loaded diagrams and full-size links with and without JavaScript, in both themes and at mobile and desktop widths.
