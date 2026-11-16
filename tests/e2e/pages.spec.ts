@@ -76,9 +76,8 @@ test.describe("projects", () => {
       await expect(page.getByRole("link", { name: `${project.name} on GitHub` })).toHaveAttribute("href", repo);
       await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", project.summary);
       await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
-      const written = (project.whatItDoes ? 1 : 0) + (project.whyItExists ? 1 : 0);
-      await expect(page.locator("[data-placeholder]")).toHaveCount(2 - written);
-      for (const text of [...(project.whatItDoes ?? []), ...(project.whyItExists ?? [])]) {
+      await expect(page.locator("[data-placeholder]")).toHaveCount(0);
+      for (const text of [...project.whatItDoes, ...project.whyItExists]) {
         await expect(page.getByText(text, { exact: true })).toBeVisible();
       }
       expect(await (await request.get("/sitemap.xml")).text()).toContain(`/projects/${slug}/</loc>`);
@@ -89,11 +88,11 @@ test.describe("projects", () => {
   test("the written project texts show with JavaScript off", async ({ browser, baseURL }) => {
     const context = await browser.newContext({ javaScriptEnabled: false, baseURL });
     const page = await context.newPage();
-    for (const slug of ["josh-shared-skills", "this-site"]) {
+    for (const slug of ["josh-shared-skills", "job-search-skills", "this-site"]) {
       await page.goto(`/projects/${slug}/`);
       const project = PROJECTS.find((p) => p.slug === slug)!;
       await expect(page.locator("[data-placeholder]")).toHaveCount(0);
-      for (const text of [...(project.whatItDoes ?? []), ...(project.whyItExists ?? [])]) {
+      for (const text of [...project.whatItDoes, ...project.whyItExists]) {
         await expect(page.getByText(text, { exact: true })).toBeVisible();
       }
     }
@@ -196,7 +195,7 @@ for (const javaScriptEnabled of [true, false]) {
 
 test.describe("placeholders", () => {
   test("each one shows the label 'Placeholder:' and has data-placeholder, on every v1 page", async ({ page }) => {
-    for (const path of ["/about/", "/projects/job-search-skills/", "/how-this-site-is-built/"]) {
+    for (const path of ["/about/", "/how-this-site-is-built/"]) {
       await page.goto(path);
       const marked = page.locator("[data-placeholder]");
       expect(await marked.count(), path).toBeGreaterThan(0);

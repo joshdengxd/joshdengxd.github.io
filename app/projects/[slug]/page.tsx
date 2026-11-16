@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ExternalLink } from "../../_components/external-link";
-import { Placeholder } from "../../_components/placeholder";
 import { PageLayout, Section } from "../../_components/page-layout";
 import pageStyles from "../../_components/page.module.css";
 import { findProject, PROJECTS, projectPath } from "@/lib/projects";
@@ -38,18 +37,14 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         </p>
       </Section>
       <Section title="What it does">
-        {project.whatItDoes ? (
-          project.whatItDoes.map((text) => <p key={text}>{text}</p>)
-        ) : (
-          <Placeholder>What this project does, in a few plain paragraphs, comes here.</Placeholder>
-        )}
+        {project.whatItDoes.map((text) => (
+          <p key={text}>{text}</p>
+        ))}
       </Section>
       <Section title="Why it exists">
-        {project.whyItExists ? (
-          project.whyItExists.map((text) => <p key={text}>{text}</p>)
-        ) : (
-          <Placeholder>The problem it came from and what I learned building it comes here.</Placeholder>
-        )}
+        {project.whyItExists.map((text) => (
+          <p key={text}>{text}</p>
+        ))}
       </Section>
       <p>
         <Link className={pageStyles.link} href="/projects/">

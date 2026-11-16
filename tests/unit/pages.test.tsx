@@ -77,19 +77,31 @@ describe("a project page", () => {
     expect(projectParams()).toEqual(PROJECTS.map((p) => ({ slug: p.slug })));
   });
 
-  it.each(PROJECTS)("$slug links its GitHub repo and has its text or placeholders and its own metadata", async (p) => {
+  it.each(PROJECTS)("$slug links its GitHub repo and has its written text and its own metadata", async (p) => {
     const { container } = render(await ProjectPage({ params: Promise.resolve({ slug: p.slug }) }));
     expect(screen.getByRole("heading", { level: 1, name: p.name })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: opensInNewTab(`${p.name} on GitHub`) })).toHaveAttribute("href", p.repoUrl);
-    const written = (p.whatItDoes ? 1 : 0) + (p.whyItExists ? 1 : 0);
-    expect(container.querySelectorAll("[data-placeholder]")).toHaveLength(2 - written);
-    for (const text of [...(p.whatItDoes ?? []), ...(p.whyItExists ?? [])]) {
+    expect(container.querySelectorAll("[data-placeholder]")).toHaveLength(0);
+    for (const text of [...p.whatItDoes, ...p.whyItExists]) {
       expect(screen.getByText(text)).toBeInTheDocument();
     }
     const meta = await projectMeta({ params: Promise.resolve({ slug: p.slug }) });
     expect(meta.title).toBe(p.name);
     expect(meta.description).toBe(p.summary);
     expect(meta.alternates?.canonical).toBe(`/projects/${p.slug}/`);
+  });
+
+  it("job-search-skills shows the agreed texts word for word under What it does and Why it exists", async () => {
+    render(await ProjectPage({ params: Promise.resolve({ slug: "job-search-skills" }) }));
+    const what = screen.getByRole("heading", { level: 2, name: "What it does" }).parentElement!;
+    const why = screen.getByRole("heading", { level: 2, name: "Why it exists" }).parentElement!;
+    expect(Array.from(what.querySelectorAll("p")).map((p) => p.textContent)).toEqual([
+      "A set of agent skills for an evidence-based job search. They check a posting against your hard requirements first, tailor a resume from one verified master resume (they can reorder and trim it, never add to it), and have fresh agents audit the result. A scheduled scan watches public job boards and tells you only about strong fits.",
+      "The producer never grades its own work: every quality gate runs in a new agent or a script. Nothing is submitted automatically. You press submit.",
+    ]);
+    expect(Array.from(why.querySelectorAll("p")).map((p) => p.textContent)).toEqual([
+      "A job search is full of tedious work: reading postings, tailoring a resume, filling in a hundred forms. I built these skills to automate that part, with checks so that nothing untrue is claimed. Then the time goes to the part that needs a person: talking to people. I share them so friends who are looking for work can use them too.",
+    ]);
   });
 
   it("an unknown slug is a 404", async () => {

@@ -10,7 +10,7 @@ Read when you add or edit a page, change metadata, the sitemap or robots, the so
 - `lib/skills.ts`: one line per skill in `.claude/skills/`, keyed by folder name, in two groups (ticket cycle, supporting). A unit test compares the keys with the folders both ways, so adding or removing a skill needs a line change here. The How this site is built page (Workflow, Skills used, What it is made of, The record) has no per-PR data: the record links (board, merged PRs, repo) come from `lib/site.ts`.
 
 ## Placeholders
-`<Placeholder>` (`app/_components/placeholder.tsx`) renders a muted paragraph with the visible label "Placeholder:" and `data-placeholder`. List what is left: `grep -r data-placeholder out/` after a build. Replacing one with real copy is deleting the component, nothing else. No check fails while placeholders remain.
+`<Placeholder>` (`app/_components/placeholder.tsx`) renders a muted paragraph with the visible label "Placeholder:" and `data-placeholder`. List what is left: `grep -r data-placeholder out/` after a build. Replacing one with real copy is deleting the component, nothing else. All three project pages now have their written text (`whatItDoes`, `whyItExists` are required in `lib/projects.ts`, no placeholder fallback); what is left is About and How this site is built. No check fails while placeholders remain.
 
 ## Metadata
 - Root layout: `title: { default, template: "%s · Xindong Deng (Josh)" }`, `metadataBase`. A page passes the bare title.
