@@ -49,7 +49,7 @@ describe("About", () => {
     const { container } = render(<AboutPage />);
     expect(screen.getByRole("heading", { level: 1, name: "About" })).toBeInTheDocument();
     expect(headings(2)).toEqual(["Background", "What I am learning", "How I work"]);
-    expect(container.querySelector("a")).toBeNull();
+    expect(Array.from(container.querySelectorAll("a"), (a) => a.textContent)).toEqual(["Matt Pocock", "Lauren Tan"]);
     expect(aboutMeta.robots).toBeUndefined();
     expect(aboutMeta.title).toBe("About");
   });

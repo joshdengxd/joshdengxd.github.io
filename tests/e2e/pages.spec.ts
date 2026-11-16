@@ -136,7 +136,7 @@ for (const javaScriptEnabled of [true, false]) {
       await expect(page.getByRole("contentinfo").getByRole("link", { name: "GitHub" })).toBeVisible();
     });
 
-    test("/about/ has no Links section and no GitHub or LinkedIn link in its main content; the footer links stay", async ({
+    test("/about/ has no Links section and no GitHub or LinkedIn link in its main content (only the two names in the text); the footer links stay", async ({
       page,
     }) => {
       await page.goto("/about/");
@@ -146,7 +146,7 @@ for (const javaScriptEnabled of [true, false]) {
         "How I work",
       ]);
       await expect(page.getByRole("heading", { name: "Links" })).toHaveCount(0);
-      await expect(page.locator("main a")).toHaveCount(0);
+      await expect(page.locator("main a")).toHaveText(["Matt Pocock", "Lauren Tan"]);
       const footer = page.getByRole("contentinfo");
       await expect(footer.getByRole("link", { name: "GitHub" })).toBeVisible();
       await expect(footer.getByRole("link", { name: "LinkedIn" })).toBeVisible();
