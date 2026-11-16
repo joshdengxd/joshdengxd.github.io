@@ -11,8 +11,8 @@ Read when working on build, routing, metadata, content or CI. Verify against cur
 - Do not let `actions/configure-pages` rewrite `next.config`.
 
 ## Content
-- Front matter is validated with a schema (for example zod); a bad file fails the build.
-- YAML turns `2026-11-14` into midnight UTC. Keep dates as ISO strings in UTC and convert for display in the reader's locale and time zone on the client; render the UTC date in the HTML for no-JS readers.
+- Front matter is validated by the strict Zod schema in `lib/posts/schema.ts`; a bad file fails the build.
+- The loader uses the `yaml` package's default YAML 1.2 schema: dates stay strings. The Zod schema requires a full UTC timestamp ending in `Z` (for example `2026-11-15T18:00:00Z`); a bare date or an offset fails the build. Convert for display in the reader's locale and time zone on the client; render the UTC date in the HTML for no-JS readers. See `blog.md` and `tests/unit/posts-loader.test.ts`.
 - Markdown via remark/rehype at build, raw HTML off (or rehype-sanitize). Highlight code at build time if needed.
 - Fixture posts only when `BLOG_FIXTURES=1` (see `blog.md`); never in the deployed build: `deploy.yml` runs `npm run check:fixture` after the build.
 
@@ -23,13 +23,13 @@ Read when working on build, routing, metadata, content or CI. Verify against cur
 - Use `next/font/local` with font files in the repo (licences in `design-language/`), so the build does not fetch from a font service.
 
 ## CI/CD
-- PR workflow: lint, type check, unit, build, e2e. Use `pull_request`, never `pull_request_target`.
+- The `checks` job runs lint, format check, type check, unit tests, a default build and the fixture guard on every PR and manual run. Playwright Chromium e2e runs against both fixture and default builds only on manual runs and Dependabot PRs; ordinary PRs record passing local e2e results at the verified SHA, as required by `AGENTS.md`. Use `pull_request`, never `pull_request_target`.
 - Deploy workflow: `actions/configure-pages`, `actions/upload-pages-artifact`, `actions/deploy-pages`; `github-pages` environment; concurrency group with `cancel-in-progress: false`.
 - Permissions: `contents: read` by default; `pages: write` and `id-token: write` only on the deploy job. Pin actions by commit SHA. Dependabot for npm and actions.
 - Branch rules: a ruleset needs each required check to have run once before it can be required.
 
 ## Verification
-- Browser checks can run against the dev server; when routing, 404 or trailing-slash behaviour matters, also check the static build (`out/`) served locally.
+- Before merge, browser verifiers check the static build (`out/`) served locally with the run command in `AGENTS.md`; the dev server differs from Pages in routing and 404 behaviour. After merge, check the live site and confirm its commit meta matches the merged SHA. E2E also serves `out/`; fixture builds must never be deployed.
 - Useful e2e: click through every page and fail on any 404 or console error.
 
 ## Windows builds
