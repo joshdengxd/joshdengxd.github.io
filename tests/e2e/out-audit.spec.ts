@@ -267,7 +267,7 @@ test.describe("personal details", () => {
     }
   });
 
-  test("outside links go only to the GitHub and LinkedIn profiles, the three public repos, the two people About names, the project board and the merged pull requests", () => {
+  test("outside links go only to approved destinations", () => {
     const allowed = [
       "https://github.com/joshdengxd",
       "https://www.linkedin.com/in/josh-deng-edm",
@@ -283,6 +283,14 @@ test.describe("personal details", () => {
       "https://www.youtube.com/watch?v=O_zcc6Xl12g",
       "https://x.com/poteto",
     ];
+    const wrapUpPost = "/blog/how-my-agents-learn-the-way-i-work/";
+    const wrapUpSources = [
+      "https://github.com/joshdengxd/joshdengxd.github.io/issues/4#issuecomment-6886752160",
+      "https://github.com/joshdengxd/joshdengxd.github.io/issues/61#issuecomment-6904551171",
+      "https://github.com/joshdengxd/joshdengxd.github.io/pull/63",
+      "https://github.com/mattpocock/skills/blob/main/skills/engineering/retro/SKILL.md",
+      `${ORIGIN}/blog/how-do-i-trust-my-agents-more/`,
+    ];
     for (const p of pages) {
       for (const href of [...p.html.replace(/<script[\s\S]*?<\/script>/g, "").matchAll(/<a [^>]*href="([^"]+)"/g)].map(
         (m) => decode(m[1]),
@@ -290,7 +298,8 @@ test.describe("personal details", () => {
         if (href.startsWith("/") || href.startsWith("#")) {
           continue;
         }
-        expect(allowed.includes(href), `${p.file} links ${href}`).toBe(true);
+        const approved = allowed.includes(href) || (p.path === wrapUpPost && wrapUpSources.includes(href));
+        expect(approved, `${p.file} links ${href}`).toBe(true);
       }
     }
   });

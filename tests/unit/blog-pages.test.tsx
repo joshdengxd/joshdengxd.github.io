@@ -20,7 +20,7 @@ const post = (over: Partial<Post> = {}): Post => ({
   ...over,
 });
 
-describe("/blog/ with the first post (the deployed state)", () => {
+describe("/blog/ with the published posts", () => {
   it("lists the first post, opens with the weekly line, and is indexable", async () => {
     render(await BlogPage());
     expect(screen.getByRole("heading", { level: 1, name: "Blog" })).toBeInTheDocument();
@@ -39,7 +39,10 @@ describe("/blog/ with the first post (the deployed state)", () => {
   });
 
   it("generates the post page and one page per tag, with no hidden _none page", async () => {
-    expect(await slugParams()).toEqual([{ slug: "how-do-i-trust-my-agents-more" }]);
+    expect(await slugParams()).toEqual([
+      { slug: "how-my-agents-learn-the-way-i-work" },
+      { slug: "how-do-i-trust-my-agents-more" },
+    ]);
     expect((await tagParams()).map((p) => p.tag).sort()).toEqual(["agents", "learning", "verification"]);
   });
 
@@ -47,6 +50,7 @@ describe("/blog/ with the first post (the deployed state)", () => {
     const urls = (await sitemap()).map((e) => e.url).join(" ");
     expect(urls).not.toContain("_none");
     expect(urls).toContain("/blog/how-do-i-trust-my-agents-more");
+    expect(urls).toContain("/blog/how-my-agents-learn-the-way-i-work");
     for (const tag of ["agents", "learning", "verification"]) {
       expect(urls).toContain(`/blog/tags/${tag}`);
     }
