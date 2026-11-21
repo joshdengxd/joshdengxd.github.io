@@ -29,6 +29,7 @@ test.describe("the list", () => {
     await expect(page.getByText("No posts yet.")).toHaveCount(0);
     const titles = page.getByRole("heading", { level: 2 });
     await expect(titles).toHaveText([
+      "How My Agents Learn the Way I Work",
       "Second fixture post, just after midnight UTC",
       TITLE,
       "How do I trust my agents more?",
