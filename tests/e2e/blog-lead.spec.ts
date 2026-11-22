@@ -2,19 +2,26 @@ import { expect, test } from "@playwright/test";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 
-const LEAD = "My learning notes on building software with agents, posted weekly. Newest first.";
+const LEAD =
+  "I think of this blog as a journal. It’s where I write about what’s been on my mind and what I’m learning along the way. If something here helps you, I’m glad I shared it.";
+const DESCRIPTION = "A personal journal of what’s been on my mind and what I’m learning along the way.";
 
 test.describe("blog opening line, JavaScript off", () => {
   test.use({ javaScriptEnabled: false });
 
-  test("shows the weekly line, the description, and no feed link", async ({ page }) => {
+  test("shows the journal introduction, matching metadata, and no feed link", async ({ page }) => {
     await page.goto("/blog/");
-    await expect(page.getByText(LEAD)).toBeVisible();
+    const lead = page.locator("h1 + p");
+    await expect(lead).toBeVisible();
+    await expect(lead).toHaveText(LEAD);
     await expect(page.getByRole("link", { name: /rss|feed/i })).toHaveCount(0);
-    await expect(page.locator('meta[name="description"]')).toHaveAttribute(
-      "content",
-      "My weekly learning notes on building software with agents.",
-    );
+    for (const selector of [
+      'meta[name="description"]',
+      'meta[property="og:description"]',
+      'meta[name="twitter:description"]',
+    ]) {
+      await expect(page.locator(selector)).toHaveAttribute("content", DESCRIPTION);
+    }
   });
 });
 
