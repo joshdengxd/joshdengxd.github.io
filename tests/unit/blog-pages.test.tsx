@@ -21,7 +21,7 @@ const post = (over: Partial<Post> = {}): Post => ({
 });
 
 describe("/blog/ with the published posts", () => {
-  it("lists the first post, opens with the weekly line, and is indexable", async () => {
+  it("lists the first post, opens with the journal introduction, and is indexable", async () => {
     render(await BlogPage());
     expect(screen.getByRole("heading", { level: 1, name: "Blog" })).toBeInTheDocument();
     expect(screen.queryByText("No posts yet.")).toBeNull();
@@ -30,12 +30,16 @@ describe("/blog/ with the published posts", () => {
       expect.stringMatching(/^\/blog\/how-do-i-trust-my-agents-more\/?$/),
     );
     expect(
-      screen.getByText("My learning notes on building software with agents, posted weekly. Newest first."),
+      screen.getByText(
+        "I think of this blog as a journal. It’s where I write about what’s been on my mind and what I’m learning along the way. If something here helps you, I’m glad I shared it.",
+      ),
     ).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /rss|feed/i })).toBeNull();
     expect(blogMeta.robots).toBeUndefined();
     expect(blogMeta.alternates?.types).toBeUndefined();
-    expect(blogMeta.description).toBe("My weekly learning notes on building software with agents.");
+    expect(blogMeta.description).toBe(
+      "A personal journal of what’s been on my mind and what I’m learning along the way.",
+    );
   });
 
   it("generates the post page and one page per tag, with no hidden _none page", async () => {
